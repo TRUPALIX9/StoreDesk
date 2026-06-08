@@ -2,48 +2,64 @@
 
 Local-first vendor pricing and invoice-review system for convenience stores and gas stations.
 
-**StoreDesk is not an inventory system.** It focuses on products, vendor prices, invoice extraction review, and mobile helper workflows.
+**StoreDesk is not an inventory system.** It focuses on products, retail prices, vendor costs, invoice extraction review, and mobile helper workflows.
 
 ## Overview
 
-StoreDesk contains three apps:
+StoreDesk contains three app repos, tracked from this parent repo as Git submodules.
 
 | App | Submodule folder | Role |
 | --- | --- | --- |
-| **StoreDesk** | `store-desk-electron/` | Electron desktop admin |
-| **StoreDesk Server** | `store-desk-server/` | Local Express + MongoDB API |
-| **StoreDesk Buddy** | `store-desk-mobile/` | Flutter mobile companion |
+| StoreDesk | `store-desk-electron/` | Electron desktop admin |
+| StoreDesk Server | `store-desk-server/` | Local Express + MongoDB API |
+| StoreDesk Buddy | `store-desk-mobile/` | Flutter mobile companion |
 
 Everything runs locally. No hosted backend or hosted MongoDB is required.
 
-## Repository model
+## Repository Model
 
-**This repo is the parent repository.** The three app folders are **Git submodules**:
+This repo is the parent repository:
 
-- `store-desk-electron` → https://github.com/TRUPALIX9/store-desk-electron
-- `store-desk-server` → https://github.com/TRUPALIX9/store-desk-server
-- `store-desk-mobile` → https://github.com/TRUPALIX9/store-desk-mobile
+- `store-desk-electron` -> https://github.com/TRUPALIX9/store-desk-electron
+- `store-desk-server` -> https://github.com/TRUPALIX9/store-desk-server
+- `store-desk-mobile` -> https://github.com/TRUPALIX9/store-desk-mobile
 
-Each submodule has its own Git history, remotes, commits, and CI. The parent repo tracks which commit of each submodule belongs to the complete StoreDesk project.
+Each submodule has its own Git history, remote, commits, CI, and release workflow. The parent repo tracks which app commits belong to the complete StoreDesk project.
 
-## Project structure
+## Project Structure
 
 ```txt
-StoreDesk/                         # parent Git repo
-├── store-desk-electron/           # submodule — StoreDesk desktop
-├── store-desk-server/             # submodule — StoreDesk Server
-├── store-desk-mobile/             # submodule — StoreDesk Buddy
-├── docs/
-├── scripts/
-├── AGENTS.md
-├── README.md
-├── .gitmodules
-└── .cursor/
-    └── rules/
-        └── storedesk-master.mdc
+StoreDesk/
+|-- store-desk-electron/     # submodule: desktop/admin app
+|-- store-desk-server/       # submodule: local API/server
+|-- store-desk-mobile/       # submodule: Flutter mobile app
+|-- docs/
+|-- scripts/
+|-- AGENTS.md
+|-- README.md
+|-- .gitmodules
+`-- .cursor/
+    `-- rules/
+        `-- storedesk-master.mdc
 ```
 
-## Clone instructions
+## Current Status
+
+- Parent repo: `TRUPALIX9/StoreDesk` with app submodule pointers.
+- Electron repo: `TRUPALIX9/store-desk-electron` with desktop UI, catalog browsing, invoice review, Husky, CI, and desktop release workflow.
+- Server repo: `TRUPALIX9/store-desk-server` with local API, catalog seed, mobile APIs, APK download route, Husky, and CI.
+- Mobile repo: `TRUPALIX9/store-desk-mobile` with Flutter app, Android project files, Husky, CI, and APK release workflow.
+- Catalog source workbook: `scripts/Hop-in-4630-556C95D1.xlsx`.
+- Normalized catalog JSON: `scripts/hop-in-4630-catalog.normalized.json`.
+- 16,718 POS rows are imported using `UPC + Modifier` as the grouping key.
+- `In Stock` and `Reorder` are intentionally ignored.
+- Default vendors are seeded as 101, Hackney, Gandhi Wholesale, and Sam's Club.
+- Flutter, JDK 17, Android Studio, Android SDK tools, and release APK build are complete on this machine.
+- Physical Android device testing is pending because `adb devices -l` currently shows no attached device.
+
+See `docs/sprint-status.md` for the full sprint status.
+
+## Clone Instructions
 
 First-time clone:
 
@@ -58,26 +74,9 @@ If already cloned without submodules:
 git submodule update --init --recursive
 ```
 
-See `scripts/README.md` for more submodule commands.
+## Working With Submodules
 
-## Update submodules
-
-Pull parent and initialize submodules:
-
-```powershell
-git pull
-git submodule update --init --recursive
-```
-
-Update submodules to latest remote `main`:
-
-```powershell
-git submodule update --remote --merge
-```
-
-## Working inside a submodule
-
-Example — change server code:
+Commit app changes inside the submodule first:
 
 ```powershell
 cd store-desk-server
@@ -85,11 +84,6 @@ git checkout main
 git pull
 npm install
 npm run dev
-```
-
-Commit inside the submodule first:
-
-```powershell
 git add .
 git commit -m "Update server API"
 git push
@@ -104,29 +98,25 @@ git commit -m "Update server submodule pointer"
 git push
 ```
 
-## Local architecture
+## Local Architecture
 
 | Component | Connection |
 | --- | --- |
-| MongoDB | `mongodb://127.0.0.1:27017/storedesk` (local) |
-| StoreDesk Server | `http://localhost:4310` (listens on `0.0.0.0`) |
+| MongoDB | `mongodb://127.0.0.1:27017/storedesk` |
+| StoreDesk Server | `http://localhost:4310` |
 | StoreDesk desktop | `http://localhost:4310` |
-| StoreDesk Buddy | `http://YOUR_COMPUTER_LAN_IP:4310` (same Wi-Fi) |
+| StoreDesk Buddy | `http://YOUR_COMPUTER_LAN_IP:4310` |
 
 Health checks:
 
-- http://localhost:4310/api/health
-- http://localhost:4310/api/mobile/health
+- `http://localhost:4310/api/health`
+- `http://localhost:4310/api/mobile/health`
 
-**Mobile must not use `localhost`** — that refers to the phone itself.
+Mobile must use the computer LAN IP. `localhost` on a phone points back to the phone.
 
-## Running locally
+## Running Locally
 
-### 1. Start MongoDB (optional)
-
-Server falls back to in-memory mode if MongoDB is unavailable.
-
-### 2. Start StoreDesk Server
+Start StoreDesk Server:
 
 ```powershell
 cd store-desk-server
@@ -135,7 +125,7 @@ copy .env.example .env
 npm run dev
 ```
 
-### 3. Start StoreDesk desktop
+Start StoreDesk desktop:
 
 ```powershell
 cd store-desk-electron
@@ -144,7 +134,7 @@ copy .env.example .env
 npm run dev
 ```
 
-### 4. StoreDesk Buddy (requires Flutter)
+Run StoreDesk Buddy:
 
 ```powershell
 cd store-desk-mobile
@@ -153,7 +143,9 @@ npm run setup:flutter
 flutter run
 ```
 
-## Android APK workflow
+## Android APK Workflow
+
+Build the mobile APK:
 
 ```powershell
 cd store-desk-mobile
@@ -161,30 +153,30 @@ flutter build apk --release
 copy build\app\outputs\flutter-apk\app-release.apk ..\store-desk-server\downloads\storedesk-buddy.apk
 ```
 
-APK download route (after copy):
+Download route after the APK is copied:
 
 ```txt
 http://<LAN_IP>:4310/downloads/storedesk-buddy.apk
 ```
 
-Returns **404 JSON** until the APK file exists. See `docs/release.md`.
+The route returns 404 JSON until the APK file exists.
 
-## Git rules
-
-- Commit app changes **inside the correct submodule**.
-- Push submodule commits **before** updating the parent pointer.
-- The parent tracks submodule commits — always commit `git add store-desk-*` in the parent after submodule pushes.
-- Do not edit app source as normal tracked files in the parent repo.
-- Do not delete `.gitmodules` or submodule metadata manually.
-- Do not force push unless explicitly instructed.
-
-## Quality checks
+## Quality Checks
 
 | Repo | Fast | Full CI |
 | --- | --- | --- |
 | Electron | `npm run check` | `npm run ci` |
 | Server | `npm run check` | `npm run ci` |
-| Mobile | `npm run check` | `npm run ci` (Flutter required) |
+| Mobile | `npm run check` | `npm run ci` |
+
+## Git Rules
+
+- Commit app changes inside the correct submodule.
+- Push submodule commits before updating the parent pointer.
+- Commit changed submodule pointers in the parent repo after submodule pushes.
+- Do not edit app source as normal tracked files in the parent repo.
+- Do not delete `.gitmodules` or submodule metadata manually.
+- Do not force push unless explicitly instructed.
 
 ## Troubleshooting
 
@@ -194,19 +186,11 @@ Returns **404 JSON** until the APK file exists. See `docs/release.md`.
 | Detached HEAD in submodule | `git checkout main` inside the submodule |
 | Parent pointer out of date | Push submodule first, then commit parent pointer |
 | Mobile cannot reach server | Use LAN IP, not localhost; same Wi-Fi |
-| APK route 404 | Build APK and copy to `store-desk-server/downloads/` |
-| Flutter checks skipped locally | Install Flutter SDK; GitHub Actions runs full mobile CI |
+| APK route 404 | Build APK and copy it to `store-desk-server/downloads/` |
+| Flutter path has spaces | Use the generated `C:\StoreDeskBuild` junction or run `npm run setup:flutter` |
 
-## Master documentation
+## Master Documentation
 
-- **`AGENTS.md`** — full product spec and agent rules
-- **`.cursor/rules/storedesk-master.mdc`** — always-on Cursor rule
-- **`docs/`** — architecture, API contract, release guide, mobile flow
-
-## Current status
-
-- Parent repo: `TRUPALIX9/StoreDesk` with submodule pointers for the app repos.
-- Electron: `TRUPALIX9/store-desk-electron` pushed with Husky, CI, and desktop release artifacts.
-- Mobile: `TRUPALIX9/store-desk-mobile` pushed with Husky, CI, and Android APK artifacts.
-- Server: `TRUPALIX9/store-desk-server`.
-- Flutter SDK: still required locally before full mobile checks or APK builds can run on this machine.
+- `AGENTS.md` - full product spec and agent rules
+- `.cursor/rules/storedesk-master.mdc` - always-on Cursor rule
+- `docs/` - architecture, API contract, release guide, mobile flow, sprint status

@@ -10,3 +10,4 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+tools/
