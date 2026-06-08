@@ -1,0 +1,62 @@
+---
+description: StoreDesk master project prompt — scope, architecture, branding, and implementation rules
+alwaysApply: true
+---
+
+# StoreDesk Master Prompt
+
+Before planning or changing code, read and follow the full specification in **`AGENTS.md`** at the workspace root (`StoreDesk/AGENTS.md`).
+
+## Parent repository with submodules
+
+This is the **StoreDesk parent repo**. App code lives in Git submodules:
+
+- `store-desk-electron/` — StoreDesk desktop
+- `store-desk-server/` — StoreDesk Server
+- `store-desk-mobile/` — StoreDesk Buddy
+
+Rules:
+
+- **Do not merge submodules** into the parent as normal tracked files.
+- **Do not convert** to npm/pnpm monorepo.
+- **Do not remove** `.gitmodules` or submodule metadata manually.
+- Commit app changes **inside the submodule**, push, then update the parent submodule pointer.
+- Clone with `--recurse-submodules` or run `git submodule update --init --recursive`.
+
+## Product names
+
+- **StoreDesk** — Electron desktop admin app (`store-desk-electron/`)
+- **StoreDesk Server** — Node.js + Express + MongoDB backend (`store-desk-server/`)
+- **StoreDesk Buddy** — Flutter mobile helper app (`store-desk-mobile/`). Never call it "StoreDesk Mobile."
+
+## Non-negotiable scope
+
+**In scope:** products, variants, UPC/barcode lookup, vendors, vendor price comparison, invoice upload/review, suggested selling prices, mobile scanning, mobile invoice upload, future lottery setup placeholder.
+
+**Never build:** stock quantity, inventory counts, add/reduce stock, low stock, reorder levels, warehouse locations, stock movements, inventory adjustment, `Inventory` model, `StockMovement` model, stock APIs.
+
+## Architecture rules
+
+- **Local-first:** backend and MongoDB run locally. No hosted backend or hosted MongoDB unless explicitly asked.
+- StoreDesk Server listens on **port 4310** and **0.0.0.0** for LAN mobile access.
+- Desktop connects to `http://localhost:4310`.
+- Mobile connects to `http://LAN_IP:4310` — never `localhost` on the phone.
+- StoreDesk Buddy connects only to **StoreDesk Server** over Wi-Fi — never directly to MongoDB.
+- Never save raw invoice extraction as final vendor price; always require review before creating `VendorPrice`.
+- Preserve vendor price history; do not silently overwrite old prices.
+- Use centralized theme tokens — do not hardcode random colors in pages.
+- Keep business logic in services, not UI pages.
+
+## Checks after major changes
+
+```txt
+Electron (store-desk-electron): npm run ci
+Server (store-desk-server):       npm run ci
+Mobile (store-desk-mobile):       npm run ci   # requires Flutter locally
+```
+
+If Flutter is not installed, document verification as pending — do not fake success.
+
+## Implementation priority
+
+Follow the sprint order in root `AGENTS.md`. Inspect the repo and existing READMEs before large refactors. Preserve passing checks unless fixing them.
