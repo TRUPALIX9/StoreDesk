@@ -205,7 +205,8 @@ Returns **404 JSON** until the APK file exists. See `docs/release.md`.
 
 ## Current status
 
-- Parent repo: `TRUPALIX9/StoreDesk` with three submodules
-- Electron + mobile: private GitHub repos with CI
-- Server: `TRUPALIX9/store-desk-server` (push after GitHub repo is created)
-- Flutter SDK: required locally for APK builds; optional for parent docs work
+- Parent repo: `TRUPALIX9/StoreDesk` with submodule pointers for the app repos.
+- Electron: `TRUPALIX9/store-desk-electron` pushed with Husky, CI, and desktop release artifacts.
+- Mobile: `TRUPALIX9/store-desk-mobile` pushed with Husky, CI, and Android APK artifacts.
+- Server: `TRUPALIX9/store-desk-server`.
+- Flutter SDK: still required locally before full mobile checks or APK builds can run on this machine.
