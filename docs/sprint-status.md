@@ -58,7 +58,11 @@ Catalog/data:
 - Profit Margin is preserved in notes when present; blank/0 uses the default margin rule.
 - In Stock and Reorder are intentionally ignored and not added to the app model.
 - Default vendors created: 101, Hackney, Gandhi Wholesale, Sam's Club.
-- Vendor costs are intentionally not invented; they will come from invoices.
+- Gandhi/Trident invoice 359 normalized at `scripts/invoices/trident-wholesale-359.normalized.json`.
+- Gandhi invoice 359 creates 15 invoice review rows from real invoice columns.
+- 7 Gandhi invoice lines match the retail catalog and seed current vendor prices.
+- 8 Gandhi invoice lines remain in review for manual catalog matching.
+- Vendor costs are seeded only from invoice data; unknown costs are not invented.
 
 Toolchain/build:
 
@@ -73,8 +77,8 @@ Toolchain/build:
 
 ## Verified
 
-- Server `npm run check`: typecheck plus 19 tests pass.
-- Electron `npm run check`: typecheck plus 8 tests pass.
+- Server `npm run check`: typecheck plus 22 tests pass.
+- Electron `npm run check`: typecheck plus 13 tests pass.
 - Mobile `npm run ci`: Flutter analyze plus 4 tests pass.
 - APK output exists at `store-desk-mobile/build/app/outputs/flutter-apk/app-release.apk`.
 - Download copy exists at `store-desk-server/downloads/storedesk-buddy.apk`.
@@ -83,9 +87,10 @@ Toolchain/build:
 ## Pending
 
 - Connect a physical Android device or create an emulator, then install and test the APK.
-- Add real invoice files for each vendor, starting with 101, Hackney, Gandhi Wholesale, and Sam's Club.
-- Convert vendor invoices into reviewed invoice lines and vendor cost records.
-- Compare vendor costs against the retail catalog and update current best vendor pricing.
+- Match the 8 unmatched Gandhi invoice rows to catalog items or create new catalog entries after review.
+- Add real invoice files for 101, Hackney, Sam's Club, and any other suppliers.
+- Convert future vendor invoices into reviewed invoice lines and vendor cost records.
+- Compare future vendor costs against the retail catalog and update current best vendor pricing.
 - Add production signing/app icon before public distribution.
 - Optional: connect MongoDB for durable production data instead of the in-memory development store.
 
