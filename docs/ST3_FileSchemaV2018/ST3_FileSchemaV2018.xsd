@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">Form ST-3</xsd:documentation>
+		<!--Released 04/01/2018 - Removed Schedule C and Atlanta Fields-->
+	</xsd:annotation>
+	<xsd:element name="ST3ReturnFile">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Returns" type="ReturnST3"/>
+				<xsd:element name="SoftwareVendor" type="xsd:string"/>
+				<!--SWVendor-->
+				<xsd:element name="SoftwareProduct" type="xsd:string"/>
+				<!--SWProduct-->
+				<xsd:element name="SoftwareErrorMessage" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ReturnST3">
+		<xsd:sequence>
+			<xsd:element name="Return" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="STN" type="xsd:string"/>
+						<!--Sale & Use #-->
+						<xsd:element name="FilingPeriod" type="xsd:date"/>
+						<!--Period Ending-->
+						<xsd:element name="Amended" type="xsd:boolean"/>
+						<!--Ammended Return-->
+						<xsd:element name="Master" type="xsd:boolean"/>
+						<!--Master Return-->
+						<xsd:element name="NoSales" type="xsd:boolean"/>
+						<!--No Sales/Use Activity-->
+						<xsd:element name="Name" type="xsd:string"/>
+						<!--Name-->
+						<xsd:element name="Address1" type="xsd:string"/>
+						<!--Address Line 1-->
+						<xsd:element name="Address2" type="xsd:string"/>
+						<!--Address Line 2-->
+						<xsd:element name="TotalSales" type="xsd:decimal"/>
+						<!--Part A Line 1-->
+						<xsd:element name="ExemptSales" type="xsd:decimal"/>
+						<!--Part A Line 2-->
+						<xsd:element name="TaxableSales" type="xsd:decimal"/>
+						<!--Part A Line 3-->
+						<xsd:element name="TotalSalesTax" type="xsd:decimal"/>
+						<!--Part A Line 4-->
+						<xsd:element name="TotalUseTax" type="xsd:decimal"/>
+						<!--Part A Line 5-->
+						<!--Part A Line 6-->
+						<xsd:element name="Pre-PaidLocalSUMF" type="xsd:decimal"/>
+						<!--Part A Line 7-->
+						<xsd:element name="TotalTaxCollected" type="xsd:decimal"/>
+						<!--Part A Line 8-->
+						<xsd:element name="TotalSalesAndUseTax" type="xsd:decimal"/>
+						<!--Part A Line 9-->
+						<xsd:element name="ExcessTax" type="xsd:decimal"/>
+						<!--Part A Line 10-->
+						<xsd:element name="TotalVendorsComp" type="xsd:decimal"/>
+						<!--Part A Line 11-->
+						<xsd:element name="PreviousPrePaid" type="xsd:decimal"/>
+						<!--Part A Line 12-->
+						<xsd:element name="CurrentPrePaid" type="xsd:decimal"/>
+						<!--Part A Line 13-->
+						<xsd:element name="TotalRemittanceDue" type="xsd:decimal"/>
+						<!--Part A Line 14-->
+						<xsd:element name="StateTaxableSales" type="xsd:decimal"/>
+						<!--Part B Line 1-->
+						<xsd:element name="StateTaxableJetFuelSales" type="xsd:decimal"/>
+						<!--Part B Line 1b (This line is only available for electronic filers)-->
+						<xsd:element name="StateTaxableEnergySales" type="xsd:decimal"/>
+						<!--Part B Line 2-->
+						<!--Part B Line 3-->
+						<!--Part B Line 4-->
+						<!--Part B Line 5-->
+						<xsd:element name="VCNonMFFirst3000TAX" type="xsd:decimal"/>
+						<!--Part D Line 1-->
+						<xsd:element name="VCNonMFAfter3000TAX" type="xsd:decimal"/>
+						<!--Part D Line 2-->
+						<xsd:element name="VCOnroadMFTAX" type="xsd:decimal"/>
+						<!--Part D Line 3-->
+						<xsd:element name="VCOffroadMFTAX" type="xsd:decimal"/>
+						<!--Part D Line 4-->
+						<xsd:element name="VCNonMFFirst3000" type="xsd:decimal"/>
+						<!--Part D Line 1a-->
+						<xsd:element name="VCNonMFAfter3000" type="xsd:decimal"/>
+						<!--Part D Line 2a-->
+						<xsd:element name="VCOnroadMF" type="xsd:decimal"/>
+						<!--Part D Line 3a-->
+						<xsd:element name="VCOffroadMF" type="xsd:decimal"/>
+						<!--Part D Line 4a-->
+						<xsd:element name="BadDebtCredit" type="xsd:decimal" minOccurs="0"/>
+						<!--Part E Line 1 (Bad Debt Credits - HB 168) -->
+						<xsd:element name="BadDebtCollected" type="xsd:decimal" minOccurs="0"/>
+						<!--Part E Line 2 (Bad Debt Collected - HB 168) -->
+						<xsd:element name="SalesDistributions" type="SalesDistribution" minOccurs="0"/>
+						<xsd:element name="MasterSalesDistributions" type="MasterSalesDistribution" minOccurs="0"/>
+						<xsd:element name="UseTaxDistributions" type="UseTaxDistribution" minOccurs="0"/>
+						<xsd:element name="MFTables" type="MFTable" minOccurs="0"/>
+						<xsd:element name="MFOffRoadTables" type="MFOffRoadTable" minOccurs="0"/>
+						<xsd:element name="NotificationEmail" type="xsd:string"/>
+						<!--Email-->
+						<xsd:element name="RoutingNumber" type="xsd:string"/>
+						<!--Routing Number For Return Payment-->
+						<xsd:element name="AccountNumber" type="xsd:string"/>
+						<!--Account Number For Return Payment-->
+						<xsd:element name="AccountType">
+							<!--Account Type For Return Payment-->
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:enumeration value="C"/>
+									<xsd:enumeration value="S"/>
+									<!--Checking-->
+									<!--Savings-->
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="PaymentAmount" type="xsd:decimal"/>
+						<!--Payment Amount For Return Payment-->
+						<xsd:element name="PaymentDate" type="xsd:date"/>
+						<!--Payment Date For Return Payment-->
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SalesDistribution">
+		<xsd:sequence>
+			<xsd:element name="SalesDistribution" minOccurs="0" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="SalesJurisdictionCode" type="xsd:string"/>
+						<xsd:element name="SalesTaxableSales" type="xsd:decimal"/>
+						<xsd:element name="SalesRateEndDate" type="xsd:date"/>
+						<xsd:element name="SalesTaxAmount" type="xsd:decimal"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<!--ST-3 Part B Sales Tax Distribution Table-->
+	</xsd:complexType>
+	<xsd:complexType name="MasterSalesDistribution">
+		<xsd:sequence>
+			<xsd:element name="MasterSalesDistribution" minOccurs="0" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="MasterSalesLocationSTN" type="xsd:string"/>
+						<!--Location STN for Master Accounts-->
+						<xsd:element name="MasterSalesJurisdictionCode" type="xsd:string"/>
+						<xsd:element name="MasterSalesTaxableSales" type="xsd:decimal"/>
+						<xsd:element name="MasterSalesTaxCollected" type="xsd:decimal"/>
+						<xsd:element name="MasterSalesRateEndDate" type="xsd:date"/>
+						<xsd:element name="MasterSalesTaxAmount" type="xsd:decimal"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<!--ST-3 Part B Master Sales Tax Distribution Table-->
+	</xsd:complexType>
+	<xsd:complexType name="UseTaxDistribution">
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="UseTaxDistribution">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="UseJurisdictionCode" type="xsd:string"/>
+						<xsd:element name="UseTaxReasonCode" type="xsd:string"/>
+						<xsd:element name="UseRateEndDate" type="xsd:date"/>
+						<xsd:element name="UseTaxAmount" type="xsd:decimal"/>
+						<xsd:element name="UseLocationSTN" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<!--ST-3 Part B Use Tax Distribution Table-->
+	</xsd:complexType>
+	<xsd:complexType name="MFTable">
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="MFTable">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="MFJurisdictionCode" type="xsd:string"/>
+						<xsd:element name="MFFuelType" type="xsd:string"/>
+						<xsd:element name="MFRateEndDate" type="xsd:date"/>
+						<xsd:element name="MFTotalGallons" type="xsd:decimal"/>
+						<!--Online Only - No corresponding field on the paper return-->
+						<xsd:element name="MFExemptGallons" type="xsd:decimal"/>
+						<!--Online Only - No corresponding field on the paper return-->
+						<xsd:element name="MFTaxableGallons" type="xsd:decimal"/>
+						<xsd:element name="MFTaxableSales" type="xsd:decimal"/>
+						<xsd:element name="MFTaxAmount" type="xsd:decimal"/>
+						<xsd:element name="MFLocationSTN" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<!--ST-3 MF Addendum-->
+	</xsd:complexType>
+	<xsd:complexType name="MFOffRoadTable">
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="MFOffRoadTable">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="OffRoadJurisdictionCode" type="xsd:string"/>
+						<xsd:element name="OffRoadTaxableSales" type="xsd:decimal"/>
+						<xsd:element name="OffRoadTaxAmount" type="xsd:decimal"/>
+						<xsd:element name="OffRoadRateEndDate" type="xsd:date"/>
+						<xsd:element name="OffRoadLocationSTN" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<!--Off-Road Fuel Worksheet-->
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,15 @@
+---
+description: Use MUI MCP for Material UI / MUI component and docs questions
+globs: store-desk-electron/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# MUI MCP
+
+When answering Material UI / MUI questions or implementing MUI UI in StoreDesk Electron:
+
+1. Call the `useMuiDocs` tool from the `mui-mcp` server for the relevant package.
+2. Call `fetchDocs` for any extra docs using only URLs returned by that content.
+3. Repeat until you have enough official docs, then answer or implement from that.
+
+Prefer official MUI APIs and patterns over invented props or components.
