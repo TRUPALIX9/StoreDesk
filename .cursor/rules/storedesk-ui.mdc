@@ -1,0 +1,18 @@
+---
+description: StoreDesk Electron UI consistency — PageShell, no redundant subtitles
+globs: store-desk-electron/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# StoreDesk UI
+
+When editing Electron UI:
+
+1. Read `.cursor/skills/react-dev/SKILL.md` for typed React/TypeScript patterns.
+2. Read `.cursor/skills/mui/SKILL.md` for Material UI / sx / theme patterns.
+3. Read and follow `.cursor/skills/storedesk-ui/SKILL.md` for StoreDesk layout.
+4. For design critique, use `.cursor/agents/ui-ux-designer.md`.
+5. Compose pages with `PageShell`, `PageHeader`, `SectionCard`, `FilterBar`, `DataTableCard`, `FormGrid`.
+6. Do **not** add explanatory subtitles under titles. Use labels, helperText, tooltips, or Alerts.
+7. Use MUI `Stack`/`Box` flex/grid and theme tokens — no hardcoded colors in pages.
+8. For MUI API questions, use the MUI MCP (`useMuiDocs` → `fetchDocs`).

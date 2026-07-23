@@ -1,0 +1,14 @@
+---
+description: StoreDesk agent team — Cursor + Codex only; work orders and handoffs
+alwaysApply: true
+---
+
+# Agent team
+
+- Org chart and ops: `.cursor/TEAM.md`
+- Skills: `agent-team`, `work-order`, `handoff` under `.cursor/skills/`
+- Specialist agents: `.cursor/agents/*.md`
+- Folder maps: nearest `AGENTS.md` (docs, scripts, tools, each submodule)
+- Codex: `.codex/skills/` pointers — **no `.claude/`**
+
+For multi-step or multi-repo work: create/update a Work Order in `docs/work-orders/` and use handoffs when switching roles.

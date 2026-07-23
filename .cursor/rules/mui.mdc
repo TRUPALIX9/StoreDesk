@@ -1,0 +1,19 @@
+---
+description: Apply vendored MUI skill + MCP for Material UI work in StoreDesk Electron
+globs: store-desk-electron/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# MUI
+
+When editing StoreDesk Electron UI that uses Material UI:
+
+1. Read `.cursor/skills/react-dev/SKILL.md` for typed React/TS patterns when building/editing components.
+2. Read `.cursor/skills/mui/SKILL.md` for sx/theme/component patterns.
+3. For deep styling or component examples, open the matching file under `.cursor/skills/mui/resources/`.
+4. Apply `.cursor/skills/storedesk-ui/SKILL.md` for StoreDesk page structure (PageShell, no subtitles, flat outlined surfaces).
+5. For official API docs, use MUI MCP: `useMuiDocs` then `fetchDocs`.
+6. Use theme tokens (`primary.main`, `text.secondary`, spacing scale) — no hardcoded hex in pages.
+7. Prefer `Stack` / `Box` + shared `components/ui` primitives over one-off layout.
+8. Prefer navy/green brand tones only — no glow KPIs or rainbow accent kits.
+9. Large UI redesigns: `review-gate` via eng-manager + `ui-ux-designer` before ship.

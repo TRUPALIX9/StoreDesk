@@ -1,0 +1,99 @@
+{
+  "mui": {
+    "type": "domain",
+    "enforcement": "suggest",
+    "priority": "high",
+    "skillPath": ".cursor/skills/mui/SKILL.md",
+    "companionSkills": [
+      ".cursor/skills/react-dev/SKILL.md",
+      ".cursor/skills/storedesk-ui/SKILL.md",
+      ".cursor/agents/ui-ux-designer.md"
+    ],
+    "promptTriggers": {
+      "keywords": [
+        "mui",
+        "material-ui",
+        "material ui",
+        "@mui/material",
+        "@mui/icons-material",
+        "@mui/system",
+        "sx prop",
+        "mui theme",
+        "ThemeProvider",
+        "createTheme",
+        "useTheme",
+        "styled",
+        "Box",
+        "Typography",
+        "Button",
+        "TextField",
+        "Card",
+        "Dialog",
+        "Drawer",
+        "AppBar",
+        "Grid",
+        "Stack",
+        "Paper",
+        "Container",
+        "IconButton",
+        "Chip",
+        "Avatar",
+        "Alert",
+        "Snackbar",
+        "Menu",
+        "MenuItem",
+        "Select",
+        "Checkbox",
+        "Radio",
+        "Switch",
+        "Tabs",
+        "Autocomplete",
+        "PageShell",
+        "SectionCard",
+        "StoreDesk"
+      ],
+      "intentPatterns": [
+        "style.*with.*mui",
+        "use.*mui.*component",
+        "create.*mui.*theme",
+        "customize.*mui",
+        "add.*material.*ui.*component",
+        "implement.*mui.*dialog",
+        "create.*mui.*form",
+        "setup.*mui.*theme",
+        "use.*mui.*icon",
+        "add.*mui.*(button|card|dialog|form|menu)",
+        "storedesk.*(ui|page|theme|layout)"
+      ]
+    },
+    "fileTriggers": {
+      "pathPatterns": [
+        "store-desk-electron/src/**/*.tsx",
+        "store-desk-electron/src/**/*.ts",
+        "store-desk-electron/src/theme/**/*.ts",
+        "**/*.styles.ts",
+        "**/*.styles.tsx",
+        "**/components/**/*.tsx",
+        "**/components/**/*.ts",
+        "**/theme.ts",
+        "**/theme.tsx",
+        "**/theme/**/*.ts"
+      ],
+      "contentPatterns": [
+        "import.*@mui/material",
+        "import.*@mui/icons-material",
+        "import.*@mui/system",
+        "from '@mui/material'",
+        "sx=\\{",
+        "<Box",
+        "<Typography",
+        "createTheme\\(",
+        "ThemeProvider",
+        "useTheme\\(\\)",
+        "styled\\(",
+        "PageShell",
+        "SectionCard"
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<title>System Journal Browser</title>
+<link id="layoutRef" href="./css/default_old.css" type="text/css" rel="stylesheet"/>
+<script language="javascript" src="./javascript/Native/tviewerSession.js"></script>
+<script language="javascript" src="./javascript/Native/searchObj.js"></script>
+<script language="javascript" src="./javascript/Native/Utilities.js"></script>
+<script language="javascript" src="./javascript/Native/credential.js"></script>
+<script language="javascript" src="./javascript/Native/Response.js"></script>
+<script language="javascript" src="./javascript/Common/lib.js"></script>
+<script language="javascript" src="./javascript/Native/printObject.js"></script>
+<script language="javascript">
+var session = new TviewerSession();
+var search = new searchObject();
+function init(){
+	if (location.protocol != 'https:'){
+		var base = "https://" + location.hostname + location.pathname;
+		window.location = base;
+		return false;
+	}else{
+		document.signIn.user.value = "";
+		document.signIn.passwd.value = "";
+		document.signIn.user.focus();
+		session.globals.setGlobalCursor("auto","");
+		return true;	
+	}
+}
+
+function whichkey(){
+	switch(event.keyCode) {
+		case 13:
+			if (document.activeElement.nodeName != "BUTTON" && document.activeElement.name != "user" && document.activeElement.name != "passwd") {
+				event.returnValue = false;
+			}
+			break;
+		default:
+			//Do nothing
+	}
+}
+
+</script>
+
+</head>
+	<body onload="init()" onunload="release()" onkeydown="javascript:whichkey();">
+		<div id="title" >
+			<table border="2" width="100%" height="61" bordercolor="#FFFFFF" cellspacing="0">       		 
+				<tr> 		   
+					<td width="187" height="37">            
+						<p align="center"> 			
+							<img border="0" src="../images/logo-verifone.gif" width="140" height="35" align="baseline">             
+						</p> 		    
+					</td> 	     		    
+					<td height="57" bgcolor="#0071BD" bordercolor="#0071BD" style="text-align: Left" valign="middle" align="left" rowspan="2" width="808">                    
+						<font face="Arial" size="5" color="#FFFFFF">System Journal Browser</font>                    
+					</td>    	          
+					<td height="57" style="padding-left:10px" bordercolor="#0071BD" valign="middle" align="center" rowspan="2" width="112">                    
+						<img border="0" src="../images/Product_Logo.jpg" align="absmiddle" width="150" height="47.25">                    
+					</td>    	          
+				</tr>       	 
+				<tr> 		   
+					<td width="187" height="16">            
+						<p align="center">
+							<a target ="_blank" href="../AppInfo.htm"><font face="Arial Narrow" size="2"><u>About</u></font></a>
+						</p>
+					</td> 	     		    
+				</tr>       	 
+			</table> 	    
+			<table width="100%" height="0" cellspacing="0" cellpadding="0">
+				<tr >	
+					<td  width="100%" bgcolor="#0071BD" height="3"></td> 	 
+				</tr>  	
+			</table> 
+		</div>
+		<div id="nav" style="position:absolute; top:120px; left:200px; width:4px; height:500px; background-color:#0071BD">
+		</div>
+		<div id="content" style="position:absolute; top:120px; left:250px">
+			<form  name="signIn" AUTOCOMPLETE="off">
+				<table border="0" width="450" height="58">
+					<tr>
+						<td height="21" bgcolor="#ADFFFF"  colspan="2">
+							<p align="center"><font color="#0071BD" face="Arial" size="4">Petroleum/C-Store Control Center</font></p>
+						</td>
+					</tr>
+					<tr>
+						<td height="21" bgcolor="#0071BD" bordercolor="#000000" bordercolorlight="#0000FF" bordercolordark="#000080" colspan="2">
+							<p align="center"><font color="#FFFFFF">Please Log In</font></p>
+							<p align="center"><b><font color="#FFFFFF">User Name:&nbsp;&nbsp; </font></b>
+								<input type="text" onkeypress="name_onkeyPress(window.event.keyCode)" name="user" size="20">
+							</p>
+							<p align="center"><b><font color="#FFFFFF">Password:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></b>
+								<input type="password" name="passwd" onkeypress="passwd_onkeyPress(window.event.keyCode)" size="20">
+							</p>
+							<p align="center"><button type="button" name="butt1" onclick="login()">Log In</button></p>
+						</td>
+					</tr>
+					<tr>
+						<td  height="21" bgcolor="#ADFFFF" colspan="2">
+							<p align="center" style="word-spacing: 0; margin: 0"><font size="2"><b>Unauthorized use of this site is prohibited.</b></font></p>
+							<p align="center" style="word-spacing: 0; margin: 0">&nbsp;</p>
+							<p align="center" style="word-spacing: 0; margin: 0">&nbsp;</p> 
+							<p align="center" style="word-spacing: 0; margin: 0">&nbsp;</p>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<p align="center" style="word-spacing: 0; margin: 0"><font size="1"></font></p>
+						</td>
+						<td  height="1">
+							<p align="right" style="word-spacing: 0; margin: 0">
+							<font size="1">Use of this site indicates you accept the <a href="../legal/lic-commander.htm">Terms of Use</a>.</font></p>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</body>
+</html>

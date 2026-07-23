@@ -1728,6 +1728,17 @@ Complete when:
 
 # Cursor Implementation Instructions
 
+## Agent team (Cursor + Codex)
+
+Runtime is **Cursor** (`.cursor/`) and **Codex** (`.codex/` + folder `AGENTS.md`). Do **not** use Claude Code or `.claude/`.
+
+- **Full guide:** `docs/agent-team-guide.md` (flows, rules, skills, WO/handoff)
+- Org chart / management styles: `.cursor/TEAM.md`
+- Agents: `.cursor/agents/` (`eng-manager`, `tech-lead`, `frontend-electron`, `backend-server`, `mobile-buddy`, `ui-ux-designer`, `qa-verifier`, `docs-scribe`)
+- Skills: `.cursor/skills/` (`agent-team`, `work-order`, `handoff`, `mui`, `react-dev`, `storedesk-ui`)
+- Work orders: `docs/work-orders/`
+- Folder maps: nearest `AGENTS.md` under `docs/`, `scripts/`, `tools/`, and each submodule
+
 Work carefully in small steps.
 
 Before making changes:

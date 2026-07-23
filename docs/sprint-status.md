@@ -49,19 +49,10 @@ Server/backend:
 
 Catalog/data:
 
-- Source workbook: `scripts/Hop-in-4630-556C95D1.xlsx`.
-- Normalized JSON: `scripts/hop-in-4630-catalog.normalized.json`.
-- 16,718 rows imported from the POS sheet.
-- UPC + Modifier is treated as the unique grouping key.
-- Description is preserved and parsed for size/unit when possible.
-- Price is treated as the current retail/shelf price.
-- Profit Margin is preserved in notes when present; blank/0 uses the default margin rule.
-- In Stock and Reorder are intentionally ignored and not added to the app model.
-- Default vendors created: 101, Hackney, Gandhi Wholesale, Sam's Club.
+- Excel POS catalog seed (`Hop-in-4630-*.xlsx` / `hop-in-4630-catalog.normalized.json`) **removed**.
+- Price Book source of truth: live Verifone Commander `vPLUs` (open/Refresh); local vendor overlays. See `docs/verifone-commander-price-book.md`.
 - Gandhi/Trident invoice 359 normalized at `scripts/invoices/trident-wholesale-359.normalized.json`.
-- Gandhi invoice 359 creates 15 invoice review rows from real invoice columns.
-- 7 Gandhi invoice lines match the retail catalog and seed current vendor prices.
-- 8 Gandhi invoice lines remain in review for manual catalog matching.
+- Demo product/variant seed remains for invoice review flows (small, not the 16k sheet).
 - Vendor costs are seeded only from invoice data; unknown costs are not invented.
 
 Toolchain/build:
@@ -87,10 +78,10 @@ Toolchain/build:
 ## Pending
 
 - Connect a physical Android device or create an emulator, then install and test the APK.
-- Match the 8 unmatched Gandhi invoice rows to catalog items or create new catalog entries after review.
+- Match unmatched Gandhi invoice rows to products/variants or create new entries after review.
 - Add real invoice files for 101, Hackney, Sam's Club, and any other suppliers.
 - Convert future vendor invoices into reviewed invoice lines and vendor cost records.
-- Compare future vendor costs against the retail catalog and update current best vendor pricing.
+- Live smoke Price Book / Cost Analysis against store Commander PLU count (`dev:embedded` + `COMMANDER_*`).
 - Add production signing/app icon before public distribution.
 - Optional: connect MongoDB for durable production data instead of the in-memory development store.
 

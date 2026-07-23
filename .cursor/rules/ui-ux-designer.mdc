@@ -1,0 +1,13 @@
+---
+description: Delegate design critique to ui-ux-designer agent for StoreDesk UI reviews
+globs: store-desk-electron/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# UI/UX Designer Agent
+
+When the user asks for UI/UX review, design critique, visual direction, aesthetic feedback, or to “make it look better” without a pure implementation brief:
+
+1. Use the project subagent **`ui-ux-designer`** (`.cursor/agents/ui-ux-designer.md`), originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/agents/ui-ux-designer.md).
+2. Keep StoreDesk constraints in that agent (navy/green theme, PageShell density, no inventory UX).
+3. After critique, implement only if the user asks — apply fixes via **`mui`** + **`storedesk-ui`** skills and MUI MCP.

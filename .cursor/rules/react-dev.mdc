@@ -1,0 +1,15 @@
+---
+description: Apply vendored react-dev skill for typed React/TSX in StoreDesk Electron
+globs: store-desk-electron/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# React Dev
+
+When editing StoreDesk Electron React/TypeScript:
+
+1. Read `.cursor/skills/react-dev/SKILL.md` for typed props, events, hooks, and components.
+2. For deep dives, open files under `.cursor/skills/react-dev/references/` or `examples/` (prefer `react-router.md` over TanStack Router).
+3. Skip Server Components / Server Actions patterns unless the user is explicitly building an RSC app — Electron is client-side.
+4. For UI layout/styling also apply `.cursor/skills/mui/` and `.cursor/skills/storedesk-ui/`.
+5. Prefer specific event types (`ChangeEvent<HTMLInputElement>`, etc.) and avoid `any` on handlers.

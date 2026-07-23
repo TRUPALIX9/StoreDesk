@@ -7,6 +7,8 @@ alwaysApply: true
 
 Before planning or changing code, read and follow the full specification in **`AGENTS.md`** at the workspace root (`StoreDesk/AGENTS.md`).
 
+For multi-agent delivery (work orders, handoffs, role routing), also read **`.cursor/TEAM.md`**. Use Cursor + Codex only — no `.claude/`.
+
 ## Parent repository with submodules
 
 This is the **StoreDesk parent repo**. App code lives in Git submodules:

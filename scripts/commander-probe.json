@@ -1,0 +1,116 @@
+[
+  {
+    "url": "https://192.168.31.11/",
+    "status": 200,
+    "contentType": "text/html",
+    "setCookie": null,
+    "len": 299,
+    "actions": [],
+    "hrefs": [],
+    "scripts": [],
+    "loginish": [],
+    "snippet": "<html>\n<head>\n<meta name=\"ROBOTS\" content=\"NOINDEX, NOFOLLOW\">\n<title>System</title>\n<script language=\"javascript\">\nfunction init(){\n\tvar base = location.protocol +\"//\" + location.hostname +\"\\/JournalBrowser\";\n\twindow.location = base;\n}\n\n</script>\n\n</head>\n\t<body onload=\"init()\">\n\t</body>\n</html>\n\n"
+  },
+  {
+    "url": "https://192.168.31.11/ConfigClient.html",
+    "status": 200,
+    "contentType": "text/html",
+    "setCookie": null,
+    "len": 3418,
+    "actions": [],
+    "hrefs": [
+      "images/favicon.ico",
+      "ConfigClient.css"
+    ],
+    "scripts": [
+      "javascript:",
+      "images/loader.gif",
+      "ConfigClient/sc/modules/ISC_Core.js",
+      "ConfigClient/sc/modules/ISC_DataBinding.js",
+      "ConfigClient/ConfigClient.nocache.js"
+    ],
+    "loginish": [
+      "ConfigClient.css",
+      "ConfigClient/sc/",
+      "ConfigClient/sc/modules/ISC_Core.js",
+      "ConfigClient/sc/modules/ISC_DataBinding.js",
+      "ConfigClient/ConfigClient.nocache.js"
+    ],
+    "snippet": "<!doctype html>\n\n<html>\n<head>\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=10\"> \n<!--Will set the Internet Explorer compatibility mode automatically-->\n<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n<link rel=\"shortcut icon\" href=\"images/favicon.ico\"/>\n<link type=\"text/css\" rel=\"stylesheet\" href=\"ConfigClient.css\" id=\"themeCssElement\"/>\n<title>Petroleum C-Store Control Center</title>\n\n <!--CSS for  loading message at application Startup-->\n    <style type=\"text/css\">\n        body\n        #loading {\n            border: 1px solid #ccc;\n            position: absolute;\n            left: 45%;\n            top: 40%;\n            padding: 2px;\n            z-index: 20001;\n            height: auto;\n        }\n\n        #loading a {\n            color: #225588;\n        }\n\n        #loading .loadingIndicator {\n            background: white;\n            font: bold 13px tahoma, arial, helvetica;\n            padding: 10px;\n            margin: 0;\n            height: auto;\n            color: #444;\n        }\n\n        #loadingMsg {\n            font: normal 10px arial, tahoma, sans-serif;\n        }\n    </style>\n\n</head>\n<body ondragstart=\"return false\" draggable=\"false\"\n      ondragenter=\"event.dataTransfer.dropEffect='none'; event.stopPropagation(); event.preventDefault();\"  \n      ondragover=\"event.dataTransfer.dropEffect='none';event.stopPropagation(); event.preventDefault();\"  \n      ondrop=\"event.dataTransfer.dropEffect='none';event.stopPropagation(); event.preventDefault();\">\n\t<!-- OPTIONAL: include this if you want history support-->\n\t<iframe src=\"javascript:''\" id=\"__gwt_historyFrame\" tabIndex='-1'\n\t\tstyle=\"position: absolute; width: 0; height: 0; border: 0\"></iframe>\n\t<iframe src=\"javascript:''\"  id=\"__printingFrame\" tabIndex='-1' \n              style=\"position: absolute; width:0;height:0;border:0\"></iframe>\n\t<noscript>\n\t\t<div\n\t\t\tstyle=\"width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red;"
+  },
+  {
+    "url": "https://192.168.31.11/configclient.html",
+    "status": 404,
+    "contentType": "text/html; charset=utf-8",
+    "setCookie": null,
+    "len": 985,
+    "actions": [],
+    "hrefs": [
+      "mailto:%5bno%20address%20given%5d",
+      "/"
+    ],
+    "scripts": [],
+    "loginish": [],
+    "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n<head>\n<title>Object not found!</title>\n<link rev=\"made\" href=\"mailto:%5bno%20address%20given%5d\" />\n<style type=\"text/css\"><!--/*--><![CDATA[/*><!--*/ \n    body { color: #000000; background-color: #FFFFFF; }\n    a:link { color: #0000CC; }\n    p, address {margin-left: 3em;}\n    span {font-size: smaller;}\n/*]]>*/--></style>\n</head>\n\n<body>\n<h1>Object not found!</h1>\n<p>\n\n\n    The requested URL was not found on this server.\n\n  \n\n    If you entered the URL manually please check your\n    spelling and try again.\n\n  \n\n</p>\n<p>\nIf you think this is a server error, please contact\nthe <a href=\"mailto:%5bno%20address%20given%5d\">webmaster</a>.\n\n</p>\n\n<h2>Error 404</h2>\n<address>\n  <a href=\"/\">192.168.31.11</a><br />\n  <span>Apache</span>\n</address>\n</body>\n</html>\n\n"
+  },
+  {
+    "url": "https://192.168.31.11/ConfigClient/",
+    "status": 404,
+    "contentType": "text/html; charset=utf-8",
+    "setCookie": null,
+    "len": 985,
+    "actions": [],
+    "hrefs": [
+      "mailto:%5bno%20address%20given%5d",
+      "/"
+    ],
+    "scripts": [],
+    "loginish": [],
+    "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n<head>\n<title>Object not found!</title>\n<link rev=\"made\" href=\"mailto:%5bno%20address%20given%5d\" />\n<style type=\"text/css\"><!--/*--><![CDATA[/*><!--*/ \n    body { color: #000000; background-color: #FFFFFF; }\n    a:link { color: #0000CC; }\n    p, address {margin-left: 3em;}\n    span {font-size: smaller;}\n/*]]>*/--></style>\n</head>\n\n<body>\n<h1>Object not found!</h1>\n<p>\n\n\n    The requested URL was not found on this server.\n\n  \n\n    If you entered the URL manually please check your\n    spelling and try again.\n\n  \n\n</p>\n<p>\nIf you think this is a server error, please contact\nthe <a href=\"mailto:%5bno%20address%20given%5d\">webmaster</a>.\n\n</p>\n\n<h2>Error 404</h2>\n<address>\n  <a href=\"/\">192.168.31.11</a><br />\n  <span>Apache</span>\n</address>\n</body>\n</html>\n\n"
+  },
+  {
+    "url": "https://192.168.31.11/ReportNavigator.html",
+    "status": 404,
+    "contentType": "text/html; charset=utf-8",
+    "setCookie": null,
+    "len": 985,
+    "actions": [],
+    "hrefs": [
+      "mailto:%5bno%20address%20given%5d",
+      "/"
+    ],
+    "scripts": [],
+    "loginish": [],
+    "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n<head>\n<title>Object not found!</title>\n<link rev=\"made\" href=\"mailto:%5bno%20address%20given%5d\" />\n<style type=\"text/css\"><!--/*--><![CDATA[/*><!--*/ \n    body { color: #000000; background-color: #FFFFFF; }\n    a:link { color: #0000CC; }\n    p, address {margin-left: 3em;}\n    span {font-size: smaller;}\n/*]]>*/--></style>\n</head>\n\n<body>\n<h1>Object not found!</h1>\n<p>\n\n\n    The requested URL was not found on this server.\n\n  \n\n    If you entered the URL manually please check your\n    spelling and try again.\n\n  \n\n</p>\n<p>\nIf you think this is a server error, please contact\nthe <a href=\"mailto:%5bno%20address%20given%5d\">webmaster</a>.\n\n</p>\n\n<h2>Error 404</h2>\n<address>\n  <a href=\"/\">192.168.31.11</a><br />\n  <span>Apache</span>\n</address>\n</body>\n</html>\n\n"
+  },
+  {
+    "url": "https://192.168.31.11/TransactionManager.html",
+    "status": 404,
+    "contentType": "text/html; charset=utf-8",
+    "setCookie": null,
+    "len": 985,
+    "actions": [],
+    "hrefs": [
+      "mailto:%5bno%20address%20given%5d",
+      "/"
+    ],
+    "scripts": [],
+    "loginish": [],
+    "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n<head>\n<title>Object not found!</title>\n<link rev=\"made\" href=\"mailto:%5bno%20address%20given%5d\" />\n<style type=\"text/css\"><!--/*--><![CDATA[/*><!--*/ \n    body { color: #000000; background-color: #FFFFFF; }\n    a:link { color: #0000CC; }\n    p, address {margin-left: 3em;}\n    span {font-size: smaller;}\n/*]]>*/--></style>\n</head>\n\n<body>\n<h1>Object not found!</h1>\n<p>\n\n\n    The requested URL was not found on this server.\n\n  \n\n    If you entered the URL manually please check your\n    spelling and try again.\n\n  \n\n</p>\n<p>\nIf you think this is a server error, please contact\nthe <a href=\"mailto:%5bno%20address%20given%5d\">webmaster</a>.\n\n</p>\n\n<h2>Error 404</h2>\n<address>\n  <a href=\"/\">192.168.31.11</a><br />\n  <span>Apache</span>\n</address>\n</body>\n</html>\n\n"
+  },
+  {
+    "url": "https://192.168.31.11/CommanderConsole.html",
+    "status": 404,
+    "contentType": "text/html; charset=utf-8",
+    "setCookie": null,
+    "len": 985,
+    "actions": [],
+    "hrefs": [
+      "mailto:%5bno%20address%20given%5d",
+      "/"
+    ],
+    "scripts": [],
+    "loginish": [],
+    "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n<head>\n<title>Object not found!</title>\n<link rev=\"made\" href=\"mailto:%5bno%20address%20given%5d\" />\n<style type=\"text/css\"><!--/*--><![CDATA[/*><!--*/ \n    body { color: #000000; background-color: #FFFFFF; }\n    a:link { color: #0000CC; }\n    p, address {margin-left: 3em;}\n    span {font-size: smaller;}\n/*]]>*/--></style>\n</head>\n\n<body>\n<h1>Object not found!</h1>\n<p>\n\n\n    The requested URL was not found on this server.\n\n  \n\n    If you entered the URL manually please check your\n    spelling and try again.\n\n  \n\n</p>\n<p>\nIf you think this is a server error, please contact\nthe <a href=\"mailto:%5bno%20address%20given%5d\">webmaster</a>.\n\n</p>\n\n<h2>Error 404</h2>\n<address>\n  <a href=\"/\">192.168.31.11</a><br />\n  <span>Apache</span>\n</address>\n</body>\n</html>\n\n"
+  }
+]

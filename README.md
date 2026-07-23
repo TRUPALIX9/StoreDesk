@@ -4,6 +4,8 @@ Local-first vendor pricing and invoice-review system for convenience stores and 
 
 **StoreDesk is not an inventory system.** It focuses on products, retail prices, vendor costs, invoice extraction review, and mobile helper workflows.
 
+**New here?** Read the end-to-end guide: [`docs/how-storedesk-works.md`](docs/how-storedesk-works.md).
+
 ## Overview
 
 StoreDesk contains three app repos, tracked from this parent repo as Git submodules.
@@ -46,16 +48,11 @@ StoreDesk/
 ## Current Status
 
 - Parent repo: `TRUPALIX9/StoreDesk` with app submodule pointers.
-- Electron repo: `TRUPALIX9/store-desk-electron` with desktop UI, catalog browsing, invoice review, Husky, CI, and desktop release workflow.
-- Server repo: `TRUPALIX9/store-desk-server` with local API, catalog seed, mobile APIs, APK download route, Husky, and CI.
+- Electron repo: `TRUPALIX9/store-desk-electron` with desktop UI, Price Book (live Commander PLUs), invoice review, Husky, CI, and desktop release workflow.
+- Server repo: `TRUPALIX9/store-desk-server` with local API, mobile APIs, APK download route, Husky, and CI.
 - Mobile repo: `TRUPALIX9/store-desk-mobile` with Flutter app, Android project files, Husky, CI, and APK release workflow.
-- Catalog source workbook: `scripts/Hop-in-4630-556C95D1.xlsx`.
-- Normalized catalog JSON: `scripts/hop-in-4630-catalog.normalized.json`.
-- 16,718 POS rows are imported using `UPC + Modifier` as the grouping key.
-- `In Stock` and `Reorder` are intentionally ignored.
-- Default vendors are seeded as 101, Hackney, Gandhi Wholesale, and Sam's Club.
+- Price Book source of truth: live Verifone Commander (`vPLUs`); no Excel POS catalog seed.
 - Gandhi/Trident invoice source: `scripts/invoices/trident-wholesale-359.normalized.json`.
-- Gandhi invoice 359 is processed into 15 review lines; 7 matched lines seed current vendor prices and 8 remain pending manual catalog matching.
 - Flutter, JDK 17, Android Studio, Android SDK tools, and release APK build are complete on this machine.
 - Physical Android device testing is pending because `adb devices -l` currently shows no attached device.
 

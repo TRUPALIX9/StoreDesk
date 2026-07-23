@@ -1,0 +1,54 @@
+{
+  "react-dev": {
+    "type": "domain",
+    "enforcement": "suggest",
+    "priority": "high",
+    "skillPath": ".cursor/skills/react-dev/SKILL.md",
+    "companionSkills": [
+      ".cursor/skills/mui/SKILL.md",
+      ".cursor/skills/storedesk-ui/SKILL.md"
+    ],
+    "promptTriggers": {
+      "keywords": [
+        "react",
+        "typescript",
+        "tsx",
+        "useState",
+        "useEffect",
+        "useRef",
+        "useMemo",
+        "custom hook",
+        "React.FormEvent",
+        "ChangeEvent",
+        "ComponentProps",
+        "React Router",
+        "generic component",
+        "forwardRef",
+        "useActionState"
+      ],
+      "intentPatterns": [
+        "type.*react.*(component|hook|event)",
+        "build.*typed.*(component|table|form)",
+        "react.*(typescript|best practices)",
+        "type.?safe.*(router|hook|handler)"
+      ]
+    },
+    "fileTriggers": {
+      "pathPatterns": [
+        "store-desk-electron/src/**/*.tsx",
+        "store-desk-electron/src/**/*.ts",
+        "**/hooks/**/*.ts",
+        "**/hooks/**/*.tsx",
+        "**/components/**/*.tsx"
+      ],
+      "contentPatterns": [
+        "from \"react\"",
+        "from 'react'",
+        "React\\.(FC|FormEvent|ChangeEvent|MouseEvent)",
+        "useState<",
+        "useQuery\\(",
+        "react-router-dom"
+      ]
+    }
+  }
+}

@@ -8,8 +8,9 @@ alwaysApply: false
 
 When answering Material UI / MUI questions or implementing MUI UI in StoreDesk Electron:
 
-1. Call the `useMuiDocs` tool from the `mui-mcp` server for the relevant package.
-2. Call `fetchDocs` for any extra docs using only URLs returned by that content.
-3. Repeat until you have enough official docs, then answer or implement from that.
+1. Load project skill `.cursor/skills/mui/SKILL.md` for patterns.
+2. Call the `useMuiDocs` tool from the `mui-mcp` / `user-mui-mcp` server for the relevant package version.
+3. Call `fetchDocs` for any extra docs using only URLs returned by that content.
+4. Repeat until you have enough official docs, then answer or implement from that.
 
-Prefer official MUI APIs and patterns over invented props or components.
+Prefer official MUI APIs and patterns over invented props or components. Prefer `@mui/material` ^6 docs while StoreDesk Electron remains on v6.
