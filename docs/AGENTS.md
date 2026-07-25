@@ -10,11 +10,12 @@ Human and agent documentation for the whole StoreDesk system. Prefer editing an 
 
 | File | Contents |
 |------|----------|
+| `storedesk-gemini-project-brief.md` | **Full project brief for Gemini/LLM paste** — product, UX, schema, APIs, Verifone, repos |
 | `agent-team-guide.md` | **Agents, skills, WO/handoff flow, product rules** (start here for team ops) |
 | `how-storedesk-works.md` | End-to-end human guide: what it is, how apps connect, journeys |
 | `system-map.md` | Connection map + ranked gap fill plan (team review) |
 | `verifone-commander-price-book.md` | **Commander / Price Book / Cost Analysis** — capabilities, E2E, API, protocol notes |
-| `verifone-commander-reports.md` | **Commander T-Log / closed daily & shift** — period list, `vtransset` schema, POS gaps |
+| `verifone-commander-reports.md` | **Commander Ruby + T-Log / closed daily & shift** — periods, KPIs, POS Reports |
 | `architecture.md` | System architecture (desktop ↔ server ↔ Buddy) |
 | `api-contract.md` | HTTP API surfaces |
 | `database-schema.md` | Mongo entities (no Inventory/Stock) |

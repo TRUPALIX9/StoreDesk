@@ -32,6 +32,40 @@ Commander exposes many report-related **FunctionCmd** values on a successful `va
 | **Period transaction set** (full) | `vtransset` | Closed (or current) period journal + sales XML (`transSet`) | `GET …&cmd=vtransset&filename=…&period=…&cookie=…` |
 | Period transaction set (compressed) | `vtranssetz` | Same family; permission-dependent fallback in `commander-login.js` | Same params, `cmd=vtranssetz` |
 | PLU catalog (read) | `vPLUs` | PLU dataset (Price Book path; also CGI form without NAXML body in download script) | See Price Book doc; download script also calls `cmd=vPLUs` |
+| Report catalog | `vreportlist` | Lists Ruby/cashier/etc report names + `reptname` params | `GET …&cmd=vreportlist&cookie=…` |
+| Report period list | `vreportpdlist` | Periods for Ruby reports (same `filename`/`period` shape as T-Log) | `GET …&cmd=vreportpdlist&cookie=…` |
+| **Ruby period report** | `vrubyrept` | Back-office Summary / Tax / Dept / … (`pd:*Pd` XML) | `GET …&cmd=vrubyrept&reptname=tax\|summary&filename=…&period=2&cookie=…` |
+
+### Ruby reports (print-aligned KPIs)
+
+Commander Ruby reports are **period summary XML**, not ticket rollups. StoreDesk **POS Reports** is Ruby-only (`vrubyrept` + `vreportpdlist`). Ticket detail lives on the **Transactions** page (`vtransset`).
+
+| UI kind | `reptname` | Root element | Print fields |
+|---------|------------|--------------|--------------|
+| Ruby Tax / Ruby daily | `tax` | `pd:taxPd` | Period `<totals>` → `taxInfo` `taxableSales` / `netTax` for **HIGH TAX** / **LOW TAX** |
+| Ruby Summary / combined | `summary` | `pd:summaryPd` | **Gas = `fuelSales`** (318 → **6817.91**); mop CREDIT/DEBIT/CASH; `difference.outsideSales` is secondary (318 → 5068.62) |
+| Ruby Department | `department` | `pd:departmentPd` | `deptInfo` → `vs:deptBase` name + `netSales` |
+| Ruby Network Card | `network` | `pd:networkPd` | Period `cardInfo` charges (not byRegister duplicates) |
+
+**Gas KPI (P0):** map UI **Gas** to Ruby `summaryInfo.fuelSales` (“Fuel sales” on the printed summary). Do **not** use `difference.outsideSales` for the primary Gas tile — that delta is lower and is shown as a secondary “Outside sales delta” metric.
+
+**Current / today:** `vreportpdlist` exposes `filename=current` / `period=2` (CURRENT DAILY). StoreDesk includes it in the period picker; live fetch of `vrubyrept` with `filename=current` works for tax/summary/department/network.
+
+**Required query params** (from `vreportlist`): `reptname` is mandatory — omitting it returns `no value called reptname found`. Period picker uses `vreportpdlist` (not `vtlogpdlist`), though `filename` + `period` values match T-Log naming (e.g. `2026-07-23.318` / `2`, or `current` / `2`).
+
+**Evidence — closed DAILY 318** (`scripts/commander-downloads/ruby-tax-2026-07-23.318.xml` / `ruby-summary-2026-07-23.318.xml`):
+
+| Line | Value |
+|------|------:|
+| HIGH TAX taxable / netTax | **959.66** / **67.19** |
+| LOW TAX taxable / netTax | **842.15** / **25.30** |
+| SALE TAX (sum) | **92.49** |
+| **Gas (`fuelSales`)** | **6817.91** |
+| Outside sales delta | 5068.62 (secondary) |
+
+Parse only the first `<totals>…</totals>` block (ignore `byCashier` / `byRegister` duplicates). Zero-rate duplicate HIGH TAX rows are ignored.
+
+Probe/fetch helpers: `scripts/probe-ruby-report.js`, `scripts/fetch-ruby-report.js`.
 
 `commander-download.js` specifically: validate → `vtlogpdlist` → filter completed **DAILY** periods → `vtransset` for each → optional `vPLUs`.
 
@@ -48,7 +82,7 @@ From FunctionCmd display names on validate (non-exhaustive; report-ish `v*` / cl
 | `vposjournal` / `vmwsposjournal` | NAXML POSJournal | Different surface than T-Log period set |
 | `vMovement` | NAXML movement reports | |
 | `vreportlist` / `vreportpdlist` / `vreportcfg` / `vreportstatus` | Configurable report list / manager review | |
-| `vrubyrept` | Ruby Reports | |
+| `vrubyrept` | Ruby Reports | **Wired** — `reptname` + `filename` + `period` from `vreportpdlist` |
 | `vviperrept` / `vviperpdlist` | Viper reports | |
 | `vmobilereport*` | Mobile report list/category | |
 | `vtilleventreport` | Till Event Reports | |
@@ -58,7 +92,7 @@ From FunctionCmd display names on validate (non-exhaustive; report-ish `v*` / cl
 | `cclosedaynow` | Close Day Now | **Close** action — not used by StoreDesk |
 | `ccwpdclose` | Carwash Paypoint Period Close | |
 
-**Gap:** no StoreDesk code calls these. Periods XML from `vtlogpdlist` on this site lists only **SHIFT (sysid=1)** and **DAILY (sysid=2)** — no MONTHLY/WEEKLY entries in the saved sample.
+**Gap:** Cashier / fuel / payroll / Viper FunctionCmds are still unwired in the app. **Ruby `vrubyrept`** is wired in POS Reports (Tax + Summary). Periods XML from `vtlogpdlist` / `vreportpdlist` on this site lists **SHIFT (sysid=1)** and **DAILY (sysid=2)** — no MONTHLY/WEEKLY entries in the saved sample.
 
 ---
 
@@ -260,8 +294,18 @@ Outer: `<trans type="sale|network sale" recalled="false">`.
 |-------|-------------|
 | `trTotNoTax` | Merch before tax |
 | `trTotWTax` | With tax |
-| `trTotTax` | Tax amount |
-| `trTax/taxAmts/taxAmt|taxRate|taxNet[@cat]` | Per tax category (`HIGH TAX`, `LOW TAX`) |
+| `trTotTax` | Tax amount (ticket total) |
+| `trTax/taxAmts/taxAmt[@cat]` | **Taxable sales base** per category (`HIGH TAX`, `LOW TAX`) — despite the name |
+| `trTax/taxAmts/taxNet[@cat]` | **Tax dollars collected** per category |
+| `trTax/taxAmts/taxRate[@cat]` | Rate percent (e.g. `7.000`, `3.000`) |
+
+Evidence (sample ticket): `taxAmt cat="HIGH TAX"=3.19`, `taxRate=7.000`, `taxNet=0.22` → 3.19×7%≈0.22.
+
+**Printed closed daily HIGH/LOW / SALE TAX** = sum of those fields on `trans type="sale"` and `network sale` only, **excluding** tickets that contain a `trLine type="preFuel"` (fuel deposit / prepay). Do **not** include `type="void"`. Use `taxAmt`/`taxNet` **as written** (do not flip signs on negative `trTotNoTax` — print keeps stored amounts). There is no period-level tax summary node in `vtransset` — this ticket filter is the print source.
+
+Proven on closed daily **318** (`2026-07-23.318`): HIGH taxable **959.66** / tax **67.19**, LOW **842.15** / **25.30**, SALE TAX **92.49**. Summing all sale+network (incl. preFuel) overstated to 992.06 / 986.15. Many prepays also appear as near-duplicate financial twins (same `trSeq`, one missing `trUniqueSN`) — that is why the past-transactions list looked duplicated.
+
+StoreDesk KPIs: **HIGH TAX / LOW TAX** → sum `taxAmt` (sale/network, no void, no preFuel); **SALE TAX** → sum `taxNet` (same tickets).
 | `trCurrTot` | Currency total |
 | `trSTotalizer` / `trGTotalizer` | Sale / grand totalizers for ticket |
 | `trFstmp*` | Food stamp totals when present |
@@ -334,10 +378,11 @@ Map closed daily `vtransset` → one `PosDailySummary` (or richer report):
 | StoreDesk field | Possible Commander derivation (hypothesis — needs product decision) |
 |-----------------|---------------------------------------------------------------------|
 | `date` | `transSet/@longId` or business date from `closedTime` |
-| `highTax` / `lowTax` | Sum `taxNet` or taxable bases by `HIGH TAX` / `LOW TAX` |
+| `highTax` / `lowTax` | Sum `taxAmt[@cat]` on **sale / network sale** only (**taxable bases**); exclude voids and tickets with `preFuel`; use amounts as written |
+| `saleTax` | Sum `taxNet[@cat]` on the same tickets (tax collected) |
 | `totalSales` | Sum `trTotWTax` on sale types, or totals delta |
-| `gas` | Sum `postFuel` `trlLineTot` / `fuelVolume` |
-| `creditCard` | Sum paycodes CREDIT+DEBIT |
+| `gas` | Prefer Ruby `fuelSales` (print Fuel sales; 318 = **6817.91**). `difference.outsideSales` / T-Log outside delta are secondary (often ~5068). `postFuel` line sum may also differ. |
+| `creditCard` / `debitCard` | Separate `trpPaycode` **CREDIT** and **DEBIT** (not combined) |
 | `cash` | Sum CASH paycodes (careful with Change) |
 | `lottery` | Sum dept **Lotto** lines |
 
