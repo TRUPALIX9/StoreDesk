@@ -92,14 +92,16 @@ Rules:
 
 ### 4.1 StoreDesk (desktop) — main screens
 
-Sidebar is intentionally small:
+Sidebar (current Electron nav):
 
 1. **Point of Sale** — daily sales table, analytics charts, Georgia sales-tax worksheets; Google Sheets sync and GTC profile live mainly under Settings  
-2. **Price Book** — live Verifone Commander PLUs on open/Refresh (`vPLUs`) plus local vendor-cost overlays (manual add overlay supported)  
-3. **Cost Analysis** — same live sell prices vs vendor case/per-item costs and margins  
-4. **Settings** — account, server URL test, data dump/reseed, Sheets/GTC, **More tools** (vendors, invoice upload/review, mobile pairing, etc.)
+2. **POS Reports** — Ruby-only Commander period KPIs (`vrubyrept`); Fuel sales = `fuelSales`; registers-focused  
+3. **Transactions** — paginated ticket cards from Commander T-Log (`vtransset`)  
+4. **Price Book** — live Verifone Commander PLUs on open/Refresh (`vPLUs`) plus local vendor-cost overlays (manual add overlay supported)  
+5. **Cost Analysis** — same live sell prices vs vendor case/per-item costs and margins  
+6. **Settings** — account, server URL test, data dump/reseed, Sheets/GTC, **More tools** (vendors, invoice upload/review, mobile pairing, etc.)
 
-Commander integration details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md). Use **`npm run dev:embedded`** in Electron when exercising Price Book APIs (not yet on standalone `store-desk-server`).
+Commander details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). Full LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md). Use **`npm run dev:embedded`** in Electron for Price Book / POS Reports / Transactions (not yet fully mirrored on standalone `store-desk-server`).
 
 Extra pages still exist as routes (dashboard, vendors, invoice review, lottery placeholder) but are **not** jammed into the main nav.
 

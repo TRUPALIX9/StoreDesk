@@ -7,12 +7,14 @@ Owners: eng-manager (coord), tech-lead, frontend-electron, backend-server, mobil
 
 Desktop sidebar (current Electron nav):
 
-1. Point of Sale  
-2. Price Book (`/price-book`) — live Commander PLUs  
-3. Cost Analysis (`/cost-analysis`) — sell vs vendor costs  
-4. Settings  
+1. Point of Sale (`/pos`)  
+2. POS Reports (`/pos/reports`) — Ruby `vrubyrept`  
+3. Transactions (`/pos/transactions`) — T-Log `vtransset`  
+4. Price Book (`/price-book`) — live Commander PLUs  
+5. Cost Analysis (`/cost-analysis`) — sell vs vendor costs  
+6. Settings  
 
-Commander / Price Book E2E: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md).
+Commander E2E: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md).
 
 ## Dual Express — why it exists (and why it’s a problem)
 
@@ -52,7 +54,7 @@ Default Electron `npm run dev` expects **external** `store-desk-server`. Embedde
 
 1. **Price Book (Commander)** — Live `vPLUs` list/search + local vendor overlays; Refresh (not Sync-first). Cost Analysis compares sell vs vendor costs. Details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md)  
 2. **Invoice truth** — Upload → extract (stub) → Review → Confirm → VendorPrice history  
-3. **POS ops** — Sheets sync → daily table/analytics → Georgia sale tax. (Commander closed-daily `vtransset` documented in [`verifone-commander-reports.md`](./verifone-commander-reports.md); not imported into POS yet.)  
+3. **POS ops** — Sheets sync → daily table/analytics → Georgia sale tax. Live Commander: **POS Reports** (Ruby) + **Transactions** (`vtransset`) — see [`verifone-commander-reports.md`](./verifone-commander-reports.md).  
 4. **Buddy pair** — Desktop Mobile Access QR → Buddy `/link` → then POS/Price Book shell today  
 
 ## Identity note (tech-lead)
