@@ -80,7 +80,7 @@ Add a StoreDesk Electron **Cost Analysis** page that compares Price Book PLU sel
 #### Next 3 actions
 1. Optional UI smoke on Cost Analysis + filters
 2. Close WO after user confirm
-3. (Optional) mirror list filters into standalone `store-desk-server` later
+3. (Optional) mirror list filters into standalone `store-desk-worker` later
 
 ### HO — 2026-07-22 (docs)
 

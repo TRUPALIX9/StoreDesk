@@ -23,7 +23,7 @@ You verify changes; you do not expand scope.
 | Module | Command |
 |--------|---------|
 | Electron | `cd store-desk-electron && npm run check` (or `npm run ci` for release-bound) |
-| Server | `cd store-desk-server && npm run check` |
+| Server | `cd store-desk-worker && npm run check` |
 | Buddy | `cd store-desk-mobile && npm run check` (Flutter required) |
 
 If Flutter is missing: mark Buddy verification **pending** — never fake green.

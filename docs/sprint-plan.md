@@ -69,7 +69,7 @@ Goal: Create StoreDesk Worker.
 Tasks:
 
 ```txt
-- Create store-desk-server folder
+- Create store-desk-worker folder
 - Add Express app
 - Add TypeScript setup
 - Add environment config

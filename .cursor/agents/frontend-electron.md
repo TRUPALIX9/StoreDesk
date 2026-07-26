@@ -27,7 +27,7 @@ You implement the desktop admin UI in `store-desk-electron/`.
 
 ## Does not own
 
-- Canonical API/models → hand off to `backend-server` (`store-desk-server/`)
+- Canonical API/models → hand off to `backend-server` (`store-desk-worker/`)
 - Flutter → `mobile-buddy`
 - Glow KPI kits / rainbow accents — banned; navy + green only
 

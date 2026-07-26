@@ -11,7 +11,7 @@
 | Name | What it is | Folder / remote |
 |------|------------|-----------------|
 | **StoreDesk** | Electron desktop admin app | `store-desk-electron/` → `https://github.com/TRUPALIX9/store-desk-electron.git` |
-| **StoreDesk Worker** | Node.js + Express API (local) | `store-desk-server/` → `https://github.com/TRUPALIX9/store-desk-server.git` |
+| **StoreDesk Worker** | Node.js + Express API (local) | `store-desk-worker/` → `https://github.com/TRUPALIX9/store-desk-worker.git` |
 | **StoreDesk Mobile** | Flutter phone helper (never call it “StoreDesk Mobile”) | `store-desk-mobile/` → `https://github.com/TRUPALIX9/store-desk-mobile.git` |
 | **Parent** | Docs, scripts, submodule pointers | `StoreDesk/` → `https://github.com/TRUPALIX9/StoreDesk.git` |
 
@@ -69,10 +69,10 @@ There are **two Express code copies**:
 
 | Copy | Path | When |
 |------|------|------|
-| **Canonical** | `store-desk-server/` | Default Electron `npm run dev` (external server) + Buddy |
+| **Canonical** | `store-desk-worker/` | Default Electron `npm run dev` (external server) + Buddy |
 | **Embedded** | `store-desk-electron/src/server/` | `npm run dev:embedded` / Electron-bundled API |
 
-**Current reality (2026-07):** Live Commander **Price Book**, **POS Reports**, and **Transactions** are implemented primarily on the **Electron embedded server**. Standalone `store-desk-server` may lag those routes. For Commander-backed UI work, use **`npm run dev:embedded`** in Electron (or port features to the standalone server). See `docs/system-map.md` and `docs/verifone-commander-price-book.md`.
+**Current reality (2026-07):** Live Commander **Price Book**, **POS Reports**, and **Transactions** are implemented primarily on the **Electron embedded server**. Standalone `store-desk-worker` may lag those routes. For Commander-backed UI work, use **`npm run dev:embedded`** in Electron (or port features to the standalone server). See `docs/system-map.md` and `docs/verifone-commander-price-book.md`.
 
 ---
 
@@ -233,7 +233,7 @@ Base: `http://localhost:4310` — JSON under `/api/*` unless noted.
 - `GET /api/pos/transactions/periods?sysid=`
 - `GET /api/pos/transactions?filename=&period=&page=&pageSize=`
 
-Standalone `store-desk-server` shares many catalog/POS/Sheets routes historically; treat embedded as SoT for the newest Commander report surfaces until ports catch up.
+Standalone `store-desk-worker` shares many catalog/POS/Sheets routes historically; treat embedded as SoT for the newest Commander report surfaces until ports catch up.
 
 ---
 
@@ -272,7 +272,7 @@ See `store-desk-electron/.env.example`. Do not commit `.env`, `scripts/commander
 ```txt
 StoreDesk/                          # parent
 ├── store-desk-electron/            # StoreDesk desktop (+ embedded API)
-├── store-desk-server/              # StoreDesk Worker
+├── store-desk-worker/              # StoreDesk Worker
 ├── store-desk-mobile/              # StoreDesk Mobile
 ├── docs/                           # architecture, Verifone, WOs, this brief
 ├── scripts/                        # Commander probe/fetch helpers
@@ -302,7 +302,7 @@ Cursor (`.cursor/`) + Codex (`.codex/` pointers). Roles: eng-manager, tech-lead,
 
 ```txt
 store-desk-electron:  npm run ci
-store-desk-server:    npm run ci
+store-desk-worker:    npm run ci
 store-desk-mobile:    npm run ci   # needs Flutter locally
 ```
 
@@ -312,7 +312,7 @@ store-desk-mobile:    npm run ci   # needs Flutter locally
 
 | Goal | Suggested command |
 |------|-------------------|
-| Desktop + external API | Run `store-desk-server` on 4310; Electron `npm run dev` |
+| Desktop + external API | Run `store-desk-worker` on 4310; Electron `npm run dev` |
 | Price Book / POS Reports / Transactions (Commander) | Electron `npm run dev:embedded` + Commander env set |
 | Buddy | Server on `0.0.0.0:4310`; phone uses `http://LAN_IP:4310`; pair via Mobile Access QR |
 
@@ -320,7 +320,7 @@ store-desk-mobile:    npm run ci   # needs Flutter locally
 
 ## 10. Explicit gaps / follow-ups (do not assume done)
 
-- Port embedded Price Book / POS Reports / Transactions to standalone `store-desk-server` (dual Express drift).
+- Port embedded Price Book / POS Reports / Transactions to standalone `store-desk-worker` (dual Express drift).
 - Invoice extraction is still largely stub/sample — review before VendorPrice is mandatory.
 - Buddy Price Book is not fully wired to the live Commander Price Book API.
 - Lottery Setup is a placeholder.

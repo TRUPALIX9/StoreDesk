@@ -13,7 +13,7 @@ StoreDesk contains app repos, tracked from this parent repo as Git submodules.
 | App | Submodule folder | Role |
 | --- | --- | --- |
 | StoreDesk | `store-desk-electron/` | Electron desktop admin |
-| StoreDesk Worker | `store-desk-server/` | Edge Express + local MongoDB API (store PC worker) |
+| StoreDesk Worker | `store-desk-worker/` | Edge Express + local MongoDB API (store PC worker) |
 | StoreDesk Mobile | `store-desk-mobile/` | Flutter phone companion |
 | StoreDesk Web | `store-desk-web/` | Next.js marketing + store licenses (Atlas) |
 | Cloud Hub | `store-desk-cloud-backend/` | WSS store rooms (Epic 1) |
@@ -25,7 +25,7 @@ Catalog and Commander stay on the store PC. Atlas is for licenses/registry only.
 This repo is the parent repository:
 
 - `store-desk-electron` -> https://github.com/TRUPALIX9/store-desk-electron
-- `store-desk-server` -> https://github.com/TRUPALIX9/store-desk-server
+- `store-desk-worker` -> https://github.com/TRUPALIX9/store-desk-worker
 - `store-desk-mobile` -> https://github.com/TRUPALIX9/store-desk-mobile
 - `store-desk-web` -> https://github.com/storedesk-dev/StoreDesk-web
 
@@ -36,7 +36,7 @@ Each submodule has its own Git history, remote, commits, CI, and release workflo
 ```txt
 StoreDesk/
 |-- store-desk-electron/     # submodule: desktop/admin app
-|-- store-desk-server/       # submodule: edge API/server
+|-- store-desk-worker/       # submodule: edge Worker API
 |-- store-desk-mobile/       # submodule: Flutter phone app
 |-- store-desk-web/          # submodule: web + licenses
 |-- brand-kit/
@@ -54,7 +54,7 @@ StoreDesk/
 
 - Parent repo: `TRUPALIX9/StoreDesk` with app submodule pointers.
 - Electron repo: `TRUPALIX9/store-desk-electron` with desktop UI, Price Book (live Commander PLUs), invoice review, Husky, CI, and desktop release workflow.
-- Server repo: `TRUPALIX9/store-desk-server` with local API, mobile APIs, APK download route, Husky, and CI.
+- Worker repo: `TRUPALIX9/store-desk-worker` with local API, mobile APIs, APK download route, Husky, and CI.
 - Mobile repo: `TRUPALIX9/store-desk-mobile` with Flutter app, Android project files, Husky, CI, and APK release workflow.
 - Price Book source of truth: live Verifone Commander (`vPLUs`); no Excel POS catalog seed.
 - Gandhi/Trident invoice source: `scripts/invoices/trident-wholesale-359.normalized.json`.
@@ -83,13 +83,13 @@ git submodule update --init --recursive
 Commit app changes inside the submodule first:
 
 ```powershell
-cd store-desk-server
+cd store-desk-worker
 git checkout main
 git pull
 npm install
 npm run dev
 git add .
-git commit -m "Update server API"
+git commit -m "Update Worker API"
 git push
 ```
 
@@ -97,7 +97,7 @@ Then update the parent pointer:
 
 ```powershell
 cd ..
-git add store-desk-server
+git add store-desk-worker
 git commit -m "Update server submodule pointer"
 git push
 ```
@@ -123,7 +123,7 @@ Mobile must use the computer LAN IP. `localhost` on a phone points back to the p
 Start StoreDesk Worker:
 
 ```powershell
-cd store-desk-server
+cd store-desk-worker
 npm install
 copy .env.example .env
 npm run dev
@@ -154,7 +154,7 @@ Build the mobile APK:
 ```powershell
 cd store-desk-mobile
 flutter build apk --release
-copy build\app\outputs\flutter-apk\app-release.apk ..\store-desk-server\downloads\storedesk-buddy.apk
+copy build\app\outputs\flutter-apk\app-release.apk ..\store-desk-worker\downloads\storedesk-buddy.apk
 ```
 
 Download route after the APK is copied:
@@ -190,7 +190,7 @@ The route returns 404 JSON until the APK file exists.
 | Detached HEAD in submodule | `git checkout main` inside the submodule |
 | Parent pointer out of date | Push submodule first, then commit parent pointer |
 | Mobile cannot reach server | Use LAN IP, not localhost; same Wi-Fi |
-| APK route 404 | Build APK and copy it to `store-desk-server/downloads/` |
+| APK route 404 | Build APK and copy it to `store-desk-worker/downloads/` |
 | Flutter path has spaces | Use the generated `C:\StoreDeskBuild` junction or run `npm run setup:flutter` |
 
 ## Master Documentation

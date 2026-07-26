@@ -1,9 +1,9 @@
 [submodule "store-desk-electron"]
 	path = store-desk-electron
 	url = https://github.com/TRUPALIX9/store-desk-electron.git
-[submodule "store-desk-server"]
-	path = store-desk-server
-	url = https://github.com/TRUPALIX9/store-desk-server.git
+[submodule "store-desk-worker"]
+	path = store-desk-worker
+	url = https://github.com/TRUPALIX9/store-desk-worker.git
 [submodule "store-desk-mobile"]
 	path = store-desk-mobile
 	url = https://github.com/TRUPALIX9/store-desk-mobile.git

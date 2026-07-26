@@ -6,7 +6,7 @@
 - **Requester:** user
 - **Primary owner:** eng-manager
 - **Reviewers:** tech-lead, ui-ux-designer, frontend-electron, backend-server, mobile-buddy, qa-verifier, docs-scribe
-- **Modules:** store-desk-electron | store-desk-server | store-desk-mobile | docs
+- **Modules:** store-desk-electron | store-desk-worker | store-desk-mobile | docs
 
 ## Goal
 

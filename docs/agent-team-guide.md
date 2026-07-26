@@ -99,7 +99,7 @@ Parent repo + **three Git submodules** — not an npm monorepo.
 ```txt
 StoreDesk/                 ← parent (docs, scripts, pointers)
 ├── store-desk-electron/   ← commit app changes HERE
-├── store-desk-server/
+├── store-desk-worker/
 └── store-desk-mobile/
 ```
 
@@ -134,7 +134,7 @@ electron   server    buddy
 | Engineering Manager | `.cursor/agents/eng-manager.md` | Intake, priority, WO create/close, unblock, routing |
 | Tech Lead | `.cursor/agents/tech-lead.md` | Cross-repo architecture, API contracts, spikes |
 | Frontend Electron | `.cursor/agents/frontend-electron.md` | `store-desk-electron/` UI + MUI |
-| Backend Server | `.cursor/agents/backend-server.md` | `store-desk-server/` API + models + services |
+| Backend Server | `.cursor/agents/backend-server.md` | `store-desk-worker/` API + models + services |
 | Mobile Buddy | `.cursor/agents/mobile-buddy.md` | `store-desk-mobile/` Flutter |
 | UI/UX Designer | `.cursor/agents/ui-ux-designer.md` | Design critique (readonly by default) |
 | QA Verifier | `.cursor/agents/qa-verifier.md` | Module checks, pass/fail + residual risk |
@@ -241,7 +241,7 @@ Handoffs must list: done / not done / decisions / files / risks / next 3 actions
 | Module | Command |
 |--------|---------|
 | Electron | `cd store-desk-electron && npm run check` (or `npm run ci` when release-bound) |
-| Server | `cd store-desk-server && npm run check` |
+| Server | `cd store-desk-worker && npm run check` |
 | Buddy | `cd store-desk-mobile && npm run check` |
 
 If Flutter is not installed: mark Buddy **pending** — never fake green.
@@ -332,7 +332,7 @@ Closest `AGENTS.md` wins for directory context.
 | `/scripts/AGENTS.md` | Catalog / invoice / helper scripts |
 | `/tools/AGENTS.md` | Parent tooling |
 | `/store-desk-electron/AGENTS.md` | Desktop app map |
-| `/store-desk-server/AGENTS.md` | API map |
+| `/store-desk-worker/AGENTS.md` | API map |
 | `/store-desk-mobile/AGENTS.md` | Buddy app map |
 
 ---

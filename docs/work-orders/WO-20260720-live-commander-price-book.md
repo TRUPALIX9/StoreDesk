@@ -30,7 +30,7 @@ Stop treating **Sync into local store** as the Price Book source of truth. Comma
 - Writing prices back to Commander (`uPLUs`)
 - StoreDesk Buddy
 - Stock / inventory
-- Porting this API into standalone `store-desk-server` (follow-up)
+- Porting this API into standalone `store-desk-worker` (follow-up)
 
 ## Architecture
 
@@ -86,7 +86,7 @@ Optional `POST /api/price-book/commander/sync` remains as an **offline cache** h
 
 #### Not done
 - Live smoke against real store PLU count
-- Mirror into `store-desk-server`
+- Mirror into `store-desk-worker`
 
 #### Next 3 actions
 1. Smoke with `dev:embedded` + COMMANDER_*

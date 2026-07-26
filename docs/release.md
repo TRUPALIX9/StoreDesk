@@ -39,7 +39,7 @@ On Windows without code-signing privileges, packaging uses `signAndEditExecutabl
 ## StoreDesk Worker
 
 ```powershell
-cd store-desk-server
+cd store-desk-worker
 copy .env.example .env
 npm run ci
 npm run dev
@@ -80,13 +80,13 @@ flutter build apk --release
 Copy APK:
 
 ```powershell
-copy build\app\outputs\flutter-apk\app-release.apk ..\store-desk-server\downloads\storedesk-buddy.apk
+copy build\app\outputs\flutter-apk\app-release.apk ..\store-desk-worker\downloads\storedesk-buddy.apk
 ```
 
 Restart server and verify:
 
 ```powershell
-cd ..\store-desk-server
+cd ..\store-desk-worker
 npm run dev
 ```
 
@@ -102,7 +102,7 @@ http://localhost:4310/downloads/storedesk-buddy.apk
 2. Start StoreDesk Worker:
 
    ```powershell
-   cd store-desk-server
+   cd store-desk-worker
    npm run dev
    ```
 
@@ -146,11 +146,11 @@ git push origin main
 
 ### Server (create remote first)
 
-Create repo: `TRUPALIX9/store-desk-server` (private recommended).
+Create repo: `TRUPALIX9/store-desk-worker` (private recommended).
 
 ```powershell
-cd store-desk-server
-git remote add origin https://github.com/TRUPALIX9/store-desk-server.git
+cd store-desk-worker
+git remote add origin https://github.com/TRUPALIX9/store-desk-worker.git
 git branch -M main
 git push -u origin main
 ```

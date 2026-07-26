@@ -38,7 +38,7 @@ Everything lives in one parent Git repo with **submodules**:
 ```txt
 StoreDesk/                          ← parent (docs, scripts, submodule pointers)
 ├── store-desk-electron/            ← StoreDesk (desktop)
-├── store-desk-server/              ← StoreDesk Worker (edge API)
+├── store-desk-worker/              ← StoreDesk Worker (edge API)
 ├── store-desk-mobile/              ← StoreDesk Mobile (phone)
 └── store-desk-web/                 ← StoreDesk Web (marketing + licenses)
 ```
@@ -86,7 +86,7 @@ Keep `:4310` until Desktop + Mobile dual-mode through the Hub is proven. No Redi
 
 Rules:
 
-1. **One real backend:** `store-desk-server` on port **4310**, listening on **`0.0.0.0`** so phones on LAN can connect.
+1. **One real backend:** `store-desk-worker` on port **4310**, listening on **`0.0.0.0`** so phones on LAN can connect.
 2. Desktop may use `http://localhost:4310` (or Vite’s `/api` proxy in dev).
 3. The phone **must** use the PC’s **LAN IP** (e.g. `http://192.168.1.25:4310`). On a phone, `localhost` means the phone itself — that will never reach the store PC.
 4. Buddy **never** talks to MongoDB. Only the server does.
@@ -114,7 +114,7 @@ Sidebar (current Electron nav):
 5. **Cost Analysis** — same live sell prices vs vendor case/per-item costs and margins  
 6. **Settings** — account, server URL test, data dump/reseed, Sheets/GTC, **More tools** (vendors, invoice upload/review, mobile pairing, etc.)
 
-Commander details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). Full LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md). Use **`npm run dev:embedded`** in Electron for Price Book / POS Reports / Transactions (not yet fully mirrored on standalone `store-desk-server`).
+Commander details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). Full LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md). Use **`npm run dev:embedded`** in Electron for Price Book / POS Reports / Transactions (not yet fully mirrored on standalone `store-desk-worker`).
 
 Extra pages still exist as routes (dashboard, vendors, invoice review, lottery placeholder) but are **not** jammed into the main nav.
 
@@ -185,7 +185,7 @@ Upload PDF/image
 ```txt
 Live Commander PLU (name, UPC, mod, dept, sell, unit)
   + local vendor overlays (101, Sam’s, Global, Hackney, Gandhi, Custom, expiry)
-  → Electron embedded /api/price-book (not yet mirrored on store-desk-server)
+  → Electron embedded /api/price-book (not yet mirrored on store-desk-worker)
   → Price Book edit dialog saves overlays only (no Commander write-back)
 ```
 
@@ -230,7 +230,7 @@ Typical machine setup:
 2. Start **StoreDesk Worker**:
 
    ```powershell
-   cd store-desk-server
+   cd store-desk-worker
    npm install
    npm run dev
    ```
@@ -265,12 +265,12 @@ You may see Express code in:
 
 | Location | Status |
 |----------|--------|
-| `store-desk-server/` | **Canonical — write API here** |
+| `store-desk-worker/` | **Canonical — write API here** |
 | `store-desk-electron/src/server/` | **Legacy embed** — same kind of API duplicated so old Electron could run alone (`dev:embedded`) |
 
 That is **double API code**, not double “products.”
 
-- Normal workflow uses **only** `store-desk-server`.
+- Normal workflow uses **only** `store-desk-worker`.
 - Editing both forever causes drift (a feature appears in one copy and not the other).
 - Long-term cleanup: delete or stop maintaining the Electron embed.
 

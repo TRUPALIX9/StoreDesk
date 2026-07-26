@@ -13,7 +13,7 @@ StoreDesk reads **live PLUs** from Verifone Commander (Sapphire / ConfigClient N
 | Probe scripts | `scripts/commander-*.js` |
 | Related WOs | `WO-20260720-live-commander-price-book`, `WO-20260720-cost-analysis-page`, `WO-20260720-remove-excel-catalog-seed` |
 
-**Runtime note:** Price Book APIs live on the **Electron embedded server** today (`npm run dev:embedded`). Default `npm run dev` talks to standalone `store-desk-server`, which does **not** yet mirror these routes. See `docs/system-map.md` (dual Express gap).
+**Runtime note:** Price Book APIs live on the **Electron embedded server** today (`npm run dev:embedded`). Default `npm run dev` talks to standalone `store-desk-worker`, which does **not** yet mirror these routes. See `docs/system-map.md` (dual Express gap).
 
 ---
 
@@ -39,7 +39,7 @@ StoreDesk reads **live PLUs** from Verifone Commander (Sapphire / ConfigClient N
 | Local vendor-cost overlays keyed by UPC + modifier | Excel / Hop-In POS catalog seed (removed) |
 | Optional offline cache via `POST …/commander/sync` (API only; demoted UX) | Stock quantity / inventory |
 | Live merge for Cost Analysis | StoreDesk Buddy Price Book (not wired to this API) |
-| Electron embedded API | Port to `store-desk-server` (follow-up) |
+| Electron embedded API | Port to `store-desk-worker` (follow-up) |
 
 ---
 

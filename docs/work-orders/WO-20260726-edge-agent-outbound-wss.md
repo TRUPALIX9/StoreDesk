@@ -4,7 +4,7 @@
 - **Epic:** 3 — Edge Agent (StoreDesk Worker)
 - **Points:** 13
 - **Primary owner:** backend-server
-- **Modules:** store-desk-server | store-desk-cloud-backend
+- **Modules:** store-desk-worker | store-desk-cloud-backend
 
 ## Goal
 

@@ -5,7 +5,7 @@
 - **Priority:** P0
 - **Points:** 3
 - **Primary owner:** eng-manager
-- **Modules:** docs | store-desk-web | store-desk-electron | store-desk-server | store-desk-mobile | store-desk-cloud-backend
+- **Modules:** docs | store-desk-web | store-desk-electron | store-desk-worker | store-desk-mobile | store-desk-cloud-backend
 
 ## Goal
 
@@ -14,7 +14,7 @@ Track StoreDesk migration from local-first to cloud-relayed multi-store (Web + A
 ## Locked decisions
 
 - Phone product: **StoreDesk Mobile** (not Buddy)
-- Edge API product: **StoreDesk Worker** (not Server); folder still `store-desk-server/`
+- Edge API product: **StoreDesk Worker** (not Server); folder still `store-desk-worker/`
 - Cloud DB: MongoDB Atlas M0 (~512MB) for licenses/registry only
 - No Redis
 - Keep `:4310` until dual-mode proven

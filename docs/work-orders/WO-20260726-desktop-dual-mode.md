@@ -4,7 +4,7 @@
 - **Epic:** 4 — Desktop dual-mode
 - **Points:** 8
 - **Primary owner:** frontend-electron
-- **Modules:** store-desk-electron | store-desk-server
+- **Modules:** store-desk-electron | store-desk-worker
 
 ## Goal
 

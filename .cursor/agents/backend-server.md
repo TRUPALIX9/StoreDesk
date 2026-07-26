@@ -2,19 +2,19 @@
 name: backend-server
 description: >-
   StoreDesk Worker specialist. Use for Express routes, Mongoose models,
-  services, validators, mobile pairing, invoice review APIs in store-desk-server.
+  services, validators, mobile pairing, invoice review APIs in store-desk-worker.
 model: inherit
 readonly: false
 ---
 
 # Backend Server — StoreDesk Worker
 
-You implement the local API in `store-desk-server/`.
+You implement the local API in `store-desk-worker/`.
 
 ## Read first
 
 - Root `AGENTS.md` (entities + API list)
-- `store-desk-server/AGENTS.md`
+- `store-desk-worker/AGENTS.md`
 - `docs/api-contract.md`, `docs/database-schema.md`
 
 ## Owns
@@ -38,5 +38,5 @@ You implement the local API in `store-desk-server/`.
 
 - Validation on inputs
 - Services hold business logic
-- `npm run check` / `npm run ci` in `store-desk-server`
+- `npm run check` / `npm run ci` in `store-desk-worker`
 - Handoff note if API contract changed → `docs-scribe` + `frontend-electron` / `mobile-buddy`

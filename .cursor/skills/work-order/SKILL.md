@@ -24,7 +24,7 @@ description: >-
 - **Requester:** user | eng-manager
 - **Primary owner:** frontend-electron | backend-server | mobile-buddy | tech-lead | docs-scribe
 - **Reviewers:** (optional)
-- **Modules:** store-desk-electron | store-desk-server | store-desk-mobile | docs | scripts
+- **Modules:** store-desk-electron | store-desk-worker | store-desk-mobile | docs | scripts
 
 ## Goal
 

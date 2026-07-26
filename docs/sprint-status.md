@@ -8,7 +8,7 @@ StoreDesk is now an end-to-end local-first product pricing and invoice review wo
 
 - `StoreDesk` parent repo with submodule pointers.
 - `store-desk-electron` desktop/admin app.
-- `store-desk-server` local API/server.
+- `store-desk-worker` local API/server.
 - `store-desk-mobile` StoreDesk Mobile Flutter companion app.
 
 The system remains intentionally scoped to catalog, vendors, vendor costs, retail prices, invoice review, and mobile scanning/upload. It is not an inventory/stock/reorder system.
@@ -64,7 +64,7 @@ Toolchain/build:
 - Android Studio installed.
 - Android SDK command-line tools, platform tools, SDK 36, SDK 35, build tools, CMake, and NDK installed by Flutter/SDK manager.
 - Mobile checks pass locally through `npm run ci`.
-- Android release APK built and copied to `store-desk-server/downloads/storedesk-buddy.apk`.
+- Android release APK built and copied to `store-desk-worker/downloads/storedesk-buddy.apk`.
 
 ## Verified
 
@@ -72,7 +72,7 @@ Toolchain/build:
 - Electron `npm run check`: typecheck plus 13 tests pass.
 - Mobile `npm run ci`: Flutter analyze plus 4 tests pass.
 - APK output exists at `store-desk-mobile/build/app/outputs/flutter-apk/app-release.apk`.
-- Download copy exists at `store-desk-server/downloads/storedesk-buddy.apk`.
+- Download copy exists at `store-desk-worker/downloads/storedesk-buddy.apk`.
 - `adb devices -l` ran successfully but found no attached Android device.
 
 ## Pending

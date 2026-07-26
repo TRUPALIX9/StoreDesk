@@ -23,7 +23,7 @@ MongoDB (local)  — or in-memory store when MONGO_URI is unset
 ## Deployment model
 
 - Server binds `0.0.0.0:4310` so phones on the same Wi‑Fi can reach it.
-- Electron currently embeds a copy of the server; the standalone `store-desk-server` package is the long-term home for the API.
+- Electron currently embeds a copy of the server; the standalone `store-desk-worker` package is the long-term home for the API.
 - Uploaded invoice files land on disk under `uploads/` (Multer).
 
 ## Scope boundaries

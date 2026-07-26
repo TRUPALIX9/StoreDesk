@@ -14,7 +14,7 @@ For multi-agent delivery (work orders, handoffs, role routing), also read **`.cu
 This is the **StoreDesk parent repo**. App code lives in Git submodules:
 
 - `store-desk-electron/` — StoreDesk desktop
-- `store-desk-server/` — StoreDesk Worker (edge API)
+- `store-desk-worker/` — StoreDesk Worker (edge API)
 - `store-desk-mobile/` — StoreDesk Mobile
 - `store-desk-web/` — StoreDesk Web (marketing + license admin on Vercel)
 - `store-desk-cloud-backend/` — Cloud Hub (WSS rooms; Epic 1)
@@ -30,7 +30,7 @@ Rules:
 ## Product names
 
 - **StoreDesk** — Electron desktop admin app (`store-desk-electron/`)
-- **StoreDesk Worker** — Edge Node.js + Express + local MongoDB (`store-desk-server/`)
+- **StoreDesk Worker** — Edge Node.js + Express + local MongoDB (`store-desk-worker/`)
 - **StoreDesk Mobile** — Flutter phone app (`store-desk-mobile/`). Prefer this name (legacy: Buddy).
 - **StoreDesk Web** — Next.js marketing + store license control plane (`store-desk-web/`)
 
@@ -59,8 +59,8 @@ Rules:
 
 ```txt
 Electron (store-desk-electron): npm run ci
-Server (store-desk-server):       npm run ci
-Mobile (store-desk-mobile):       npm run ci   # requires Flutter locally
+Worker (store-desk-worker):     npm run ci
+Mobile (store-desk-mobile):     npm run ci   # requires Flutter locally
 ```
 
 If Flutter is not installed, document verification as pending — do not fake success.

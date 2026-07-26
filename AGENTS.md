@@ -56,7 +56,7 @@ Cloud Hub: StoreDesk Cloud Hub
 ```
 
 Do not call the mobile app “StoreDesk Buddy.”
-Do not call the edge API “StoreDesk Server” — it is **StoreDesk Worker** (runs on the store PC; folder remains `store-desk-server/` until a repo rename).
+Do not call the edge API “StoreDesk Server” — it is **StoreDesk Worker** (folder/repo `store-desk-worker/`).
 Use **StoreDesk Mobile** and **StoreDesk Worker** in product copy.
 
 ---
@@ -292,7 +292,7 @@ StoreDesk uses a **parent Git repository with Git submodules**.
 ```txt
 StoreDesk/                         # parent Git repo (this workspace root when cloned)
 ├── store-desk-electron/           # submodule — StoreDesk desktop
-├── store-desk-server/             # submodule — StoreDesk Worker
+├── store-desk-worker/             # submodule — StoreDesk Worker
 ├── store-desk-mobile/             # submodule — StoreDesk Mobile
 ├── store-desk-web/                # submodule — StoreDesk Web (licenses)
 ├── store-desk-cloud-backend/      # submodule — Cloud Hub (WSS)
@@ -309,7 +309,7 @@ GitHub remotes:
 
 - Parent: `https://github.com/TRUPALIX9/StoreDesk.git`
 - Electron: `https://github.com/TRUPALIX9/store-desk-electron.git`
-- Server: `https://github.com/TRUPALIX9/store-desk-server.git`
+- Worker: `https://github.com/TRUPALIX9/store-desk-worker.git`
 - Mobile: `https://github.com/TRUPALIX9/store-desk-mobile.git`
 - Web: `https://github.com/storedesk-dev/StoreDesk-web.git`
 - Cloud Hub: `https://github.com/TRUPALIX9/store-desk-cloud-backend.git` (Epic 1)
@@ -318,7 +318,7 @@ Rules:
 
 - **Use Git submodules** — do not merge app repos into the parent codebase.
 - Do **not** convert to an npm/pnpm monorepo unless explicitly asked.
-- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-server`, `store-desk-mobile`, `store-desk-web`, `store-desk-cloud-backend`).
+- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-worker`, `store-desk-mobile`, `store-desk-web`, `store-desk-cloud-backend`) unless explicitly asked.
 - Do **not** rewrite or delete Git history.
 - Make app-specific code changes **inside the correct submodule**.
 - Commit submodule changes inside the submodule, push, then update the parent submodule pointer.
@@ -373,10 +373,10 @@ Settings
 
 # Server Structure
 
-Inside `store-desk-server`, use this structure:
+Inside `store-desk-worker`, use this structure:
 
 ```txt
-store-desk-server/
+store-desk-worker/
 ├── src/
 │   ├── index.ts
 │   ├── app.ts
@@ -1764,7 +1764,7 @@ Implementation priority:
 ```txt
 1. Add or update AGENTS.md.
 2. Create docs/wireframes.md from this plan.
-3. Create store-desk-server foundation.
+3. Create store-desk-worker foundation.
 4. Add models and services.
 5. Add backend APIs.
 6. Connect Electron to backend.
