@@ -30,7 +30,7 @@ electron   server    buddy
 | Tech Lead | `.cursor/agents/tech-lead.md` | Cross-repo architecture, API contracts, spikes |
 | Frontend (Electron) | `.cursor/agents/frontend-electron.md` | `store-desk-electron/` UI + MUI |
 | Backend (Server) | `.cursor/agents/backend-server.md` | `store-desk-server/` API + models |
-| Mobile (Buddy) | `.cursor/agents/mobile-buddy.md` | `store-desk-mobile/` Flutter |
+| Mobile (StoreDesk Mobile) | `.cursor/agents/mobile-buddy.md` | `store-desk-mobile/` Flutter |
 | UI/UX Designer | `.cursor/agents/ui-ux-designer.md` | Design critique (readonly by default) |
 | QA Verifier | `.cursor/agents/qa-verifier.md` | `npm run ci` / Flutter checks / regressions |
 | Docs Scribe | `.cursor/agents/docs-scribe.md` | `docs/`, folder `AGENTS.md`, skills sync |
@@ -62,7 +62,7 @@ Closest `AGENTS.md` wins for Codex/Cursor directory context:
 | `/tools/AGENTS.md` | Parent tooling helpers |
 | `/store-desk-electron/AGENTS.md` | Desktop app map |
 | `/store-desk-server/AGENTS.md` | API map |
-| `/store-desk-mobile/AGENTS.md` | Buddy app map |
+| `/store-desk-mobile/AGENTS.md` | StoreDesk Mobile app map |
 
 ## Skills (Cursor canonical)
 

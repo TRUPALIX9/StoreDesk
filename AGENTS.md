@@ -10,7 +10,7 @@ This project includes:
 2. **StoreDesk Server**  
    Local Node.js + Express + MongoDB backend.
 
-3. **StoreDesk Buddy**  
+3. **StoreDesk Mobile**  
    Flutter mobile helper app.
 
 The goal is to build a professional, themed, production-quality app for:
@@ -49,12 +49,12 @@ Use this branding:
 
 ```txt
 Main Desktop App: StoreDesk
-Mobile App: StoreDesk Buddy
+Mobile App: StoreDesk Mobile
 Backend/API: StoreDesk Server
 ```
 
-Do not call the mobile app "StoreDesk Mobile."
-Use **StoreDesk Buddy** everywhere.
+Do not call the mobile app “StoreDesk Buddy.”
+Use **StoreDesk Mobile** everywhere.
 
 ---
 
@@ -73,7 +73,7 @@ Build a local-first system where the store owner can:
 9. Compare true cost across vendors.
 10. Calculate price per pack, price per item, and price per base unit.
 11. Suggest a selling price using margin or markup rules.
-12. Pair StoreDesk Buddy mobile app using QR.
+12. Pair StoreDesk Mobile mobile app using QR.
 13. Let the phone scan barcodes, search products, compare prices, and upload invoices.
 
 ---
@@ -111,7 +111,7 @@ Use:
 - JWT or secure signed token for mobile authentication
 - Vitest for testing
 
-## Mobile: StoreDesk Buddy
+## Mobile: StoreDesk Mobile
 
 Use:
 
@@ -178,7 +178,7 @@ Do not hardcode random colors inside pages.
 
 ## Mobile Theme
 
-StoreDesk Buddy must feel simple and fast.
+StoreDesk Mobile must feel simple and fast.
 
 Style:
 
@@ -195,12 +195,12 @@ Style:
 
 # Local Connection Rule
 
-StoreDesk Buddy must never connect directly to MongoDB.
+StoreDesk Mobile must never connect directly to MongoDB.
 
 Correct connection:
 
 ```txt
-StoreDesk Buddy
+StoreDesk Mobile
     ↓
 Local Wi-Fi API URL
     ↓
@@ -232,7 +232,7 @@ StoreDesk desktop must provide two different QR codes.
 
 ## QR 1: Android APK Download QR
 
-This QR lets an Android phone download the StoreDesk Buddy APK.
+This QR lets an Android phone download the StoreDesk Mobile APK.
 
 Example target:
 
@@ -243,7 +243,7 @@ http://192.168.1.25:4000/downloads/storedesk-buddy.apk
 Desktop should label this clearly:
 
 ```txt
-Download StoreDesk Buddy for Android
+Download StoreDesk Mobile for Android
 ```
 
 Important:
@@ -254,7 +254,7 @@ Important:
 
 ## QR 2: Mobile Pairing QR
 
-This QR connects the installed StoreDesk Buddy app to StoreDesk Server.
+This QR connects the installed StoreDesk Mobile app to StoreDesk Server.
 
 It should contain:
 
@@ -273,8 +273,8 @@ expiresAt: date/time
 
 Mobile flow:
 
-1. User installs StoreDesk Buddy.
-2. User opens StoreDesk Buddy.
+1. User installs StoreDesk Mobile.
+2. User opens StoreDesk Mobile.
 3. User taps "Scan Pairing QR."
 4. User scans QR from StoreDesk desktop.
 5. App saves server URL and token.
@@ -290,7 +290,9 @@ StoreDesk uses a **parent Git repository with Git submodules**.
 StoreDesk/                         # parent Git repo (this workspace root when cloned)
 ├── store-desk-electron/           # submodule — StoreDesk desktop
 ├── store-desk-server/             # submodule — StoreDesk Server
-├── store-desk-mobile/             # submodule — StoreDesk Buddy
+├── store-desk-mobile/             # submodule — StoreDesk Mobile
+├── store-desk-web/                # submodule — StoreDesk Web (licenses)
+├── brand-kit/                     # logos + icon
 ├── docs/
 ├── scripts/
 ├── AGENTS.md
@@ -305,12 +307,13 @@ GitHub remotes:
 - Electron: `https://github.com/TRUPALIX9/store-desk-electron.git`
 - Server: `https://github.com/TRUPALIX9/store-desk-server.git`
 - Mobile: `https://github.com/TRUPALIX9/store-desk-mobile.git`
+- Web: `https://github.com/storedesk-dev/StoreDesk-web.git`
 
 Rules:
 
 - **Use Git submodules** — do not merge app repos into the parent codebase.
 - Do **not** convert to an npm/pnpm monorepo unless explicitly asked.
-- Do **not** rename the three submodule folders.
+- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-server`, `store-desk-mobile`, `store-desk-web`).
 - Do **not** rewrite or delete Git history.
 - Make app-specific code changes **inside the correct submodule**.
 - Commit submodule changes inside the submodule, push, then update the parent submodule pointer.
@@ -769,7 +772,7 @@ nearest_0_99
 
 ## MobileDevice
 
-Represents paired StoreDesk Buddy devices.
+Represents paired StoreDesk Mobile devices.
 
 MobileDevice fields should support:
 
@@ -1017,7 +1020,7 @@ GET    /api/mobile/review-queue
 │ Settings      │ │ 1. Start Local Server       [Running ✅]       │ │
 │               │ │ 2. Database Connection      [Connected ✅]     │ │
 │               │ │ 3. Mobile Access            [Configure]        │ │
-│               │ │ 4. Download StoreDesk Buddy [Show QR]          │ │
+│               │ │ 4. Download StoreDesk Mobile [Show QR]          │ │
 │               │ │ 5. Pair Phone                [Generate QR]      │ │
 │               │ └────────────────────────────────────────────────┘ │
 │               │                                                    │
@@ -1057,7 +1060,7 @@ Setup checklist:
 4. Add first product
 5. Add first product variant
 6. Add first vendor price
-7. Download StoreDesk Buddy
+7. Download StoreDesk Mobile
 8. Pair mobile device
 9. Upload first invoice
 ```
@@ -1402,7 +1405,7 @@ Do not build full lottery logic until vendor pricing and invoice flow are stable
 │ URL: http://192.168.1.25:4000                                      │
 │                                                                    │
 │ ┌────────────────────────────┐ ┌────────────────────────────┐       │
-│ │ Download StoreDesk Buddy   │ │ Pair Mobile Device          │       │
+│ │ Download StoreDesk Mobile   │ │ Pair Mobile Device          │       │
 │ │                            │ │                            │       │
 │ │ Android APK QR             │ │ Pairing QR                  │       │
 │ │ [ QR CODE ]                │ │ [ QR CODE ]                 │       │
@@ -1436,13 +1439,13 @@ Developer/debug info
 
 ---
 
-# StoreDesk Buddy Mobile Wireframes
+# StoreDesk Mobile Mobile Wireframes
 
 ## First Launch
 
 ```txt
 ┌────────────────────────────┐
-│ StoreDesk Buddy            │
+│ StoreDesk Mobile            │
 ├────────────────────────────┤
 │ Welcome                    │
 │                            │
@@ -1474,7 +1477,7 @@ Developer/debug info
 
 ```txt
 ┌────────────────────────────┐
-│ StoreDesk Buddy            │
+│ StoreDesk Mobile            │
 ├────────────────────────────┤
 │ Connected: StoreDesk ✅    │
 │                            │
@@ -1679,7 +1682,7 @@ Complete when:
 - Suggested selling price works
 ```
 
-## MVP 2 — StoreDesk Buddy Lookup
+## MVP 2 — StoreDesk Mobile Lookup
 
 Complete when:
 
@@ -1709,7 +1712,7 @@ Complete when:
 ```txt
 - Dashboard/Mobile Access shows APK QR
 - Dashboard/Mobile Access shows pairing QR
-- StoreDesk Buddy can connect through QR
+- StoreDesk Mobile can connect through QR
 ```
 
 ## MVP 5 — Release Candidate
@@ -1810,7 +1813,7 @@ If Flutter is not installed locally, do not fake success. Document it as pending
 - Do not save raw invoice extraction directly as final vendor price.
 - Always require invoice review before creating VendorPrice.
 - Use StoreDesk for desktop.
-- Use StoreDesk Buddy for mobile.
+- Use StoreDesk Mobile for mobile.
 - Use StoreDesk Server for backend.
 - StoreDesk Server runs on port 4310 and listens on 0.0.0.0 for LAN mobile access.
 - Backend and MongoDB are local-first — no hosted backend or hosted MongoDB unless explicitly asked.
@@ -1831,7 +1834,7 @@ StoreDesk is the desktop command center for a convenience store or gas station.
 
 The owner can manage products, vendors, invoices, vendor prices, and pricing rules.
 
-StoreDesk Buddy is the phone helper app.
+StoreDesk Mobile is the phone helper app.
 
 Employees can scan products, search items, view best vendor price, view suggested selling price, and upload invoices.
 

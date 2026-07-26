@@ -1,6 +1,6 @@
 # StoreDesk
 
-Local-first vendor pricing and invoice-review system for convenience stores and gas stations.
+Local-first edge ops with optional cloud license control for convenience stores and gas stations.
 
 **StoreDesk is not an inventory system.** It focuses on products, retail prices, vendor costs, invoice extraction review, and mobile helper workflows.
 
@@ -8,15 +8,16 @@ Local-first vendor pricing and invoice-review system for convenience stores and 
 
 ## Overview
 
-StoreDesk contains three app repos, tracked from this parent repo as Git submodules.
+StoreDesk contains app repos, tracked from this parent repo as Git submodules.
 
 | App | Submodule folder | Role |
 | --- | --- | --- |
 | StoreDesk | `store-desk-electron/` | Electron desktop admin |
-| StoreDesk Server | `store-desk-server/` | Local Express + MongoDB API |
-| StoreDesk Buddy | `store-desk-mobile/` | Flutter mobile companion |
+| StoreDesk Server | `store-desk-server/` | Edge Express + local MongoDB API |
+| StoreDesk Mobile | `store-desk-mobile/` | Flutter phone companion |
+| StoreDesk Web | `store-desk-web/` | Next.js marketing + store licenses (Atlas) |
 
-Everything runs locally. No hosted backend or hosted MongoDB is required.
+Catalog and Commander stay on the store PC. Atlas is for licenses/registry only.
 
 ## Repository Model
 
@@ -25,6 +26,7 @@ This repo is the parent repository:
 - `store-desk-electron` -> https://github.com/TRUPALIX9/store-desk-electron
 - `store-desk-server` -> https://github.com/TRUPALIX9/store-desk-server
 - `store-desk-mobile` -> https://github.com/TRUPALIX9/store-desk-mobile
+- `store-desk-web` -> https://github.com/storedesk-dev/StoreDesk-web
 
 Each submodule has its own Git history, remote, commits, CI, and release workflow. The parent repo tracks which app commits belong to the complete StoreDesk project.
 
@@ -33,8 +35,10 @@ Each submodule has its own Git history, remote, commits, CI, and release workflo
 ```txt
 StoreDesk/
 |-- store-desk-electron/     # submodule: desktop/admin app
-|-- store-desk-server/       # submodule: local API/server
-|-- store-desk-mobile/       # submodule: Flutter mobile app
+|-- store-desk-server/       # submodule: edge API/server
+|-- store-desk-mobile/       # submodule: Flutter phone app
+|-- store-desk-web/          # submodule: web + licenses
+|-- brand-kit/
 |-- docs/
 |-- scripts/
 |-- AGENTS.md

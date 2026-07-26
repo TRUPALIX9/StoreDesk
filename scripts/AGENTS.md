@@ -4,22 +4,28 @@ Parent context: root `AGENTS.md`.
 
 ## Purpose
 
-Offline data prep for invoice seeds and helper scripts used by StoreDesk.
+Local helper scripts and offline invoice seed data for StoreDesk.
 
 ## Typical contents
 
 | Asset | Role |
 |-------|------|
-| `invoices/` | Normalized invoice JSON (e.g. Gandhi/Trident) |
-| `make.ps1` / related | Local helper scripts |
-| `README.md` | Human how-to for regenerating artifacts |
-| Commander helpers | Live Verifone Commander probe/login scripts (not committed secrets) |
+| `make.ps1` | Windows task runner behind `make` / `make.cmd` |
+| `package.json` | Optional Node helpers for scripts |
+| `invoices/` | Normalized invoice JSON seeds |
+| `README.md` | Human how-to |
+
+## Do not keep
+
+- `commander-downloads/` probe XML dumps
+- Committed Commander credentials / session XML
+
+Price Book PLUs come from **live Commander** via app tooling, not checked-in XML dumps.
 
 ## Rules
 
-- Price Book PLUs come from **live Commander**, not an Excel catalog dump.
-- Do not reintroduce `Hop-in-4630-*.xlsx` / `hop-in-4630-catalog.normalized.json` seed pipelines.
-- Prefer deterministic, documented transforms for invoice JSON; do not silently change price meaning.
+- Do not reintroduce Excel catalog seed pipelines (`Hop-in-4630-*.xlsx`).
+- Prefer deterministic, documented transforms for invoice JSON.
 - Commit script changes in the **parent** repo (not submodules).
 
 ## Owner

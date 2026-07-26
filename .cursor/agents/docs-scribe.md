@@ -29,5 +29,5 @@ You keep agent/human docs accurate. Prefer surgical edits over new essay docs.
 ## Definition of done
 
 - Links resolve to real paths
-- Naming uses StoreDesk / StoreDesk Server / StoreDesk Buddy
+- Naming uses StoreDesk / StoreDesk Server / StoreDesk Mobile
 - Handoff back to `eng-manager` with changed doc list

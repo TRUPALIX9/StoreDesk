@@ -56,8 +56,13 @@ PageShell
 2. **Labels on controls** — meaning from fields, not paragraphs.
 3. **Alerts only when needed** — blocked actions, errors, empty states.
 4. **Flex/Stack first** — `Stack` for 1D; grid via `FormGrid` / `Box`.
-5. **Flat surfaces** — outlined Paper; no glow KPI kits; navy/green only.
+5. **Flat surfaces** — outlined Paper; no glow KPI kits; brand blue `#1A63F4` / green `#00A87B` only (`brand-kit/`).
 6. **One search** — page FilterBar only for that list.
+
+## Brand
+
+Assets: `brand-kit/` (canonical: `logo-mark.svg`, `logo-lockup-horizontal.svg`, `app-icon.ico`).  
+Desktop copies live under `store-desk-electron/public/brand/`.
 
 ## Agent workflow (UI change)
 

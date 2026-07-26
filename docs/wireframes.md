@@ -37,7 +37,7 @@ List invoices needing review → open invoice → editable rows → match produc
 - Pairing QR / 6-digit code
 - Paired devices list with disable action
 
-## StoreDesk Buddy
+## StoreDesk Mobile
 
 ```txt
 Connect → Home → Scan | Search | Upload Invoice | Settings

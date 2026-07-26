@@ -26,7 +26,12 @@ Make on Windows cannot natively open a second terminal for the API server, check
 
 ## Other files in this folder
 
-Data assets only (catalog JSON, invoice samples, Excel source) - not run commands.
+| Path | Role |
+|------|------|
+| `invoices/` | Normalized invoice JSON seeds |
+| `package.json` | Optional Node helpers |
+
+Do **not** commit `commander-downloads/` probe dumps or Commander session XML.
 
 ## First-time clone
 

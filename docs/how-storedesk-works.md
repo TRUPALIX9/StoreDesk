@@ -8,7 +8,7 @@ For agent/team ops see [`agent-team-guide.md`](./agent-team-guide.md) (full) and
 
 ## 1. What StoreDesk is
 
-**StoreDesk** is a **local-first** desktop + phone system for convenience stores and gas stations.
+**StoreDesk** is an **edge-first** desktop + phone system for convenience stores and gas stations, with a **cloud control plane** for multi-store licenses (StoreDesk Web + Atlas). Catalog and Commander stay on the store PC.
 
 It helps the store owner and staff:
 
@@ -16,7 +16,8 @@ It helps the store owner and staff:
 - Browse **live Verifone Commander PLUs** and local vendor costs
 - Keep a **Price Book** / **Cost Analysis** sheet (UPC-centered sell + vendor columns)
 - Upload **invoices**, review extracted lines, and save confirmed **vendor prices**
-- Pair **StoreDesk Buddy** on a phone to scan barcodes and look up prices on the store Wi‑Fi
+- Pair **StoreDesk Mobile** on a phone (LAN today; cloud-relayed later)
+- Manage **store licenses** and agent keys on StoreDesk Web (Vercel + Atlas M0)
 
 It is **not** a stock / inventory-count system.
 
@@ -32,26 +33,38 @@ It is **not** a stock / inventory-count system.
 
 ## 2. The three apps
 
-Everything lives in one parent Git repo with **three submodules**:
+Everything lives in one parent Git repo with **submodules**:
 
 ```txt
 StoreDesk/                          ← parent (docs, scripts, submodule pointers)
 ├── store-desk-electron/            ← StoreDesk (desktop)
-├── store-desk-server/              ← StoreDesk Server (API)
-└── store-desk-mobile/              ← StoreDesk Buddy (phone)
+├── store-desk-server/              ← StoreDesk Server (edge API)
+├── store-desk-mobile/              ← StoreDesk Mobile (phone)
+└── store-desk-web/                 ← StoreDesk Web (marketing + licenses)
 ```
 
 | Name | Tech | Job |
 |------|------|-----|
 | **StoreDesk** | Electron + React + MUI | Admin / ops desktop UI |
-| **StoreDesk Server** | Node + Express (+ optional local Mongo) | Single API all clients use |
-| **StoreDesk Buddy** | Flutter | Phone helper on the same Wi‑Fi |
+| **StoreDesk Server** | Node + Express + local Mongo | Edge API (catalog, Commander, invoices) |
+| **StoreDesk Mobile** | Flutter | Phone helper (LAN now; Hub later) |
+| **StoreDesk Web** | Next.js on Vercel | Product site + store license admin (Atlas) |
 
 Product branding:
 
 - Desktop = **StoreDesk**
 - API = **StoreDesk Server**
-- Phone = **StoreDesk Buddy** (never “StoreDesk Mobile”)
+- Phone = **StoreDesk Mobile** (not “Buddy”)
+- Web = **StoreDesk Web**
+
+### Target cloud shape (migration)
+
+```txt
+Phone / Desktop  →  Cloud Hub (WSS)  →  Edge Agent on store PC  →  local Mongo + Commander
+Admin browser    →  StoreDesk Web     →  Atlas (licenses only)
+```
+
+Keep `:4310` until Desktop + Mobile dual-mode through the Hub is proven. No Redis in Phase 0–1.(never “StoreDesk Mobile”)
 
 ---
 
@@ -65,7 +78,7 @@ Product branding:
 └─────────────────────┘         │  • catalog / prices      │
                                 │  • invoices / review     │
 ┌─────────────────────┐  Wi‑Fi  │  • POS daily / sheets    │
-│  StoreDesk Buddy    │────────►│  • mobile pair + lookup  │
+│  StoreDesk Mobile    │────────►│  • mobile pair + lookup  │
 │  (phone)            │  token  │  • optional Mongo blob   │
 │  http://LAN_IP:4310 │         └──────────────────────────┘
 └─────────────────────┘
@@ -119,7 +132,7 @@ The server is the **source of truth** for:
 
 Runtime note: today much of the live data is an **in-memory store**. If Mongo is configured, the whole store can be **saved/loaded as a blob** (`AppState`). That is not yet “one Mongo collection per entity” for every request.
 
-### 4.3 StoreDesk Buddy — phone helper
+### 4.3 StoreDesk Mobile — phone helper
 
 Typical flow:
 
@@ -178,7 +191,7 @@ Live Commander PLU (name, UPC, mod, dept, sell, unit)
 
 This sits beside the Product/Variant model. Unifying them is a future product decision. See [`verifone-commander-price-book.md`](./verifone-commander-price-book.md).
 
-### E. Pair StoreDesk Buddy
+### E. Pair StoreDesk Mobile
 
 ```txt
 Desktop Settings → Mobile Access / Link phone

@@ -12,7 +12,7 @@
 |------|------------|-----------------|
 | **StoreDesk** | Electron desktop admin app | `store-desk-electron/` → `https://github.com/TRUPALIX9/store-desk-electron.git` |
 | **StoreDesk Server** | Node.js + Express API (local) | `store-desk-server/` → `https://github.com/TRUPALIX9/store-desk-server.git` |
-| **StoreDesk Buddy** | Flutter phone helper (never call it “StoreDesk Mobile”) | `store-desk-mobile/` → `https://github.com/TRUPALIX9/store-desk-mobile.git` |
+| **StoreDesk Mobile** | Flutter phone helper (never call it “StoreDesk Mobile”) | `store-desk-mobile/` → `https://github.com/TRUPALIX9/store-desk-mobile.git` |
 | **Parent** | Docs, scripts, submodule pointers | `StoreDesk/` → `https://github.com/TRUPALIX9/StoreDesk.git` |
 
 ---
@@ -28,7 +28,7 @@
 - **POS Reports:** Ruby Commander period reports (`vrubyrept`) — print-aligned KPIs (tax, fuel/merch, network, departments, tenders).
 - **Transactions:** paginated ticket cards from Commander T-Log (`vtransset`).
 - Products / variants / vendors / vendor price history / invoice upload → review → confirm prices.
-- **StoreDesk Buddy:** pair over LAN, scan barcodes, look up products/prices, upload invoices.
+- **StoreDesk Mobile:** pair over LAN, scan barcodes, look up products/prices, upload invoices.
 - Suggested selling prices from margin/markup rules (no inventory math).
 
 ### Does not (non-negotiable)
@@ -50,7 +50,7 @@
 └─────────────────────┘         │  catalog / prices / POS  │
                                 │  invoices / mobile pair  │
 ┌─────────────────────┐  Wi‑Fi  │  optional Mongo blob     │
-│  StoreDesk Buddy    │────────►│                          │
+│  StoreDesk Mobile    │────────►│                          │
 │  http://LAN_IP:4310 │  token  └──────────────────────────┘
 └─────────────────────┘
 ```
@@ -273,7 +273,7 @@ See `store-desk-electron/.env.example`. Do not commit `.env`, `scripts/commander
 StoreDesk/                          # parent
 ├── store-desk-electron/            # StoreDesk desktop (+ embedded API)
 ├── store-desk-server/              # StoreDesk Server
-├── store-desk-mobile/              # StoreDesk Buddy
+├── store-desk-mobile/              # StoreDesk Mobile
 ├── docs/                           # architecture, Verifone, WOs, this brief
 ├── scripts/                        # Commander probe/fetch helpers
 ├── AGENTS.md                       # product master prompt
@@ -330,5 +330,5 @@ store-desk-mobile:    npm run ci   # needs Flutter locally
 
 ## 11. One-sentence pitch
 
-**StoreDesk** is a local-first desktop command center (with **StoreDesk Buddy** on Wi‑Fi) for convenience stores: live Verifone Commander price book and Ruby/T-Log reporting, Sheets-backed POS analytics, vendor cost overlays, and invoice-reviewed vendor prices — **without** stock inventory.
+**StoreDesk** is a local-first desktop command center (with **StoreDesk Mobile** on Wi‑Fi) for convenience stores: live Verifone Commander price book and Ruby/T-Log reporting, Sheets-backed POS analytics, vendor cost overlays, and invoice-reviewed vendor prices — **without** stock inventory.
 )

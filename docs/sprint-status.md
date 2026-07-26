@@ -9,7 +9,7 @@ StoreDesk is now an end-to-end local-first product pricing and invoice review wo
 - `StoreDesk` parent repo with submodule pointers.
 - `store-desk-electron` desktop/admin app.
 - `store-desk-server` local API/server.
-- `store-desk-mobile` StoreDesk Buddy Flutter companion app.
+- `store-desk-mobile` StoreDesk Mobile Flutter companion app.
 
 The system remains intentionally scoped to catalog, vendors, vendor costs, retail prices, invoice review, and mobile scanning/upload. It is not an inventory/stock/reorder system.
 
@@ -34,7 +34,7 @@ Desktop UI/UX:
 
 Mobile UI/UX:
 
-- StoreDesk Buddy has connect-first routing.
+- StoreDesk Mobile has connect-first routing.
 - Screens exist for connect, pairing, home, scanner, product lookup, product search, vendor prices, invoice upload, barcode display, and settings.
 - Mobile uses secure storage for server URL/token and Dio API client with bearer auth.
 - Mobile app is built for Android locally.
@@ -88,7 +88,7 @@ Toolchain/build:
 ## Next Invoice Workflow
 
 1. Add vendor invoice files.
-2. Upload invoice in desktop or StoreDesk Buddy.
+2. Upload invoice in desktop or StoreDesk Mobile.
 3. Review extracted lines.
 4. Match by UPC, SKU, vendor item code, or normalized description.
 5. Confirm reviewed invoice.

@@ -56,7 +56,7 @@ APK route (after APK is copied):
 
 If APK is missing, the server returns **404 JSON** with build instructions.
 
-## StoreDesk Buddy (Android APK)
+## StoreDesk Mobile (Android APK)
 
 ### Windows Flutter setup
 
@@ -116,8 +116,8 @@ http://localhost:4310/downloads/storedesk-buddy.apk
 
 5. Open **Mobile Access** — confirm QR codes and server URL.
 6. Connect Android phone to the same Wi-Fi.
-7. Install StoreDesk Buddy APK (from download route or `adb install`).
-8. Open StoreDesk Buddy and scan pairing QR.
+7. Install StoreDesk Mobile APK (from download route or `adb install`).
+8. Open StoreDesk Mobile and scan pairing QR.
 9. Confirm pairing success on desktop.
 10. Scan or search a product; view vendor prices.
 11. Upload invoice PDF/image from mobile.

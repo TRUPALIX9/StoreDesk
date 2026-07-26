@@ -39,7 +39,7 @@ StoreDesk (Electron React)
                       ├─ memory arrays (+ optional Mongo AppState blob)
                       └─ files / downloads
 
-StoreDesk Buddy (Flutter)
+StoreDesk Mobile (Flutter)
   └─ Wi‑Fi LAN  →  same Server /api/mobile/*  (device Bearer token)
 ```
 
