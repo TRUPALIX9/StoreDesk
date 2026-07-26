@@ -16,6 +16,7 @@ StoreDesk contains app repos, tracked from this parent repo as Git submodules.
 | StoreDesk Server | `store-desk-server/` | Edge Express + local MongoDB API |
 | StoreDesk Mobile | `store-desk-mobile/` | Flutter phone companion |
 | StoreDesk Web | `store-desk-web/` | Next.js marketing + store licenses (Atlas) |
+| Cloud Hub | `store-desk-cloud-backend/` | WSS store rooms (Epic 1) |
 
 Catalog and Commander stay on the store PC. Atlas is for licenses/registry only.
 

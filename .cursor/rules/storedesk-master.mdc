@@ -17,6 +17,7 @@ This is the **StoreDesk parent repo**. App code lives in Git submodules:
 - `store-desk-server/` — StoreDesk Server (edge API)
 - `store-desk-mobile/` — StoreDesk Mobile
 - `store-desk-web/` — StoreDesk Web (marketing + license admin on Vercel)
+- `store-desk-cloud-backend/` — Cloud Hub (WSS rooms; Epic 1)
 
 Rules:
 
