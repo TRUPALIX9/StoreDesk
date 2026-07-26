@@ -292,6 +292,7 @@ StoreDesk/                         # parent Git repo (this workspace root when c
 ├── store-desk-server/             # submodule — StoreDesk Server
 ├── store-desk-mobile/             # submodule — StoreDesk Mobile
 ├── store-desk-web/                # submodule — StoreDesk Web (licenses)
+├── store-desk-cloud-backend/      # submodule — Cloud Hub (WSS)
 ├── brand-kit/                     # logos + icon
 ├── docs/
 ├── scripts/
@@ -308,12 +309,13 @@ GitHub remotes:
 - Server: `https://github.com/TRUPALIX9/store-desk-server.git`
 - Mobile: `https://github.com/TRUPALIX9/store-desk-mobile.git`
 - Web: `https://github.com/storedesk-dev/StoreDesk-web.git`
+- Cloud Hub: `https://github.com/storedesk-dev/store-desk-cloud-backend.git` (Epic 1)
 
 Rules:
 
 - **Use Git submodules** — do not merge app repos into the parent codebase.
 - Do **not** convert to an npm/pnpm monorepo unless explicitly asked.
-- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-server`, `store-desk-mobile`, `store-desk-web`).
+- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-server`, `store-desk-mobile`, `store-desk-web`, `store-desk-cloud-backend`).
 - Do **not** rewrite or delete Git history.
 - Make app-specific code changes **inside the correct submodule**.
 - Commit submodule changes inside the submodule, push, then update the parent submodule pointer.
