@@ -1,8 +1,8 @@
 # WO-20260726-edge-agent-outbound-wss
 
-- **Status:** in_progress
+- **Status:** done
 - **Epic:** 3 — Edge Agent (StoreDesk Worker)
-- **Points:** 13 (this slice focuses on G2 outbound WSS; G1/G3/G4 follow)
+- **Points:** 13
 - **Primary owner:** backend-server
 - **Modules:** store-desk-server | store-desk-cloud-backend
 
@@ -14,10 +14,10 @@ StoreDesk Worker on the store PC opens an **outbound** WebSocket to Cloud Hub wi
 
 | Story | Pts | Status |
 |-------|-----|--------|
-| G2 Outbound WSS | 3 | in_progress |
-| G1 Consolidate embed | 5 | deferred |
-| G3 Commander relay | 3 | deferred (stub relay ack only) |
-| G4 Windows service notes | 2 | deferred |
+| G2 Outbound WSS | 3 | done |
+| G1 Consolidate embed | 5 | deferred (Epic 4 dual-mode) |
+| G3 Commander relay | 3 | done (HTTP `/api/*` loopback relay) |
+| G4 Windows service notes | 2 | done (README) |
 
 ## Env (Worker)
 
@@ -29,16 +29,29 @@ AGENT_KEY=sk_…
 
 If unset, Worker runs LAN-only (current behavior).
 
+## Relay payload (G3)
+
+```txt
+Client → Hub room:
+  { "type":"relay", "payload":{ "id", "method", "path":"/api/…", "query?", "body?" } }
+Agent → Hub room:
+  { "type":"relay", "from":"agent", "payload":{ "id", "ok", "status", "body"|"error" } }
+```
+
+Paths must be under `/api/` on `127.0.0.1:$PORT` only.
+
 ## E2E
 
 - [x] Worker starts `:4310` with or without Hub env
-- [x] Unit: hello payload + ping/pong + relay stub
+- [x] Unit: hello + ping/pong + HTTP relay validation
 - [x] Health includes `hub` status object
-- [ ] Live Hub join (needs Hub process + created GitHub remote)
+- [x] Unit: path allowlist + method reject
+- [ ] Live Hub join (ops: Hub GitHub/org remote + running Hub)
 - [ ] Desktop still uses localhost:4310 (manual)
 
 ## Shipped
 
 - `src/services/hubOutbound.service.ts`
+- `src/services/hubRelay.service.ts`
 - Env: `HUB_WS_URL`, `STORE_ID`, `AGENT_KEY`
-- Commit on Worker remote: see parent master WO log
+- README: Cloud Hub + Windows service notes

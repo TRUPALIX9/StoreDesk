@@ -20,6 +20,7 @@ Track StoreDesk migration from local-first to cloud-relayed multi-store (Web + A
 - Keep `:4310` until dual-mode proven
 - Brand: `#1A63F4` / `#00A87B` (+ kit shadows/mint)
 - Web remote: `https://github.com/storedesk-dev/StoreDesk-web`
+- **Marketing:** only ship features that exist (Worker + Desktop + Mobile on backoffice LAN). Do not advertise Hub/cloud licenses to clients until dual-mode ships.
 
 ## Child WOs
 
@@ -28,27 +29,27 @@ Track StoreDesk migration from local-first to cloud-relayed multi-store (Web + A
 | WO-20260726-scripts-commander-cleanup | 2 | done |
 | WO-20260726-brand-kit-rollout | 5 | done |
 | WO-20260726-docs-cloud-mobile-rename | 3 | done |
-| WO-20260726-storedesk-web-foundation | 8 | done (pushed) |
-| WO-20260726-cloud-hub-foundation | 8 | done locally — GitHub `storedesk-dev/store-desk-cloud-backend` **not created yet** (org permission) |
-| WO-20260726-edge-agent-outbound-wss | 13 | in_progress (G2 shipped; G1/G3/G4 deferred) |
+| WO-20260726-storedesk-web-foundation | 8 | done (ongoing polish) |
+| WO-20260726-cloud-hub-foundation | 8 | done locally — GitHub `storedesk-dev/store-desk-cloud-backend` **not created yet** |
+| WO-20260726-edge-agent-outbound-wss | 13 | done (live Hub E2E pending org repo) |
+| WO-20260726-desktop-dual-mode | 8 | todo |
 
 ## Later epics
 
 | Epic | Pts | WO |
 |------|-----|-----|
-| Desktop dual-mode | 8 | TBD (Epic 4) |
 | StoreDesk Mobile cloud | 8 | TBD (Epic 5) |
 
 ## E2E / push log
 
-- Web: pushed `801423f` → storedesk-dev/StoreDesk-web
-- Electron Worker rename: `e2126d1` pushed
-- Worker (server) rename: `c55018d` pushed; Hub outbound: `9622a90` pushed
-- Mobile docs: `66a1a42` pushed
-- Hub GitHub repo: blocked — `TRUPALIX9 cannot create a repository for storedesk-dev`
+- Web: light theme + client-facing product story (no Hub marketing)
+- Worker Hub outbound + G3 relay + G4 notes
+- Hub GitHub repo: blocked — org create permission
 
 ## Handoff
 
-### HO — 2026-07-26 continue
+### HO — 2026-07-26 push + dual-mode WO
 
-- Next: create Hub repo under storedesk-dev org, then G3 Commander relay + G4 Windows service notes; then Desktop dual-mode.
+- Web marketing trimmed to Worker / Desktop / Mobile / local backend only.
+- Edge Agent WO closed (code); live Hub join still ops-blocked.
+- Next: push Web + Worker; open Desktop dual-mode; create Hub remote when org allows.
