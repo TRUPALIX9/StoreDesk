@@ -14,8 +14,8 @@ StoreDesk Desktop can run against **local Worker `:4310`** (default) and, when H
 
 | Story | Pts | Status |
 |-------|-----|--------|
-| D1 Mode switch / settings | 3 | todo |
-| D2 Prefer localhost:4310 | 2 | todo |
+| D1 Mode switch / settings | 3 | done (Local Worker URL; Hub mode deferred) |
+| D2 Prefer localhost:4310 | 2 | done (default `127.0.0.1:4310`) |
 | D3 Hub client path (relay) | 3 | todo |
 
 ## Locked
@@ -26,11 +26,11 @@ StoreDesk Desktop can run against **local Worker `:4310`** (default) and, when H
 
 ## E2E
 
-- [ ] Desktop settings: Local Worker URL
-- [ ] Health check against `:4310`
+- [x] Desktop settings: Local Worker URL
+- [x] Default `http://127.0.0.1:4310`
 - [ ] Optional Hub connect smoke (when Hub env present)
 - [ ] `npm run ci` in electron
 
 ## Handoff
 
-Opened after Edge Agent G2/G3/G4 code complete. Start when Hub remote exists or continue LAN-only Desktop polish first.
+D1/D2 shipped in Settings + `api/config.ts`. D3 waits on Hub org remote.
