@@ -38,6 +38,7 @@ Hub rejects bad key with close 4401
 - [x] Bad key rejected (4401)
 - [x] `GET /health` 200
 - [x] `npm run ci` passed
+- [x] GitHub remote: `https://github.com/TRUPALIX9/store-desk-cloud-backend`
 - [ ] Deploy to Cloud Run (ops follow-up)
 - [ ] Wire live Atlas AGENT_KEY from Web-created stores (ops: set MONGODB_URI)
 

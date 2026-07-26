@@ -30,7 +30,7 @@ Track StoreDesk migration from local-first to cloud-relayed multi-store (Web + A
 | WO-20260726-brand-kit-rollout | 5 | done |
 | WO-20260726-docs-cloud-mobile-rename | 3 | done |
 | WO-20260726-storedesk-web-foundation | 8 | done (ongoing polish) |
-| WO-20260726-cloud-hub-foundation | 8 | done locally — GitHub `storedesk-dev/store-desk-cloud-backend` **not created yet** |
+| WO-20260726-cloud-hub-foundation | 8 | done — pushed `https://github.com/TRUPALIX9/store-desk-cloud-backend` |
 | WO-20260726-edge-agent-outbound-wss | 13 | done (live Hub E2E pending org repo) |
 | WO-20260726-desktop-dual-mode | 8 | in_progress (D1/D2 done; D3 Hub client blocked on org repo) |
 
@@ -44,12 +44,11 @@ Track StoreDesk migration from local-first to cloud-relayed multi-store (Web + A
 
 - Web: light theme + client-facing product story (no Hub marketing)
 - Worker Hub outbound + G3 relay + G4 notes
-- Hub GitHub repo: blocked — org create permission
+- Hub GitHub repo: `https://github.com/TRUPALIX9/store-desk-cloud-backend` (private)
 
 ## Handoff
 
-### HO — 2026-07-26 push + dual-mode WO
+### HO — 2026-07-26 Hub remote on TRUPALIX9
 
-- Web marketing trimmed to Worker / Desktop / Mobile / local backend only.
-- Edge Agent WO closed (code); live Hub join still ops-blocked.
-- Next: push Web + Worker; open Desktop dual-mode; create Hub remote when org allows.
+- Hub remote: `https://github.com/TRUPALIX9/store-desk-cloud-backend` (private), submodule URL updated.
+- Next: live Hub join E2E with Worker; Desktop dual-mode D3.

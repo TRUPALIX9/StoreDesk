@@ -12,4 +12,4 @@
 	url = https://github.com/storedesk-dev/StoreDesk-web.git
 [submodule "store-desk-cloud-backend"]
 	path = store-desk-cloud-backend
-	url = https://github.com/storedesk-dev/store-desk-cloud-backend.git
+	url = https://github.com/TRUPALIX9/store-desk-cloud-backend.git

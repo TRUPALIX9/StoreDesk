@@ -312,7 +312,7 @@ GitHub remotes:
 - Server: `https://github.com/TRUPALIX9/store-desk-server.git`
 - Mobile: `https://github.com/TRUPALIX9/store-desk-mobile.git`
 - Web: `https://github.com/storedesk-dev/StoreDesk-web.git`
-- Cloud Hub: `https://github.com/storedesk-dev/store-desk-cloud-backend.git` (Epic 1)
+- Cloud Hub: `https://github.com/TRUPALIX9/store-desk-cloud-backend.git` (Epic 1)
 
 Rules:
 
