@@ -34,6 +34,6 @@ Primary: `docs-scribe`. Tech contract edits reviewed by `tech-lead`.
 
 ## Rules
 
-- Product names: StoreDesk / StoreDesk Server / StoreDesk Mobile
+- Product names: StoreDesk / StoreDesk Worker / StoreDesk Mobile
 - Document local-first (port 4310); no hosted backend unless asked
 - Do not document stock/inventory product scope as in-scope

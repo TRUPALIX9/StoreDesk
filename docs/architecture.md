@@ -7,7 +7,7 @@ Local-first system for convenience stores and gas stations. Three apps share one
 | Component | Tech | Role |
 |-----------|------|------|
 | **StoreDesk** | Electron + React + MUI | Desktop admin UI |
-| **StoreDesk Server** | Node.js + Express + MongoDB | Local API on port 4310 |
+| **StoreDesk Worker** | Node.js + Express + MongoDB | Local API on port 4310 |
 | **StoreDesk Buddy** | Flutter | Mobile scanning and invoice upload |
 
 ## Data flow
@@ -15,7 +15,7 @@ Local-first system for convenience stores and gas stations. Three apps share one
 ```txt
 Desktop / Mobile UI
         ↓ HTTP (JSON)
-StoreDesk Server (Express)
+StoreDesk Worker (Express)
         ↓
 MongoDB (local)  — or in-memory store when MONGO_URI is unset
 ```

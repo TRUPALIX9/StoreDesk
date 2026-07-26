@@ -7,8 +7,8 @@ This project includes:
 1. **StoreDesk**  
    Main Electron desktop admin app.
 
-2. **StoreDesk Server**  
-   Local Node.js + Express + MongoDB backend.
+2. **StoreDesk Worker**  
+   Edge Node.js + Express + local MongoDB API on the store PC (not a hosted cloud server).
 
 3. **StoreDesk Mobile**  
    Flutter mobile helper app.
@@ -50,11 +50,14 @@ Use this branding:
 ```txt
 Main Desktop App: StoreDesk
 Mobile App: StoreDesk Mobile
-Backend/API: StoreDesk Server
+Edge Worker / API: StoreDesk Worker
+Web: StoreDesk Web
+Cloud Hub: StoreDesk Cloud Hub
 ```
 
 Do not call the mobile app “StoreDesk Buddy.”
-Use **StoreDesk Mobile** everywhere.
+Do not call the edge API “StoreDesk Server” — it is **StoreDesk Worker** (runs on the store PC; folder remains `store-desk-server/` until a repo rename).
+Use **StoreDesk Mobile** and **StoreDesk Worker** in product copy.
 
 ---
 
@@ -97,7 +100,7 @@ Use:
 - Recharts or ApexCharts later for charts
 - Electron Builder later for packaging
 
-## Backend: StoreDesk Server
+## Backend: StoreDesk Worker
 
 Use:
 
@@ -204,7 +207,7 @@ StoreDesk Mobile
     ↓
 Local Wi-Fi API URL
     ↓
-StoreDesk Server
+StoreDesk Worker
     ↓
 MongoDB Local
 ```
@@ -254,7 +257,7 @@ Important:
 
 ## QR 2: Mobile Pairing QR
 
-This QR connects the installed StoreDesk Mobile app to StoreDesk Server.
+This QR connects the installed StoreDesk Mobile app to StoreDesk Worker.
 
 It should contain:
 
@@ -289,7 +292,7 @@ StoreDesk uses a **parent Git repository with Git submodules**.
 ```txt
 StoreDesk/                         # parent Git repo (this workspace root when cloned)
 ├── store-desk-electron/           # submodule — StoreDesk desktop
-├── store-desk-server/             # submodule — StoreDesk Server
+├── store-desk-server/             # submodule — StoreDesk Worker
 ├── store-desk-mobile/             # submodule — StoreDesk Mobile
 ├── store-desk-web/                # submodule — StoreDesk Web (licenses)
 ├── store-desk-cloud-backend/      # submodule — Cloud Hub (WSS)
@@ -1056,7 +1059,7 @@ The dashboard must include a setup panel.
 Setup checklist:
 
 ```txt
-1. Start StoreDesk Server
+1. Start StoreDesk Worker
 2. Connect MongoDB
 3. Add first vendor
 4. Add first product
@@ -1816,8 +1819,8 @@ If Flutter is not installed locally, do not fake success. Document it as pending
 - Always require invoice review before creating VendorPrice.
 - Use StoreDesk for desktop.
 - Use StoreDesk Mobile for mobile.
-- Use StoreDesk Server for backend.
-- StoreDesk Server runs on port 4310 and listens on 0.0.0.0 for LAN mobile access.
+- Use StoreDesk Worker for backend.
+- StoreDesk Worker runs on port 4310 and listens on 0.0.0.0 for LAN mobile access.
 - Backend and MongoDB are local-first — no hosted backend or hosted MongoDB unless explicitly asked.
 - Keep three separate Git submodule repos; do not merge into parent or convert to monorepo.
 - Commit app changes in the submodule; commit submodule pointer updates in the parent repo.
@@ -1840,7 +1843,7 @@ StoreDesk Mobile is the phone helper app.
 
 Employees can scan products, search items, view best vendor price, view suggested selling price, and upload invoices.
 
-Everything runs locally through StoreDesk Server on the same Wi-Fi.
+Everything runs locally through StoreDesk Worker on the same Wi-Fi.
 
 MongoDB stays local and protected.
 

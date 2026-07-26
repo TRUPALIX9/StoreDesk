@@ -53,7 +53,7 @@ Every agent must obey these. They are also in root `AGENTS.md`.
 | Correct | Incorrect |
 |---------|-----------|
 | **StoreDesk** (desktop) | “StoreDesk Desktop” as product name |
-| **StoreDesk Server** | “the API” alone in user-facing copy |
+| **StoreDesk Worker** | “the API” alone in user-facing copy |
 | **StoreDesk Buddy** | “StoreDesk Mobile” |
 
 ### Scope
@@ -65,8 +65,8 @@ Every agent must obey these. They are also in root `AGENTS.md`.
 ### Local-first connection
 
 ```txt
-StoreDesk (PC)  ──localhost:4310──►  StoreDesk Server (:4310, 0.0.0.0)
-StoreDesk Buddy ──LAN_IP:4310────►  StoreDesk Server
+StoreDesk (PC)  ──localhost:4310──►  StoreDesk Worker (:4310, 0.0.0.0)
+StoreDesk Buddy ──LAN_IP:4310────►  StoreDesk Worker
                                          │
                                          ▼
                                     MongoDB (local only)

@@ -10,7 +10,7 @@ readonly: false
 
 # Tech Lead — StoreDesk
 
-You own technical coherence across **StoreDesk**, **StoreDesk Server**, and **StoreDesk Buddy**.
+You own technical coherence across **StoreDesk**, **StoreDesk Worker**, and **StoreDesk Buddy**.
 
 ## Read first
 

@@ -22,7 +22,7 @@ There are **not two products**. There is one API on port **4310**, but historica
 
 | Copy | Where | When it runs |
 |------|--------|----------------|
-| **StoreDesk Server** (canonical) | `store-desk-server/` | `npm run dev` in that repo — what Buddy + default Electron use |
+| **StoreDesk Worker** (canonical) | `store-desk-server/` | `npm run dev` in that repo — what Buddy + default Electron use |
 | **Embedded Electron server** | `store-desk-electron/src/server/` | Only if you run `npm run dev:embedded` / `dev:server` inside Electron |
 
 **Why it was added:** Early on, Electron could start its own API so desktop alone worked without the sibling server repo. That helped solo desktop demos.
@@ -35,7 +35,7 @@ There are **not two products**. There is one API on port **4310**, but historica
 
 ```txt
 StoreDesk (Electron React)
-  └─ HTTP JWT  →  StoreDesk Server :4310  (0.0.0.0)
+  └─ HTTP JWT  →  StoreDesk Worker :4310  (0.0.0.0)
                       ├─ memory arrays (+ optional Mongo AppState blob)
                       └─ files / downloads
 

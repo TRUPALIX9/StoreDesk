@@ -64,7 +64,7 @@ Acceptance criteria:
 
 ## Sprint 2 — Server Foundation
 
-Goal: Create StoreDesk Server.
+Goal: Create StoreDesk Worker.
 
 Tasks:
 
@@ -185,7 +185,7 @@ Acceptance criteria:
 
 ## Sprint 6 — Desktop Backend Integration
 
-Goal: Connect StoreDesk Electron app to StoreDesk Server.
+Goal: Connect StoreDesk Electron app to StoreDesk Worker.
 
 Tasks:
 

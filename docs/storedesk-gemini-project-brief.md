@@ -11,7 +11,7 @@
 | Name | What it is | Folder / remote |
 |------|------------|-----------------|
 | **StoreDesk** | Electron desktop admin app | `store-desk-electron/` → `https://github.com/TRUPALIX9/store-desk-electron.git` |
-| **StoreDesk Server** | Node.js + Express API (local) | `store-desk-server/` → `https://github.com/TRUPALIX9/store-desk-server.git` |
+| **StoreDesk Worker** | Node.js + Express API (local) | `store-desk-server/` → `https://github.com/TRUPALIX9/store-desk-server.git` |
 | **StoreDesk Mobile** | Flutter phone helper (never call it “StoreDesk Mobile”) | `store-desk-mobile/` → `https://github.com/TRUPALIX9/store-desk-mobile.git` |
 | **Parent** | Docs, scripts, submodule pointers | `StoreDesk/` → `https://github.com/TRUPALIX9/StoreDesk.git` |
 
@@ -36,7 +36,7 @@
 - Stock quantity, on-hand counts, add/reduce stock, low-stock alerts, reorder levels, warehouse locations, stock movements.
 - No `Inventory` / `StockMovement` product models as the core product (an `/api/inventory` route exists as a catalog/list alias historically — it is **not** stock tracking).
 - No writing PLUs back to Commander (`uPLUs` not implemented).
-- Buddy never talks to MongoDB directly — only to StoreDesk Server over HTTP.
+- Buddy never talks to MongoDB directly — only to StoreDesk Worker over HTTP.
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```txt
 ┌─────────────────────┐         ┌──────────────────────────┐
-│  StoreDesk          │  HTTP   │  StoreDesk Server        │
+│  StoreDesk          │  HTTP   │  StoreDesk Worker        │
 │  (Electron, PC)     │────────►│  http://0.0.0.0:4310     │
 │  localhost:4310     │  JWT    │                          │
 └─────────────────────┘         │  catalog / prices / POS  │
@@ -272,7 +272,7 @@ See `store-desk-electron/.env.example`. Do not commit `.env`, `scripts/commander
 ```txt
 StoreDesk/                          # parent
 ├── store-desk-electron/            # StoreDesk desktop (+ embedded API)
-├── store-desk-server/              # StoreDesk Server
+├── store-desk-server/              # StoreDesk Worker
 ├── store-desk-mobile/              # StoreDesk Mobile
 ├── docs/                           # architecture, Verifone, WOs, this brief
 ├── scripts/                        # Commander probe/fetch helpers

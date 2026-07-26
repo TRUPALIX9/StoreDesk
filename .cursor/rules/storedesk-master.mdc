@@ -14,7 +14,7 @@ For multi-agent delivery (work orders, handoffs, role routing), also read **`.cu
 This is the **StoreDesk parent repo**. App code lives in Git submodules:
 
 - `store-desk-electron/` — StoreDesk desktop
-- `store-desk-server/` — StoreDesk Server (edge API)
+- `store-desk-server/` — StoreDesk Worker (edge API)
 - `store-desk-mobile/` — StoreDesk Mobile
 - `store-desk-web/` — StoreDesk Web (marketing + license admin on Vercel)
 - `store-desk-cloud-backend/` — Cloud Hub (WSS rooms; Epic 1)
@@ -30,7 +30,7 @@ Rules:
 ## Product names
 
 - **StoreDesk** — Electron desktop admin app (`store-desk-electron/`)
-- **StoreDesk Server** — Edge Node.js + Express + local MongoDB (`store-desk-server/`)
+- **StoreDesk Worker** — Edge Node.js + Express + local MongoDB (`store-desk-server/`)
 - **StoreDesk Mobile** — Flutter phone app (`store-desk-mobile/`). Prefer this name (legacy: Buddy).
 - **StoreDesk Web** — Next.js marketing + store license control plane (`store-desk-web/`)
 
@@ -45,10 +45,10 @@ Rules:
 - **Edge-first catalog:** store catalog, Commander, and invoices stay on the store PC (local Mongo). Atlas holds **licenses / store registry / agent keys only** (~512MB M0).
 - **Cloud Hub (planned):** Desktop and Mobile may connect via outbound WSS through Cloud Run; keep `listen(4310)` until dual-mode is proven.
 - **No Redis** for Phase 0–1 Hub unless explicitly added later (Memorystore).
-- StoreDesk Server listens on **port 4310** and **0.0.0.0** for LAN mobile access (current mode).
+- StoreDesk Worker listens on **port 4310** and **0.0.0.0** for LAN mobile access (current mode).
 - Desktop connects to `http://localhost:4310` in local mode.
 - Mobile connects to `http://LAN_IP:4310` in LAN mode — never `localhost` on the phone.
-- StoreDesk Mobile connects only to StoreDesk Server (or Cloud Hub later) — never directly to MongoDB.
+- StoreDesk Mobile connects only to StoreDesk Worker (or Cloud Hub later) — never directly to MongoDB.
 - Never save raw invoice extraction as final vendor price; always require review before creating `VendorPrice`.
 - Preserve vendor price history; do not silently overwrite old prices.
 - Brand colors: primary `#1A63F4`, secondary `#00A87B` (see `brand-kit/`).

@@ -2,7 +2,7 @@
 
 ## Environment
 
-StoreDesk Server defaults:
+StoreDesk Worker defaults:
 
 ```env
 PORT=4310
@@ -36,7 +36,7 @@ Unpacked build: `store-desk-electron/release/win-unpacked/StoreDesk.exe`
 
 On Windows without code-signing privileges, packaging uses `signAndEditExecutable: false`.
 
-## StoreDesk Server
+## StoreDesk Worker
 
 ```powershell
 cd store-desk-server
@@ -99,7 +99,7 @@ http://localhost:4310/downloads/storedesk-buddy.apk
 ## End-to-end demo checklist
 
 1. Start local MongoDB (optional — in-memory fallback works without it).
-2. Start StoreDesk Server:
+2. Start StoreDesk Worker:
 
    ```powershell
    cd store-desk-server

@@ -25,7 +25,7 @@ You implement the Flutter helper app in `store-desk-mobile/`.
 
 ## Rules
 
-- Talk only to **StoreDesk Server** over LAN — never MongoDB
+- Talk only to **StoreDesk Worker** over LAN — never MongoDB
 - Never use `localhost` as the phone server URL
 - Large tap targets, one-hand flows, clear connection status
 - No stock/inventory screens or copy

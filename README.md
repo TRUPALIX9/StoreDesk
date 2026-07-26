@@ -13,7 +13,7 @@ StoreDesk contains app repos, tracked from this parent repo as Git submodules.
 | App | Submodule folder | Role |
 | --- | --- | --- |
 | StoreDesk | `store-desk-electron/` | Electron desktop admin |
-| StoreDesk Server | `store-desk-server/` | Edge Express + local MongoDB API |
+| StoreDesk Worker | `store-desk-server/` | Edge Express + local MongoDB API (store PC worker) |
 | StoreDesk Mobile | `store-desk-mobile/` | Flutter phone companion |
 | StoreDesk Web | `store-desk-web/` | Next.js marketing + store licenses (Atlas) |
 | Cloud Hub | `store-desk-cloud-backend/` | WSS store rooms (Epic 1) |
@@ -107,7 +107,7 @@ git push
 | Component | Connection |
 | --- | --- |
 | MongoDB | `mongodb://127.0.0.1:27017/storedesk` |
-| StoreDesk Server | `http://localhost:4310` |
+| StoreDesk Worker | `http://localhost:4310` |
 | StoreDesk desktop | `http://localhost:4310` |
 | StoreDesk Buddy | `http://YOUR_COMPUTER_LAN_IP:4310` |
 
@@ -120,7 +120,7 @@ Mobile must use the computer LAN IP. `localhost` on a phone points back to the p
 
 ## Running Locally
 
-Start StoreDesk Server:
+Start StoreDesk Worker:
 
 ```powershell
 cd store-desk-server

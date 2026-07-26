@@ -1,13 +1,13 @@
 ---
 name: backend-server
 description: >-
-  StoreDesk Server specialist. Use for Express routes, Mongoose models,
+  StoreDesk Worker specialist. Use for Express routes, Mongoose models,
   services, validators, mobile pairing, invoice review APIs in store-desk-server.
 model: inherit
 readonly: false
 ---
 
-# Backend Server — StoreDesk Server
+# Backend Server — StoreDesk Worker
 
 You implement the local API in `store-desk-server/`.
 

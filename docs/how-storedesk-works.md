@@ -38,7 +38,7 @@ Everything lives in one parent Git repo with **submodules**:
 ```txt
 StoreDesk/                          ← parent (docs, scripts, submodule pointers)
 ├── store-desk-electron/            ← StoreDesk (desktop)
-├── store-desk-server/              ← StoreDesk Server (edge API)
+├── store-desk-server/              ← StoreDesk Worker (edge API)
 ├── store-desk-mobile/              ← StoreDesk Mobile (phone)
 └── store-desk-web/                 ← StoreDesk Web (marketing + licenses)
 ```
@@ -46,14 +46,14 @@ StoreDesk/                          ← parent (docs, scripts, submodule pointer
 | Name | Tech | Job |
 |------|------|-----|
 | **StoreDesk** | Electron + React + MUI | Admin / ops desktop UI |
-| **StoreDesk Server** | Node + Express + local Mongo | Edge API (catalog, Commander, invoices) |
+| **StoreDesk Worker** | Node + Express + local Mongo | Edge API (catalog, Commander, invoices) |
 | **StoreDesk Mobile** | Flutter | Phone helper (LAN now; Hub later) |
 | **StoreDesk Web** | Next.js on Vercel | Product site + store license admin (Atlas) |
 
 Product branding:
 
 - Desktop = **StoreDesk**
-- API = **StoreDesk Server**
+- API = **StoreDesk Worker**
 - Phone = **StoreDesk Mobile** (not “Buddy”)
 - Web = **StoreDesk Web**
 
@@ -72,7 +72,7 @@ Keep `:4310` until Desktop + Mobile dual-mode through the Hub is proven. No Redi
 
 ```txt
 ┌─────────────────────┐         ┌──────────────────────────┐
-│  StoreDesk          │  HTTP   │  StoreDesk Server        │
+│  StoreDesk          │  HTTP   │  StoreDesk Worker        │
 │  (Electron, PC)     │────────►│  http://0.0.0.0:4310     │
 │  localhost:4310     │  JWT    │                          │
 └─────────────────────┘         │  • catalog / prices      │
@@ -118,7 +118,7 @@ Commander details: [`verifone-commander-price-book.md`](./verifone-commander-pri
 
 Extra pages still exist as routes (dashboard, vendors, invoice review, lottery placeholder) but are **not** jammed into the main nav.
 
-### 4.2 StoreDesk Server — what it stores and serves
+### 4.2 StoreDesk Worker — what it stores and serves
 
 The server is the **source of truth** for:
 
@@ -227,7 +227,7 @@ Matching priority for invoice lines (simplified): UPC → SKU → internal barco
 Typical machine setup:
 
 1. Install / start **MongoDB** locally *or* run with memory mode where allowed.
-2. Start **StoreDesk Server**:
+2. Start **StoreDesk Worker**:
 
    ```powershell
    cd store-desk-server
@@ -312,4 +312,4 @@ All of that stays **on the local network** — no required cloud backend.
 
 ## 11. One-sentence summary
 
-**StoreDesk is the store’s local command center for POS visibility, catalog/vendor costs, invoice-confirmed prices, and a paired phone helper — running entirely through StoreDesk Server on the LAN, without stock-count inventory.**
+**StoreDesk is the store’s local command center for POS visibility, catalog/vendor costs, invoice-confirmed prices, and a paired phone helper — running entirely through StoreDesk Worker on the LAN, without stock-count inventory.**
