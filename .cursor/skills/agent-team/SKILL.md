@@ -48,3 +48,10 @@ Set `management:` on the Work Order:
 | `review-gate` | IC builds; no merge/close until tech-lead (and UI designer if UI) reviews |
 
 Default for StoreDesk: **`collaborative`** for cross-repo; **`delegated`** for single-module bugfix; **`review-gate`** for UI redesigns.
+
+## Branches and CI
+
+- **`production`** (default) + **`develop`** in parent and every submodule — not `main`.
+- Commit in submodule → push branch → bump parent pointer.
+- CI: `.github/workflows/ci.yml` per repo on both branches.
+- Docker: Cloud Hub only; edge apps are native (see `docs/architecture.md`).

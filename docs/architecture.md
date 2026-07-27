@@ -26,6 +26,25 @@ MongoDB (local)  — or in-memory store when MONGO_URI is unset
 - Electron currently embeds a copy of the server; the standalone `store-desk-worker` package is the long-term home for the API.
 - Uploaded invoice files land on disk under `uploads/` (Multer).
 
+### Branches and CI
+
+| Branch | Role |
+|--------|------|
+| `production` | Stable / release line (default in GitHub) |
+| `develop` | Integration before promotion |
+
+Parent + all submodules follow this model. CI runs on push/PR to both branches. Promote with PR `develop` → `production`.
+
+### Docker (optional components)
+
+| Component | Docker | Notes |
+|-----------|--------|-------|
+| Cloud Hub | Yes — `store-desk-cloud-backend/Dockerfile` | Cloud Run WSS rooms |
+| Worker | No | Native Node on store PC |
+| Electron | No | Desktop installer |
+| Mobile | No | Flutter APK / iOS build |
+| Web | No | Vercel deploy |
+
 ## Scope boundaries
 
 **In scope:** products, variants, vendors, vendor prices, invoices, extraction review, pricing suggestions, mobile pairing.

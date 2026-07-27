@@ -76,3 +76,18 @@ Closest `AGENTS.md` wins for Codex/Cursor directory context:
 | react-dev | `.cursor/skills/react-dev/` |
 
 Codex mirrors (thin pointers): `.codex/skills/*/SKILL.md`.
+
+## Git branches and CI
+
+Parent repo and every app submodule use two long-lived branches:
+
+| Branch | Role |
+|--------|------|
+| `production` | Released / stable line (default; replaces `main`) |
+| `develop` | Integration line for ongoing work |
+
+Flow: land work on `develop` → promote with PR `develop` → `production`. CI runs on push/PR to both branches in each repo (`.github/workflows/ci.yml`).
+
+Submodule rule unchanged: commit inside the submodule, push its branch, then update the parent submodule pointer on the matching parent branch.
+
+Docker: only **Cloud Hub** (`store-desk-cloud-backend/Dockerfile`) is containerized today — for Cloud Run. Electron, Worker, Mobile, and Web run natively on the store PC or Vercel; no Docker required for local-first edge.

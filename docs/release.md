@@ -1,5 +1,22 @@
 # StoreDesk Release Guide
 
+## Branching
+
+StoreDesk uses two long-lived branches in the parent repo and every app submodule:
+
+| Branch | Role |
+|--------|------|
+| `production` | Released / stable line (former `main`) |
+| `develop` | Integration line for ongoing work |
+
+Flow:
+
+1. Land feature work on `develop` (direct push or PR into `develop`).
+2. Promote with a PR from `develop` → `production`.
+3. CI runs on pushes and PRs targeting both `production` and `develop`.
+
+Do not use `main` — it has been replaced by `production`.
+
 ## Environment
 
 StoreDesk Worker defaults:
@@ -128,34 +145,34 @@ http://localhost:4310/downloads/storedesk-buddy.apk
 
 iOS builds require Xcode on macOS. Use TestFlight or direct Xcode install. APK QR is Android-only.
 
-## GitHub — push all three repos
+## GitHub — repos and branches
 
-### Electron (remote exists)
-
-```powershell
-cd store-desk-electron
-git push origin main
-```
-
-### Mobile (remote exists)
+Every StoreDesk repo (parent + submodules) uses **`production`** (stable) and **`develop`** (integration). Do not use `main`.
 
 ```powershell
-cd store-desk-mobile
-git push origin main
-```
+# Parent
+cd StoreDesk
+git push origin production develop
 
-### Server (create remote first)
-
-Create repo: `TRUPALIX9/store-desk-worker` (private recommended).
-
-```powershell
+# Submodule example (commit inside submodule first, then update parent pointer)
 cd store-desk-worker
-git remote add origin https://github.com/TRUPALIX9/store-desk-worker.git
-git branch -M main
-git push -u origin main
+git push origin production develop
+cd ..
+git add store-desk-worker
+git commit -m "Bump store-desk-worker submodule pointer"
+git push origin develop
 ```
 
-If `origin` already exists, run `git remote -v` before adding. Do not force push.
+Remotes:
+
+| Repo | GitHub |
+|------|--------|
+| Parent | `TRUPALIX9/StoreDesk` |
+| Electron | `TRUPALIX9/store-desk-electron` |
+| Worker | `TRUPALIX9/store-desk-worker` |
+| Mobile | `TRUPALIX9/store-desk-mobile` |
+| Web | `storedesk-dev/StoreDesk-web` |
+| Cloud Hub | `TRUPALIX9/store-desk-cloud-backend` |
 
 ## Release candidate checklist
 

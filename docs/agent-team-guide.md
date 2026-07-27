@@ -94,19 +94,33 @@ Upload → Invoice → Extract → InvoiceItem rows → User review → Confirm
 
 ### Git / repo shape
 
-Parent repo + **three Git submodules** — not an npm monorepo.
+Parent repo + **Git submodules** — not an npm monorepo.
 
 ```txt
-StoreDesk/                 ← parent (docs, scripts, pointers)
-├── store-desk-electron/   ← commit app changes HERE
+StoreDesk/                    ← parent (docs, scripts, pointers)
+├── store-desk-electron/      ← commit app changes HERE
 ├── store-desk-worker/
-└── store-desk-mobile/
+├── store-desk-mobile/
+├── store-desk-web/
+└── store-desk-cloud-backend/
 ```
 
 1. Change app code **inside** the correct submodule.
 2. Commit + push in the submodule, then update the parent pointer.
 3. Do not merge submodule trees into the parent as normal files.
 4. Do not delete `.gitmodules` by hand.
+
+### Branches and CI
+
+| Branch | Role |
+|--------|------|
+| `production` | Stable / default (replaces `main`) |
+| `develop` | Integration line |
+
+- Land work on `develop`; promote with PR → `production`.
+- Each repo has `.github/workflows/ci.yml` on push/PR to both branches.
+- Submodule pointer on the parent should track the same branch line (usually `production` on the parent tracks submodule `production` tips).
+- **Docker:** only Cloud Hub is containerized (`store-desk-cloud-backend/Dockerfile` for Cloud Run). Worker/Electron/Mobile/Web run natively — see `docs/architecture.md`.
 
 ---
 
