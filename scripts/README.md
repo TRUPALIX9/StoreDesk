@@ -9,16 +9,21 @@ Only two files matter for day-to-day commands:
 
 `make.cmd` at the repo root calls the same runner if GNU `make` is not installed.
 
-## Daily workflow
+## Daily workflow (development — same PC)
 
 ```powershell
 cd StoreDesk
-make dev       # MongoDB + server + desktop
-make status    # what's running
-make stop      # stop server / UI
+make setup     # .env for Worker + Hub + Desktop (local demo Hub keys)
+make stack     # Hub :8080 + Worker :4310 + Desktop
+make status
+make stop
 ```
 
-Without GNU make: `.\make.cmd dev`
+Without GNU make: `.\make.cmd stack`
+
+**Deploy is separate and unchanged:** Cloud Hub via Docker/Cloud Run; Worker installed on the store PC. Make never deploys.
+
+See: `docs/local-same-pc.md`.
 
 ## Why PowerShell at all?
 
@@ -40,7 +45,7 @@ git clone --recurse-submodules https://github.com/TRUPALIX9/StoreDesk.git
 cd StoreDesk
 make setup
 make install
-make dev
+make stack
 ```
 
 If submodules are empty after clone:

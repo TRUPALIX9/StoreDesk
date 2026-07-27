@@ -10,9 +10,9 @@ RUN  := powershell -NoProfile -ExecutionPolicy Bypass -File "$(ROOT)/scripts/mak
 
 .DEFAULT_GOAL := help
 
-.PHONY: help setup env reset-local mongo mongo-reset dev server electron stop status \
+.PHONY: help setup env reset-local mongo mongo-reset hub worker server stack dev electron stop status \
 	apk install install-server install-electron install-mobile ci ci-server ci-electron ci-mobile
 
-help setup env reset-local mongo mongo-reset dev server electron stop status \
+help setup env reset-local mongo mongo-reset hub worker server stack dev electron stop status \
 	apk install install-server install-electron install-mobile ci ci-server ci-electron ci-mobile:
 	@$(RUN) $@

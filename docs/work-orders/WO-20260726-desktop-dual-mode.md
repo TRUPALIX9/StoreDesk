@@ -1,36 +1,56 @@
 # WO-20260726-desktop-dual-mode
 
-- **Status:** todo
+- **Status:** in_progress
 - **Epic:** 4 — Desktop dual-mode
 - **Points:** 8
 - **Primary owner:** frontend-electron
-- **Modules:** store-desk-electron | store-desk-worker
+- **Modules:** store-desk-electron | store-desk-worker | store-desk-cloud-backend
 
 ## Goal
 
-StoreDesk Desktop can run against **local Worker `:4310`** (default) and, when Hub is available, optionally reach a store room through Cloud Hub relay — without breaking LAN-only stores.
+StoreDesk Desktop talks to the **Cloud Hub (main backend)** for store data. Hub asks the store’s **Worker** (edge agent) and returns the latest. Desktop does **not** call Worker on the backoffice PC directly in cloud mode.
+
+```txt
+StoreDesk Desktop (Electron)
+        │  WSS / relay ask
+        ▼
+Cloud Hub  (main backend — Cloud Run)
+        │  room relay to agent
+        ▼
+StoreDesk Worker (backoffice PC, outbound WSS)
+        │
+        ▼
+Local Mongo + Verifone Commander
+```
+
+LAN-only / dev may still hit `:4310` as a temporary fallback until Hub path is proven — not the product cloud design.
 
 ## Stories
 
 | Story | Pts | Status |
 |-------|-----|--------|
-| D1 Mode switch / settings | 3 | done (Local Worker URL; Hub mode deferred) |
-| D2 Prefer localhost:4310 | 2 | done (default `127.0.0.1:4310`) |
-| D3 Hub client path (relay) | 3 | todo |
+| D1 Settings shell | 3 | done (interim Local Worker URL — supersede with Hub settings in D3) |
+| D2 Local `:4310` fallback | 2 | done (dev/LAN only) |
+| D3 Hub client (primary) | 5 | todo — Desktop → Hub → Worker relay |
 
-## Locked
+## Locked (2026-07-26)
 
-- Keep `:4310` until dual-mode proven
-- Marketing stays LAN / backoffice-PC focused until D3 ships
-- Depends on Hub repo under `storedesk-dev` + Worker G2/G3
+- **Cloud path:** Electron → Cloud Hub → Worker. No “Electron must use local Worker” for multi-store / cloud.
+- Worker keeps outbound WSS + HTTP `:4310` for Mobile LAN and Hub agent duties.
+- Hub remote: `https://github.com/TRUPALIX9/store-desk-cloud-backend`
+- Marketing stays LAN-focused until D3 ships.
 
-## E2E
+## D3 acceptance
 
-- [x] Desktop settings: Local Worker URL
-- [x] Default `http://127.0.0.1:4310`
-- [ ] Optional Hub connect smoke (when Hub env present)
+- [ ] Desktop settings: Hub URL + store credentials (not “Local Worker URL” as primary)
+- [ ] Desktop sends relay asks through Hub; Worker answers via existing G3 `/api/*` relay
+- [ ] Latest Price Book / health-style reads work without Desktop on store LAN
+- [ ] Worker still required on backoffice PC (agent must be online)
 - [ ] `npm run ci` in electron
 
 ## Handoff
 
-D1/D2 shipped in Settings + `api/config.ts`. D3 waits on Hub org remote.
+### HO — 2026-07-26 architecture correction
+
+- User: Electron should talk to **main backend (Hub)**; Hub fetches latest from **Worker**. Local Worker URL is not the cloud product path.
+- After Cloud Run Hub is up: implement D3 Hub client; demote Local Worker to optional LAN/dev fallback.

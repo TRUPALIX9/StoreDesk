@@ -118,9 +118,21 @@ Health checks:
 
 Mobile must use the computer LAN IP. `localhost` on a phone points back to the phone.
 
-## Running Locally
+## Running Locally (development — same PC)
 
-Start StoreDesk Worker:
+Preferred (whole stack via make):
+
+```powershell
+make setup
+make install
+make stack      # Hub :8080 + Worker :4310 + Desktop
+make status
+make stop
+```
+
+Details: [`docs/local-same-pc.md`](docs/local-same-pc.md).
+
+Manual (same as before):
 
 ```powershell
 cd store-desk-worker
@@ -129,14 +141,14 @@ copy .env.example .env
 npm run dev
 ```
 
-Start StoreDesk desktop:
-
 ```powershell
 cd store-desk-electron
 npm install
 copy .env.example .env
 npm run dev
 ```
+
+**Deploy is unchanged** and not driven by make: Hub Docker → Cloud Run; Worker installed on the store PC with production `HUB_WS_URL` / store keys.
 
 Run StoreDesk Buddy:
 
