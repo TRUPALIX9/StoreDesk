@@ -25,6 +25,8 @@ Human and agent documentation for the whole StoreDesk system. Prefer editing an 
 | `invoice-extraction.md` | Extraction/review notes |
 | `sprint-plan.md` / `sprint-status.md` | Delivery plan/status |
 | `release.md` | Release notes/process |
+| `cloud-backend-deploy.md` | Cloud Hub (WSS) deploy — Cloud Run checklist |
+| `env-by-project.md` | Env vars per submodule — local / GitHub / Cloud Run / Vite |
 | `work-orders/` | Active agent Work Orders (`WO-*.md`) |
 | `handoffs/` | Optional cross-session handoffs (`HO-*.md`) |
 

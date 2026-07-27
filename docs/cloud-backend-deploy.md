@@ -349,6 +349,7 @@ Useful for Worker outbound smoke before Cloud Run.
 ## Related docs
 
 - Submodule: `store-desk-cloud-backend/README.md`, `AGENTS.md`, `Dockerfile`
+- Env inventory (all projects): `docs/env-by-project.md`
 - WOs: `docs/work-orders/WO-20260726-cloud-hub-foundation.md`, `WO-20260727-cloud-backend-deploy.md`
 - Worker outbound: `docs/work-orders/WO-20260726-edge-agent-outbound-wss.md`
 - Architecture: `docs/architecture.md`, `docs/how-storedesk-works.md`
