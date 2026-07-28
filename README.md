@@ -6,6 +6,8 @@ Local-first edge ops with optional cloud license control for convenience stores 
 
 **New here?** Read the end-to-end guide: [`docs/how-storedesk-works.md`](docs/how-storedesk-works.md).
 
+**Release snapshot:** See [`docs/release-status.md`](docs/release-status.md) for module versions, pinned SHAs, CI, artifacts, deployments, compatibility, and blockers.
+
 ## Overview
 
 StoreDesk contains app repos, tracked from this parent repo as Git submodules.
@@ -28,6 +30,7 @@ This repo is the parent repository:
 - `store-desk-worker` -> https://github.com/TRUPALIX9/store-desk-worker
 - `store-desk-mobile` -> https://github.com/TRUPALIX9/store-desk-mobile
 - `store-desk-web` -> https://github.com/storedesk-dev/StoreDesk-web
+- `store-desk-cloud-backend` -> https://github.com/TRUPALIX9/store-desk-cloud-backend
 
 Each submodule has its own Git history, remote, commits, CI, and release workflow. The parent repo tracks which app commits belong to the complete StoreDesk project.
 
@@ -39,6 +42,7 @@ StoreDesk/
 |-- store-desk-worker/       # submodule: edge Worker API
 |-- store-desk-mobile/       # submodule: Flutter phone app
 |-- store-desk-web/          # submodule: web + licenses
+|-- store-desk-cloud-backend/ # submodule: Cloud Hub
 |-- brand-kit/
 |-- docs/
 |-- scripts/
@@ -84,7 +88,7 @@ Commit app changes inside the submodule first:
 
 ```powershell
 cd store-desk-worker
-git checkout main
+git checkout production
 git pull
 npm install
 npm run dev
@@ -109,7 +113,7 @@ git push
 | MongoDB | `mongodb://127.0.0.1:27017/storedesk` |
 | StoreDesk Worker | `http://localhost:4310` |
 | StoreDesk desktop | `http://localhost:4310` |
-| StoreDesk Buddy | `http://YOUR_COMPUTER_LAN_IP:4310` |
+| StoreDesk Mobile | `http://YOUR_COMPUTER_LAN_IP:4310` |
 
 Health checks:
 
@@ -138,7 +142,7 @@ copy .env.example .env
 npm run dev
 ```
 
-Run StoreDesk Buddy:
+Run StoreDesk Mobile:
 
 ```powershell
 cd store-desk-mobile
@@ -187,7 +191,7 @@ The route returns 404 JSON until the APK file exists.
 | Issue | Fix |
 | --- | --- |
 | Empty submodule folders after clone | `git submodule update --init --recursive` |
-| Detached HEAD in submodule | `git checkout main` inside the submodule |
+| Detached HEAD in submodule | `git checkout production` inside the submodule |
 | Parent pointer out of date | Push submodule first, then commit parent pointer |
 | Mobile cannot reach server | Use LAN IP, not localhost; same Wi-Fi |
 | APK route 404 | Build APK and copy it to `store-desk-worker/downloads/` |
