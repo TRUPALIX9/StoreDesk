@@ -1,6 +1,6 @@
 # WO-20260728-store-setup-lifecycle
 
-- **Status:** in_progress
+- **Status:** completed
 - **Management:** collaborative
 - **Priority:** P0
 - **Requester:** user
