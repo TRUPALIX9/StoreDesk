@@ -29,26 +29,24 @@ No error, success body, log, telemetry event, or diagnostic response may echo a 
 
 ## Organization, setup key, and Worker credential v1
 
-StoreDesk Web is the control-plane host. `User` is a global identity; authorization is always resolved through an active `OrganizationMembership` and optional store scope. `Organization` owns its `Account`, `Subscription` records, `Store` records, and `WorkerInstallation` records. Every route below verifies that all referenced records have the same `organizationId`; IDs in request bodies are selectors, not authority.
+StoreDesk Web is an internal control-plane host. Only central StoreDesk support/admin operators authenticate to it. Organization contacts do not have cloud accounts, memberships, passwords, password-reset, or self-service APIs. Internal operator identity and role are retained only for admin authorization and audit.
 
-An authorized support/admin workflow creates the organization/account/subscription/store and issues one setup key for one intended Worker installation. Web sends that key to an authorized organization user through the configured email provider. Issuance/list responses expose delivery status and key ID only, never the secret. Email contains a short-lived single-use setup key, not a Worker credential.
+`Organization` is a tenant/container with billing/contact metadata and owns `Subscription` and `Store` records. A `WorkerInstallation` belongs to one exact Organization and Store and consumes an eligible Subscription entitlement. Every retrieval, presence, sync, audit, diagnostics, and admin operation scopes and verifies the full `organizationId → storeId → workerInstallationId` chain. Client-supplied IDs are selectors, never authority.
+
+Central admin Worker creation explicitly selects an existing Organization and Store/site, captures `workerName`, site contact email, useful store number/address metadata, generates an immutable `workerInstallationId`, and persists the three canonical IDs plus support display snapshots. Contact email is routing metadata only. Web sends the setup key to that contact; issuance/list responses expose delivery status and key ID only. The short-lived single-use setup key is Electron/Worker's only cloud-onboarding credential and is never a Worker credential.
 
 ### Issue or replace emailed setup key
 
 | Method | Path | Caller | Result |
 |--------|------|--------|--------|
-| POST | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations` | authorized support/organization admin | Reserves an installation under an eligible subscription |
-| POST | `/api/v1/worker-installations/:installationId/setup-keys` | authorized support/organization admin | Revokes any unconsumed predecessor, creates one key, queues email, returns safe delivery metadata |
-| GET | `/api/v1/worker-installations/:installationId/setup-keys/:keyId` | authorized support/organization admin | Safe status: `queued|sent|delivery_failed|consumed|expired|revoked` |
-| DELETE | `/api/v1/worker-installations/:installationId/setup-keys/:keyId` | authorized support/organization admin | Revokes an unconsumed key |
+| POST | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations` | central support/admin | Creates immutable installation ID from selected existing site, Worker name, contact email, subscription, store number/address snapshots |
+| POST | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/setup-keys` | central support/admin | Revokes any unconsumed predecessor, creates one bound key, queues email, returns safe delivery metadata |
+| GET | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/setup-keys/:keyId` | central support/admin | Safe status: `queued|sent|delivery_failed|consumed|expired|revoked` |
+| DELETE | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/setup-keys/:keyId` | central support/admin | Revokes an unconsumed key |
 
-Issuance requires recipient user ID, eligible subscription ID, delivery reason, and an idempotency key. The recipient must have an active membership in the same organization. The stored record contains a public key ID and Argon2id hash of the secret, tenant/store/installation/recipient binding, TTL, bounded attempt counters, delivery metadata, and audit references. A delivery failure is remediated by revoke/reissue, never by retrieving plaintext.
+Creation requires an existing `organizationId`, `storeId`, eligible `subscriptionId`, Worker display name, site contact email, delivery reason, and idempotency key. Store number/address are copied as support display snapshots while canonical IDs remain authoritative; snapshot changes never rebind an installation. The generated `workerInstallationId` is immutable. The setup-key record contains a public key ID and Argon2id hash of the secret, exact organization/store/installation/contact-email binding, TTL, bounded attempt counters, delivery metadata, and internal operator audit reference. Delivery failure is remediated by revoke/reissue, never by retrieving plaintext.
 
-### Record EULA acceptance
-
-`POST /api/v1/organizations/:organizationId/eula-acceptances`
-
-The caller must be an authenticated user with setup authority for the selected organization/store. Request includes the published `eulaVersion`, canonical-document SHA-256, account/store/installation context, and explicit acceptance. Success returns an immutable `eulaAcceptanceId`. The server obtains accepted timestamp, user identity, correlation ID, and safe source metadata itself. Acceptance is rejected if the version/hash is not currently published. EULA audit rows cannot be updated or deleted through product APIs.
+EULA/privacy/system acknowledgements are submitted only during setup-key redemption. There is no customer-authenticated EULA endpoint. Possession of the valid bound key authorizes onboarding for its exact selected site.
 
 ### Redeem setup key
 
@@ -57,9 +55,18 @@ The caller must be an authenticated user with setup authority for the selected o
 ```json
 {
   "setupKey": "<key-id>.<one-time-secret>",
-  "eulaAcceptanceId": "eula_<id>",
+  "acknowledgements": {
+    "eulaVersion": "2026-07",
+    "eulaDocumentSha256": "<64-hex-placeholder>",
+    "privacyVersion": "2026-07",
+    "systemAcknowledgementVersion": "setup-v1",
+    "contactEmail": "site-contact@example.invalid",
+    "acceptedAt": "2030-01-01T00:00:00Z"
+  },
   "installation": {
-    "installationId": "inst_<uuid>",
+    "organizationId": "org_<id>",
+    "storeId": "store_<id>",
+    "workerInstallationId": "winst_<uuid>",
     "platform": "windows|macos|linux",
     "workerVersion": "1.2.3",
     "serviceManagerVersion": "1.2.3"
@@ -74,7 +81,8 @@ Success (`201`, returned once):
   "contractVersion": "setup-v1",
   "store": {
     "storeId": "SD-PLACEHOLDER",
-    "accountId": "acct_<id>",
+    "organizationId": "org_<id>",
+    "workerInstallationId": "winst_<uuid>",
     "status": "active"
   },
   "subscription": {
@@ -89,7 +97,9 @@ Success (`201`, returned once):
 }
 ```
 
-Only StoreDesk Worker calls redemption over TLS. Electron accepts the emailed key in its onboarding UI, immediately transfers it over authenticated protected local IPC to the Worker activation path, clears renderer/form state, and never receives the redemption response. The service manager may broker that protected handoff and seal-file ACL operation, but its IPC response and logs never contain the permanent credential. Web atomically validates membership/EULA, tenant/store/subscription entitlement, setup-key binding/TTL/attempt budget, and installation identity before consuming the key and creating one Worker credential. Same-installation retries with the same idempotency key return safe completion status, not the credential; concurrent or replayed redemption cannot mint another credential.
+Electron performs no cloud login. With no activated local Worker it goes directly to setup-key onboarding, accepts acknowledgements, then transfers the key and acknowledgement payload over authenticated protected local IPC to the Worker activation path and clears renderer/form state. Only StoreDesk Worker calls redemption over TLS. The service manager may broker protected handoff and seal-file ACL operations, but its IPC response and logs never contain the permanent credential.
+
+Web atomically validates the setup-key hash, exact organization/store/installation/contact-email binding, subscription entitlement, current EULA/privacy/system versions and document hash, TTL/attempt budget, and installation identity before consuming the key, recording immutable acceptance/redemption audit, and creating one Worker credential. The server records redemption time independently. Same-installation retries with the same idempotency key return safe completion status, not the credential; concurrent or replayed redemption cannot mint another credential.
 
 The Web/Atlas record stores the setup key and Worker credential only as approved hashes with credential IDs, expiry/status, and audit metadata. Worker seals the returned credential before reporting success; it must not persist in email after delivery requirements, installer arguments, shell history, plaintext `.env`, Electron UI/main state, Mobile storage, or logs.
 
@@ -103,7 +113,7 @@ Activation error codes:
 | 410 | `SETUP_KEY_EXPIRED` | Key expired or was revoked |
 | 428 | `EULA_ACCEPTANCE_REQUIRED` | Current EULA/version acceptance is absent or context-mismatched |
 | 409 | `INSTALLATION_ALREADY_BOUND` | Installation ID is already bound incompatibly |
-| 402 | `SUBSCRIPTION_INACTIVE` | Account has no eligible entitlement |
+| 402 | `SUBSCRIPTION_INACTIVE` | Organization/store has no eligible entitlement |
 | 423 | `STORE_SUSPENDED` | Store cannot activate |
 | 429 | `ACTIVATION_RATE_LIMITED` | Retry after the response delay/header |
 | 503 | `ACTIVATION_UNAVAILABLE` | Temporary control-plane failure; retryable |
@@ -112,9 +122,9 @@ Activation error codes:
 
 | Method | Path | Caller | Result |
 |--------|------|--------|--------|
-| POST | `/api/v1/stores/:storeId/worker-credentials/rotate` | authorized owner/admin | Creates an audited rotation authorization/challenge; no credential is returned to the caller |
-| POST | `/api/v1/worker-installations/:installationId/worker-credentials/complete-rotation` | currently authenticated Worker | Replacement returned once to Worker over TLS; optional bounded overlap with prior credential |
-| DELETE | `/api/v1/stores/:storeId/worker-credentials/:credentialId` | authorized owner/admin | Revokes credential and active Worker relay sessions |
+| POST | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/worker-credentials/rotate` | central support/admin | Creates an audited rotation authorization/challenge; no credential is returned to the caller |
+| POST | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/worker-credentials/complete-rotation` | currently authenticated Worker | Replacement returned once to Worker over TLS; optional bounded overlap with prior credential |
+| DELETE | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/worker-credentials/:credentialId` | central support/admin | Revokes credential and active Worker relay sessions |
 
 Rotation requires recent privileged reauthentication and an audit reason. The replacement is created/delivered only while the currently authenticated Worker proves installation possession and completes a short-lived, single-use rotation challenge; it is never returned to the initiating Web user or displayed to desktop/mobile clients. Emergency revocation may move the installation to `suspended`; failed rotation leaves the prior credential valid until the declared overlap expires.
 
@@ -122,11 +132,11 @@ Rotation requires recent privileged reauthentication and an audit reason. The re
 
 | Method | Path | Caller | Description |
 |--------|------|--------|-------------|
-| GET | `/api/v1/worker-installations/:installationId/bootstrap` | Worker credential | Organization/store identity, entitlement/grace policy, protocol range, server time, credential status, and Hub metadata only |
-| POST | `/api/v1/worker-installations/:installationId/bootstrap/complete` | Worker credential | Idempotently records bootstrap version, Hub handshake evidence, health summary, and completion time |
-| GET | `/api/v1/worker-installations/:installationId/readiness` | authorized organization user or Worker | Safe onboarding/readiness projection |
+| GET | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/bootstrap` | Worker credential | Canonical IDs, support snapshots, entitlement/grace policy, protocol range, server time, credential status, and Hub metadata only |
+| POST | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/bootstrap/complete` | Worker credential | Idempotently records exact IDs, bootstrap version, Hub handshake evidence, health summary, and completion time |
+| GET | `/api/v1/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/readiness` | central support/admin or Worker credential | Safe hierarchy-aware onboarding/readiness projection |
 
-Bootstrap payloads never contain local catalog, Commander, invoice, or vendor-price data. `ready=true` requires setup-key redemption, current EULA acceptance, sealed Worker credential, entitlement verification, compatible Hub handshake, and successful first bootstrap. Device approval and Mobile pairing endpoints return `409 WORKER_BOOTSTRAP_INCOMPLETE` until ready.
+Bootstrap/presence payloads report the exact three IDs and support snapshots but never contain local catalog, Commander, invoice, or vendor-price data. `ready=true` requires setup-key redemption, current EULA acceptance, sealed Worker credential, entitlement verification, compatible Hub handshake, and successful first bootstrap. App-user session issuance for the assignment returns `409 WORKER_BOOTSTRAP_INCOMPLETE` until ready.
 
 ## Store lifecycle and diagnostics projection
 
@@ -150,7 +160,7 @@ storedesk-service install
 storedesk-service uninstall
 storedesk-service status [--json]
 storedesk-service start|stop|restart worker
-storedesk-service activate --code-stdin
+storedesk-service activate --setup-key-stdin
 storedesk-service config validate
 storedesk-service update check|stage|apply [--version <semver>]
 storedesk-service rollback [--to <semver>]
@@ -167,22 +177,32 @@ Rules:
 - Diagnostic bundles contain lifecycle/version/service/dependency/update summaries and bounded logs after redaction. Secret-pattern tests must fail bundle creation if redaction cannot be guaranteed.
 - CLI exit codes: `0` success, `2` invalid input, `3` authorization/elevation required, `4` invalid lifecycle transition, `5` dependency unavailable, `6` health gate failed/rollback started, `7` recovery required.
 
-## Organizations, accounts, users, subscriptions, and device approval v1
+## Organizations, app users, assignments, and client sessions v1
 
-Control-plane entities are Organization, Account, User, OrganizationMembership, Subscription, Store, WorkerInstallation, SetupKey, EulaAcceptance, DeviceApproval, and AuditEvent. An organization owns one v1 account and may own multiple subscriptions/stores/installations; a user may hold different roles in multiple organizations. Roles are `owner`, `organization_admin`, `store_admin`, and `member`; store-admin authority is limited to assigned stores. Only an appropriately scoped owner/admin can approve/revoke a remote device or authorize Worker credential rotation.
+Control-plane product entities are Organization, Subscription, Store, WorkerInstallation, SetupKey, EulaAcceptance, AppUser, UserAssignment, ClientDevice, ClientSession, and AuditEvent. StoreContact fields are routing/display metadata on the appropriate site/installation records, not login principals. `InternalAdmin` support/admin identities authenticate only to Web admin. `AppUser` identities authenticate only from Electron/Mobile and cannot access Web admin or customer self-service/password-reset portals.
+
+Web admin and diagnostic UI/API always present the hierarchy `Organization → Store/site → WorkerInstallation`, including immutable canonical IDs and useful Worker/store/contact/address snapshots. Lookup by a Worker ID still verifies and returns its parent IDs; no flat unscoped Worker list, presence, sync, audit, diagnostic, rotation, or approval operation is permitted.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/v1/stores/:storeId/device-approvals` | Register a pending device request; rate-limited, proof-of-possession required |
-| GET | `/api/v1/stores/:storeId/device-approvals` | List safe device metadata and status for owner/admin |
-| POST | `/api/v1/stores/:storeId/device-approvals/:id/approve` | Approve scopes/expiry for one installation-bound device |
-| POST | `/api/v1/stores/:storeId/device-approvals/:id/deny` | Deny a pending request |
-| DELETE | `/api/v1/stores/:storeId/device-approvals/:id` | Revoke approval and relay refresh/session credentials |
-| POST | `/api/v1/relay-sessions/exchange` | Exchange an approved client or Worker credential for a short-lived Hub relay session |
+| POST | `/api/v1/admin/app-users` | Central admin provisions an Electron/Mobile app account by email and queues a one-time app enrollment credential; no Web-admin access |
+| POST | `/api/v1/admin/app-users/:appUserId/assignments` | Central admin grants role/scopes for one exact Organization → Store → WorkerInstallation |
+| DELETE | `/api/v1/admin/app-users/:appUserId/assignments/:assignmentId` | Revokes assignment, refresh credentials, and active Hub sessions |
+| POST | `/api/v1/app-auth/enroll` | Electron/Mobile consumes one-time emailed app enrollment credential and establishes app authentication; never creates a Web session |
+| POST | `/api/v1/app-auth/login` | AppUser login from Electron/Mobile; returns safe authorized assignment summaries only |
+| POST | `/api/v1/app-auth/sessions` | Issues a short-lived audience/role/assignment/device-scoped Hub session for one granted ready assignment |
+| POST | `/api/v1/app-auth/refresh` | Rotates refresh credential and rechecks user, assignment, device, installation, and subscription status |
+| POST | `/api/v1/app-auth/logout` | Revokes current refresh credential/session and clears device session state |
+| POST | `/api/v1/admin/app-users/:appUserId/disable` | Disables app account and revokes all refresh credentials/sessions |
+| POST | `/api/v1/admin/app-users/:appUserId/reissue-enrollment` | Central admin revokes prior enrollment/recovery material and emails a replacement; no self-service reset |
+| DELETE | `/api/v1/admin/client-devices/:deviceId` | Revokes a device and all of its sessions |
+| GET | `/api/v1/admin/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/sessions` | Hierarchy-scoped safe session/device audit |
 
-Approval statuses: `pending`, `approved`, `denied`, `revoked`, `expired`. Safe metadata includes device name/type, installation ID, requested/approved scopes, created/expiry times, and public-key fingerprint where used. It excludes plaintext credentials and raw hardware identifiers.
+Login with one active assignment auto-selects it. Multiple assignments return only authorized hierarchy/display snapshots and require an explicit `assignmentId` selection; arbitrary Worker IDs are rejected. Zero assignments, disabled user/device, revoked assignment, suspended subscription, or non-ready Worker returns a stable denial/offline status without leaking other tenants.
 
-These endpoints require the installation readiness gate. Mobile pairing is ordered strictly after Worker activation, Hub verification, and first bootstrap; a QR generated before readiness must not contain a usable pairing grant.
+AppUser enrollment credentials are distinct from Worker setup keys and bind only the intended AppUser email/device enrollment. They are high-entropy, short-lived, single-use, hashed at rest, redacted, rate-limited, and cannot redeem a Worker or access Web admin. Password/account recovery is central-admin reissue into Electron/Mobile, not a customer Web password-reset portal.
+
+QR/6-digit pairing, manual LAN URL entry, manual Worker IDs, and pairing approval endpoints are retired target behavior. Emergency local recovery, if implemented, is disabled by default, elevated, audited, and outside onboarding.
 
 Relay-session exchange response:
 
@@ -192,21 +212,24 @@ Relay-session exchange response:
   "sessionToken": "<short-lived-signed-token>",
   "expiresAt": "2030-01-01T00:05:00Z",
   "hubUrl": "wss://hub.example.invalid/ws",
+  "organizationId": "org_<id>",
   "storeId": "SD-PLACEHOLDER",
-  "role": "agent|client",
+  "workerInstallationId": "winst_<uuid>",
+  "assignmentId": "assign_<id>",
+  "role": "app_user",
   "scopes": ["relay:request"]
 }
 ```
 
-Subscription/store suspension denies new relay sessions and closes existing sessions. Local behavior follows the last verified entitlement/grace policy and remains audit-visible; suspension never deletes local data.
+Session issuance and Hub/Worker relay independently enforce AppUser, UserAssignment, Organization, Store, WorkerInstallation, role, scopes, audience, device, subscription, expiry, and revocation. Disable/revoke/logout closes active sessions and invalidates refresh credentials. Connectivity loss produces explicit offline messaging and never broadens assignment or silently falls back to unauthenticated LAN. Suspension never deletes local data.
 
 ## StoreDesk Cloud Hub relay v1
 
-The Hub no longer accepts `agentKey` in a client `hello`. Both roles present a short-lived relay session whose audience is StoreDesk Cloud Hub; role and store are claims, not caller-controlled authority.
+The Hub no longer accepts `agentKey` in a client `hello`. Both roles present a short-lived relay session whose audience is StoreDesk Cloud Hub; organization, store, Worker installation, assignment, role, scopes, and device are signed claims, not caller-controlled authority.
 
 ```json
 {"version":1,"type":"hello","sessionToken":"<short-lived-token>"}
-{"version":1,"type":"welcome","sessionId":"hs_<id>","storeId":"SD-PLACEHOLDER","role":"client","expiresAt":"2030-01-01T00:05:00Z"}
+{"version":1,"type":"welcome","sessionId":"hs_<id>","organizationId":"org_<id>","storeId":"SD-PLACEHOLDER","workerInstallationId":"winst_<uuid>","assignmentId":"assign_<id>","role":"app_user","expiresAt":"2030-01-01T00:05:00Z"}
 ```
 
 Client request:
@@ -325,13 +348,11 @@ Alias: `/api/prices` mirrors `/api/vendor-prices`.
 | POST | `/api/pricing/calculate` |
 | GET | `/api/pricing/suggestion/:variantId` |
 
-## Mobile (separate device Bearer token after approval/pairing)
+## Mobile application routes
 
 | Method | Path |
 |--------|------|
 | GET | `/api/mobile/health` |
-| POST | `/api/mobile/pair/request` |
-| POST | `/api/mobile/pair/confirm` |
 | GET | `/api/mobile/products/by-code/:code` |
 | GET | `/api/mobile/products/search?q=` |
 | GET | `/api/mobile/products/:productId` |
@@ -344,6 +365,8 @@ Alias: `/api/prices` mirrors `/api/vendor-prices`.
 | POST | `/api/mobile/invoices/upload` |
 | GET | `/api/mobile/invoices/:invoiceId/status` |
 | GET | `/api/mobile/review-queue` |
+
+These routes are reachable only through an assignment-scoped Hub session issued by `/api/v1/app-auth/*`. The legacy `/api/mobile/pair/request` and `/api/mobile/pair/confirm` routes are retired from the target contract and must not be used by new Electron/Mobile flows.
 
 ## Invoice confirm rule
 

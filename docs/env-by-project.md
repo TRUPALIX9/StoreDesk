@@ -26,17 +26,18 @@ Compact reference for local `.env`, GitHub Actions secrets, Vercel, and Cloud Ru
 
 | Credential / secret | Plaintext may exist in | At-rest rule | Must never exist in |
 |---------------------|------------------------|--------------|---------------------|
-| Emailed one-time setup key | Authorized recipient email; Electron form only until protected IPC handoff; Worker activation process memory | Web stores key ID + Argon2id secret hash + organization/store/installation/recipient binding, TTL, attempts, consumed/revoked metadata | Admin/list API responses, `.env`, command arguments/history, logs, diagnostics, Electron persisted/main state, Mobile storage |
+| Emailed one-time setup key | Bound site contact email; Electron form only until protected IPC handoff; Worker activation process memory | Web stores key ID + Argon2id secret hash + exact organization/store/worker-installation/contact-email binding, TTL, attempts, consumed/revoked metadata | Admin/list API responses, `.env`, command arguments/history, logs, diagnostics, Electron persisted/main state, Mobile storage |
 | Store-scoped Worker credential | StoreDesk Worker process memory and Worker-readable sealed config only | Atlas stores credential ID + Argon2id hash; local AES-256-GCM envelope | Service-manager IPC/results, StoreDesk, StoreDesk Mobile, email, QR, Hub client hello, Vite/Flutter defines, logs |
-| Desktop/mobile token | One approved client secure storage and Worker validation path | Worker stores HMAC-SHA-256 digest keyed by installation key | Web/Atlas catalog records, other clients, logs |
-| Client relay refresh credential | Approved client secure storage; Web exchange path | Control plane stores credential ID + Argon2id hash | Worker credential slot, Hub logs/messages after exchange |
+| AppUser enrollment credential | Intended AppUser email and Electron/Mobile enrollment memory | Control plane stores credential ID + approved hash, AppUser/email binding, TTL, consumed/revoked metadata | Web admin session, Worker credential/setup-key slots, URLs, logs, other users |
+| App-user refresh credential | Electron/Mobile OS secure storage after app login | Control plane stores session/credential ID + approved hash, user/assignment/device/status metadata | Worker credential slot, other clients, logs, URLs |
+| Hub client session | One Electron/Mobile process memory/secure cache for its short TTL | Signed claims; assignment/audience/role/device/session IDs, expiry/revocation audit | URLs, logs, diagnostics, Mongo catalog, other assignments |
 | Relay session token | One process memory/secure cache for its short TTL | Signed short-lived claims; no plaintext persistence required | URLs, logs, diagnostics, Mongo catalog |
 | Installation key | Service manager and OS machine keystore; fallback protected key file | Unique 256-bit key, machine/SYSTEM/root protected | Encrypted config file, app `.env`, backups without OS wrapping, UI |
 | Commander/Mongo/SMTP secrets | StoreDesk Worker after config decrypt | AES-256-GCM sealed config + OS ACLs | Electron renderer/embedded server target state, Mobile, Web, Hub |
 
 Hash values are not authentication credentials and are never returned by APIs. Setup-key and Worker/refresh credential hashes use approved Argon2id parameters recorded with the hash and upgrade-on-verify. Random local client token lookup uses keyed HMAC-SHA-256; rotation changes plaintext and digest. Do not substitute reversible encryption for control-plane credential hashes.
 
-Email delivery transports only the short-lived setup key and safe organization/store context. It never transports Worker, client, relay, Commander, Mongo, or installation-key secrets. Provider logs/events must suppress message bodies and setup-key query parameters; delivery webhooks are signature-verified and retain only provider message ID, status, timestamps, and safe failure codes. An undelivered key is revoked/reissued, never retrieved.
+Email delivery transports only the short-lived setup key and safe Organization → Store/site → Worker display context. Contact email is routing metadata, never a login identity. It never transports Worker, client, relay, Commander, Mongo, or installation-key secrets. Provider logs/events must suppress message bodies and setup-key query parameters; delivery webhooks are signature-verified and retain only provider message ID, status, timestamps, and safe failure codes. An undelivered key is revoked/reissued, never retrieved.
 
 ### Encrypted local config envelope
 
@@ -79,7 +80,7 @@ Sources: `.env.example`, README, `docs/storedesk-gemini-project-brief.md`, embed
 | `MONGO_URI` | Recommended | Recommended | Local Mongo for catalog | `mongodb://127.0.0.1:27017/storedesk` |
 | `UPLOAD_DIR` | Optional | Optional | Invoice / upload files | `uploads` |
 | `CORS_ORIGIN` | Optional | Optional | Allowed browser origins (comma-separated) | `http://localhost:5173,http://127.0.0.1:5173` |
-| `APP_SECRET` | Yes if auth on | **Required** if `NODE_ENV=production` | JWT / pairing / cron secret | `change-me-in-development` |
+| `APP_SECRET` | Yes if auth on | **Required** if `NODE_ENV=production` | Legacy JWT / cron secret; pairing use is retired target behavior | `change-me-in-development` |
 | `JWT_EXPIRES_IN` | Optional | Optional | JWT lifetime | `7d` |
 | `APP_URL` | Optional | Optional | Base URL in auth emails | `http://127.0.0.1:5173` |
 | `AUTH_DISABLED` | Optional | **No** (leave unset/`false`) | Skip JWT on server | `true` (tests/dev only) |
@@ -95,6 +96,8 @@ Sources: `.env.example`, README, `docs/storedesk-gemini-project-brief.md`, embed
 
 **Belongs in:** renderer-safe URL/feature configuration only. Existing embedded Node secrets are migration inputs and must move to StoreDesk Worker sealed config. New Commander/API work belongs in Worker; never expose these values through `VITE_*`.
 
+Electron has no customer Web-admin login configuration. If no activated local Worker exists it opens setup-key onboarding directly. Once activated, store users authenticate with centrally provisioned AppUser credentials and receive only assignment-scoped client sessions. Do not add organization-member portals, customer Web sessions, manual Worker/LAN selectors, setup-key persistence, or permanent Worker credentials to Electron configuration.
+
 ---
 
 ## 2. `store-desk-worker` (edge API on store PC)
@@ -108,7 +111,7 @@ Copy `store-desk-worker/.env.example` → `.env`. Listens **`0.0.0.0:4310`**.
 | `MONGO_URI` | Recommended | Recommended | Local Mongo (memory fallback if unset) | `mongodb://127.0.0.1:27017/storedesk` |
 | `UPLOAD_DIR` | Optional | Optional | Upload directory | `uploads` |
 | `CORS_ORIGIN` | Optional | Optional | Allowed origins | `http://localhost:5173,http://localhost:3000` |
-| `APP_SECRET` | Yes if auth on | **Required** in production | JWT / pairing / cron | `change-me-in-development` |
+| `APP_SECRET` | Yes if auth on | **Required** in production | Legacy JWT / cron; not AppUser/Hub session signing material | `change-me-in-development` |
 | `JWT_EXPIRES_IN` | Optional | Optional | JWT lifetime | `7d` |
 | `APP_URL` | Optional | Optional | Links in emails | `http://127.0.0.1:5173` |
 | `AUTH_DISABLED` | Optional | **No** | Bypass JWT (tests) | `true` |
@@ -118,7 +121,9 @@ Copy `store-desk-worker/.env.example` → `.env`. Listens **`0.0.0.0:4310`**.
 | `GOOGLE_APPLICATION_CREDENTIALS` | Optional | Optional | SA JSON path | `./secrets/gcp-service-account.json` |
 | `COMMANDER_HOST` / `COMMANDER_USER` / `COMMANDER_PASSWORD` | Dev migration | Sealed config | Canonical Commander adapter settings | *(no production example secret)* |
 | `HUB_WS_URL` | Optional | Optional (Hub path) | Outbound Cloud Hub WebSocket | `wss://YOUR_RUN_HOST/ws` or `ws://127.0.0.1:8080/ws` |
+| `ORGANIZATION_ID` | Dev migration only | Sealed config | Canonical organization identity from setup redemption | `org_placeholder` |
 | `STORE_ID` | With Hub | With Hub | Store id matching Atlas `Store` | `SD-DEMO01` |
+| `WORKER_INSTALLATION_ID` | Dev migration only | Sealed config | Immutable Worker installation identity | `winst_placeholder` |
 | `AGENT_KEY` | Legacy Hub v0 only | **Forbidden after setup-v1 migration** | Temporary compatibility name for old shared Hub auth | *(do not add new values)* |
 | `STOREDESK_CONFIG_PATH` | Optional override | Optional | Encrypted config path; platform default above is preferred | *(platform path above)* |
 
@@ -128,15 +133,17 @@ Copy `store-desk-worker/.env.example` → `.env`. Listens **`0.0.0.0:4310`**.
 
 ## 3. `store-desk-mobile` (Flutter)
 
-**No app `.env.example`.** Runtime config is **QR / manual pairing and approval** → OS secure storage (`serverUrl`, device token, optional relay refresh credential). Phone never uses Mongo, Commander, installation, or Worker secrets directly.
+**No app `.env.example`.** Runtime identity is centrally provisioned AppUser login followed by assignment-scoped short-lived Hub client sessions and a revocable refresh credential in OS secure storage. Phone never uses a setup key, QR/6-digit pairing, manual LAN/Worker selection, Mongo, Atlas, Commander, installation key, or Worker credential directly.
 
 | Variable | Where | Required? | Purpose | Example |
 |----------|-------|-----------|---------|---------|
-| *(none for app runtime)* | — | — | Server URL + pairing from QR | `http://192.168.1.25:4310` |
+| *(none for app runtime)* | — | — | App auth/Hub endpoints are signed release configuration or trusted discovery, not user-entered Worker URLs | — |
 | `FLUTTER_ROOT` / `FLUTTER_BIN` | Dev machine / CI | For builds | Locate Flutter SDK | path to Flutter |
 | `STOREDESK_FLUTTER_WORKSPACE` | Windows CI helper | Optional | Junction root for path-length workarounds | `C:\StoreDeskBuild` |
 
 **Belongs in:** secure storage on device; tooling env on builder only. Do not bake Worker URLs into client-visible compile defines unless you accept that they ship in the APK.
+
+One granted assignment auto-connects; multiple assignments show only the authorized Organization → Store → Worker selector. Logout clears local session material. Disabled/revoked users, assignments, devices, refresh credentials, and sessions must fail closed with explicit online/offline messaging.
 
 ---
 
@@ -162,7 +169,8 @@ Notes:
 - README may mention `ADMIN_TOKEN`; code/`.env.example` use **`ADMIN_PASSWORD`**.
 - `NEXT_PUBLIC_*` is **client-visible** — never put Atlas URI or admin password there.
 - `SETUP_EMAIL_API_KEY`, EULA policy, and setup-key generation/delivery are server-only. Never put the key, recipient, or provider payload in `NEXT_PUBLIC_*`, URLs, analytics, or error reporting.
-- Same Atlas control-plane DB as Cloud Hub. Under setup-v1, Organization/Account/User/Subscription/Store/WorkerInstallation records are tenant-scoped; setup/Worker/client records reference credential IDs and approved hashes. Plaintext credentials never appear in Atlas documents or admin responses.
+- Same Atlas control-plane DB as Cloud Hub. Under setup-v1, Organization/Subscription/Store/WorkerInstallation and AppUser/UserAssignment records are hierarchy-scoped. Each installation persists immutable `organizationId`, `storeId`, and `workerInstallationId` plus support display snapshots (Worker name, store number/address, contact email). Setup/Worker/client records reference credential IDs and approved hashes. Plaintext credentials never appear in Atlas documents or admin responses.
+- Web authentication is for central `InternalAdmin` support/admin operators only. `AppUser` credentials work only in Electron/Mobile auth endpoints and grant only explicit `UserAssignment` records; they cannot access Web admin, customer self-service, invitations, or Web password-reset portals.
 
 **Belongs in:** `.env.local` locally; Vercel env for production. Not Cloud Run Hub secrets (separate app).
 
@@ -216,8 +224,9 @@ Without `MONGODB_URI`, test-only memory fixtures may be used locally. Setup-v1 f
 | `APP_SECRET` / JWT | Legacy embedded | Yes (migration) | — | — | — |
 | Commander | Legacy migration only | **Sealed config owner** | — | — | — |
 | Worker credential | Never | **Sealed config only** | Never | Hash/control plane | Verify hash/session issue |
-| Desktop/mobile client credential | OS secure storage | Validate hash | OS secure storage | Relay refresh hash/approval | Short-lived session only |
-| Hub URL / store ID | Optional client config | Non-secret config | Optional client config | Issues metadata | Serves WSS |
+| AppUser refresh credential | OS secure storage | — | OS secure storage | Hash/session/assignment authority | Verify/revoke session |
+| Hub client session | Process memory | Verify assignment claims | Process memory | Issue after assignment checks | Enforce assignment/role/audience |
+| Organization/store/installation IDs | Assignment/session claims | **Sealed canonical IDs** | Assignment/session claims | Hierarchy authority | Presence/relay isolation |
 | `VITE_*` | Yes (API URL only) | — | — | — | — |
 | `NEXT_PUBLIC_*` | — | — | — | Site URL only | — |
 | GitHub deploy secrets | — | — | — | (Vercel separate) | `GCP_SA_KEY` (+ URI) |
