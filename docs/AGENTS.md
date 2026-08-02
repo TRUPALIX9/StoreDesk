@@ -10,7 +10,7 @@ Human and agent documentation for the whole StoreDesk system. Prefer editing an 
 
 | File | Contents |
 |------|----------|
-| `storedesk-gemini-project-brief.md` | **Full project brief for Gemini/LLM paste** — product, UX, schema, APIs, Verifone, repos |
+| `storedesk-gemini-project-brief.md` | **Full Gemini/LLM paste brief** — modules, pages, DB split, how it works, optimization (updated 2026-08-02) |
 | `agent-team-guide.md` | **Agents, skills, WO/handoff flow, product rules** (start here for team ops) |
 | `how-storedesk-works.md` | End-to-end human guide: what it is, how apps connect, journeys |
 | `system-map.md` | Connection map + ranked gap fill plan (team review) |
@@ -21,10 +21,11 @@ Human and agent documentation for the whole StoreDesk system. Prefer editing an 
 | `database-schema.md` | Mongo entities (no Inventory/Stock) |
 | `wireframes.md` | Desktop/mobile UX wireframes |
 | `ui-architecture.md` | Electron UI system + Cursor skills |
-| `mobile-flow.md` | StoreDesk Mobile pairing/scan/upload flows |
+| `mobile-flow.md` | StoreDesk Mobile pairing/scan/prices + Play beta `0.0.1-beta1` vs APK (no mobile invoice upload) |
 | `invoice-extraction.md` | Extraction/review notes |
 | `sprint-plan.md` / `sprint-status.md` | Delivery plan/status |
-| `release.md` | Release notes/process |
+| `release.md` | Branching, APK/AAB, Play beta, checklists |
+| `../brand-kit/README.md` | Logos + color tokens (`#1A63F4` / `#00A87B`) |
 | `cloud-backend-deploy.md` | Cloud Hub (WSS) deploy — Cloud Run checklist |
 | `env-by-project.md` | Env vars per submodule — local / GitHub / Cloud Run / Vite |
 | `release-status.md` | Canonical parent + module versions, SHAs, CI, artifacts, deployments, compatibility, and blockers |

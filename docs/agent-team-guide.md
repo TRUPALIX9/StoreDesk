@@ -58,7 +58,11 @@ Every agent must obey these. They are also in root `AGENTS.md`.
 
 ### Scope
 
-**In scope:** products, variants, UPC/barcode, vendors, vendor price history, invoice upload/review, suggested sell price, Buddy scan/upload, lottery placeholder.
+**In scope:** products, variants, UPC/barcode, vendors, vendor price history, suggested sell price, mobile scan/lookup, lottery placeholder, org AppUsers from Web license.
+
+**Removed from UI:** invoice upload/review, desktop APK URL, pairing QR.
+
+**Mobile note:** StoreDesk Mobile uses AppUser login from org license — no pairing QR.
 
 **Never build:** stock quantity, inventory counts, add/reduce stock, low stock, reorder levels, warehouses, stock movements, `Inventory` / `StockMovement` models or APIs.
 
@@ -180,6 +184,9 @@ Skills are reusable instruction packs. **Cursor paths are canonical.** Codex cop
 | **agent-team** | `.cursor/skills/agent-team/SKILL.md` | Org model, routing, management styles |
 | **work-order** | `.cursor/skills/work-order/SKILL.md` | Create/update `docs/work-orders/WO-*.md` |
 | **handoff** | `.cursor/skills/handoff/SKILL.md` | Role/session transfer notes |
+| **context-budget** | `.cursor/skills/context-budget/SKILL.md` | Skip build/vendor/secrets; keep searches in `src`/`docs` |
+
+Also: root **`.cursorignore`** + always-on rule **`.cursor/rules/context-budget.mdc`**. Codex: `.codex/AGENTS.md` “Context budget” + `.codex/skills/context-budget/`.
 
 ### Desktop UI skills (Electron)
 

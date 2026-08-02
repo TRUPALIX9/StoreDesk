@@ -11,7 +11,7 @@ StoreDesk is now an end-to-end local-first product pricing and invoice review wo
 - `store-desk-worker` local API/server.
 - `store-desk-mobile` StoreDesk Mobile Flutter companion app.
 
-The system remains intentionally scoped to catalog, vendors, vendor costs, retail prices, invoice review, and mobile scanning/upload. It is not an inventory/stock/reorder system.
+The system remains intentionally scoped to catalog, vendors, vendor costs, retail prices, desktop invoice review, and mobile scanning/lookup. It is not an inventory/stock/reorder system. Mobile invoice upload was removed from the current mobile beta (desktop/Worker keep invoice flows).
 
 ## Done
 
@@ -35,7 +35,7 @@ Desktop UI/UX:
 Mobile UI/UX:
 
 - StoreDesk Mobile has connect-first routing.
-- Screens exist for connect, pairing, home, scanner, product lookup, product search, vendor prices, invoice upload, barcode display, and settings.
+- Screens exist for connect, pairing, home, scanner, product lookup, product search, vendor prices, barcode display, and settings (no mobile invoice upload in current beta).
 - Mobile uses secure storage for server URL/token and Dio API client with bearer auth.
 - Mobile app is built for Android locally.
 
@@ -44,7 +44,7 @@ Server/backend:
 - Express + TypeScript server runs on port `4310`.
 - Local in-memory data store works without MongoDB; MongoDB connection is available when configured.
 - Core models exist for products, variants, vendors, vendor prices, invoices, invoice items, extraction jobs, pricing rules, and mobile devices.
-- API routes exist for catalog, vendors, vendor prices, pricing, invoices, review queue, mobile pairing, mobile product lookup/search, and mobile invoice upload.
+- API routes exist for catalog, vendors, vendor prices, pricing, invoices, review queue, mobile pairing, and mobile product lookup/search. Legacy mobile invoice upload routes may still exist on Worker but are unused by the current Flutter client.
 - Invoice review can match/correct lines and create vendor price records from confirmed invoice items.
 
 Catalog/data:

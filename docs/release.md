@@ -75,45 +75,57 @@ APK route (after APK is copied):
 
 If APK is missing, the server returns **404 JSON** with build instructions.
 
-## StoreDesk Mobile (Android APK)
+## StoreDesk Mobile (Android)
 
-### Windows Flutter setup
+Brand: launcher / Play label **StoreDesk** (`com.storedesk`); docs say StoreDesk Mobile. Colors `#1A63F4` / `#00A87B` — `brand-kit/` and `store-desk-mobile/docs/brand/`. Full flow: [`mobile-flow.md`](./mobile-flow.md).
 
-1. Install Flutter SDK: https://docs.flutter.dev/get-started/install/windows
-2. Add Flutter to PATH.
-3. Run `flutter doctor`.
-4. Accept Android licenses: `flutter doctor --android-licenses`
-5. Install Android Studio / Android SDK if needed.
+### Versioning (Play beta)
 
-### Build and deploy APK
+| Field | Value |
+|-------|--------|
+| Version name | `0.0.1` |
+| Version code | `1` |
+| Release name | `0.0.1-beta1` |
+| `pubspec.yaml` | `0.0.1+1` |
 
-```powershell
+Bump `version:` in `store-desk-mobile/pubspec.yaml` before each Play upload. Version **code** must always increase for Play.
+
+### Flutter setup
+
+1. Install Flutter SDK: https://docs.flutter.dev/get-started/install
+2. Add Flutter to PATH; run `flutter doctor` and accept Android licenses.
+3. Install Android Studio / SDK (and Xcode on macOS for iOS later).
+
+### Google Play — AAB (preferred for Console)
+
+```bash
 cd store-desk-mobile
 npm run setup:flutter
 flutter pub get
-flutter analyze
-flutter test
+npm run ci
+flutter build appbundle --release
+```
+
+Upload `build/app/outputs/bundle/release/app-release.aab` to **Internal testing** first. Release name: `0.0.1-beta1`. Signing uses gitignored `android/key.properties` + upload `.jks`.
+
+Suggested “What’s new” text lives in [`store-desk-mobile/README.md`](../store-desk-mobile/README.md).
+
+### LAN sideload — APK (Worker download QR)
+
+```bash
+cd store-desk-mobile
 flutter build apk --release
+cp build/app/outputs/flutter-apk/app-release.apk \
+  ../store-desk-worker/downloads/storedesk-buddy.apk
 ```
 
-Copy APK:
-
-```powershell
-copy build\app\outputs\flutter-apk\app-release.apk ..\store-desk-worker\downloads\storedesk-buddy.apk
-```
-
-Restart server and verify:
-
-```powershell
-cd ..\store-desk-worker
-npm run dev
-```
-
-Test in browser:
+Verify:
 
 ```txt
 http://localhost:4310/downloads/storedesk-buddy.apk
 ```
+
+If the APK is missing, Worker returns **404 JSON** with build instructions. The filename `storedesk-buddy.apk` is the route contract; product name remains StoreDesk.
 
 ## End-to-end demo checklist
 
@@ -133,15 +145,12 @@ http://localhost:4310/downloads/storedesk-buddy.apk
    npm run dev
    ```
 
-5. Open **Mobile Access** — confirm QR codes and server URL.
-6. Connect Android phone to the same Wi-Fi.
-7. Install StoreDesk Mobile APK (from download route or `adb install`).
-8. Open StoreDesk Mobile and scan pairing QR.
-9. Confirm pairing success on desktop.
-10. Scan or search a product; view vendor prices.
-11. Upload invoice PDF/image from mobile.
-12. Review invoice on desktop.
-13. Confirm **no inventory/stock screens** exist anywhere.
+5. Open **User access** — confirm org users (from Web license); no APK / pairing QR.
+6. Sign in on Android with an org AppUser (or demo login for Play review).
+7. Confirm pairing QR / APK URL screens are gone.
+8. Scan or search a product; view vendor prices.
+9. Confirm **no** invoice upload/review UI on desktop or mobile.
+10. Confirm **no inventory/stock screens** exist anywhere.
 
 ## iPhone path
 
@@ -182,7 +191,8 @@ Remotes:
 - [ ] Server `npm run ci` passes (16 tests)
 - [ ] Mobile CI passes on GitHub Actions (or locally with Flutter)
 - [ ] Desktop installer builds
-- [ ] APK built and copied to `downloads/storedesk-buddy.apk`
+- [ ] APK built and copied to `downloads/storedesk-buddy.apk` (LAN path)
 - [ ] APK download route returns 200
+- [ ] Play AAB built for current `pubspec` version; internal track notes ready
 - [ ] Pairing works on real Android device
-- [ ] All three repos pushed to GitHub
+- [ ] Parent + submodule pointers pushed (`production` / `develop` as appropriate)

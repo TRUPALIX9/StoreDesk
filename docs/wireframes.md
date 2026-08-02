@@ -40,7 +40,7 @@ List invoices needing review → open invoice → editable rows → match produc
 ## StoreDesk Mobile
 
 ```txt
-Connect → Home → Scan | Search | Upload Invoice | Settings
+Connect → Home → Scan | Search | Settings
 ```
 
 Connect flow: scan pairing QR or enter server URL + code. Home shows connection status.

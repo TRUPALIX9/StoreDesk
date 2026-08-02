@@ -1,0 +1,39 @@
+# Keep Cursor / agent indexing off regenerated and vendor trees.
+# Product source of truth stays under src/, lib/, app/, docs/, and AGENTS.md.
+
+**/node_modules/
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/coverage/
+**/.turbo/
+**/.cache/
+**/.dart_tool/
+**/ios/Pods/
+**/android/.gradle/
+**/android/app/build/
+**/release/
+**/win-unpacked/
+**/*.apk
+**/*.aab
+**/*.log
+
+# Lockfiles are huge; open only when changing dependencies.
+**/package-lock.json
+**/pnpm-lock.yaml
+**/yarn.lock
+**/pubspec.lock
+
+# Probe / fixture dumps
+scripts/commander-downloads/
+**/*.map
+
+# Secrets and local env (examples stay visible via git)
+**/.env
+**/.env.*
+!**/.env.example
+**/secrets/**
+!**/.gitkeep
+**/*service-account*.json
+**/store-desk-*.json
