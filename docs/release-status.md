@@ -1,8 +1,9 @@
 # StoreDesk release status
 
-**Verified:** 2026-07-26 (EDT); parent and Cloud Hub revisions refreshed 2026-07-28
+**Verified:** 2026-07-26 (EDT); parent and Cloud Hub revisions refreshed 2026-07-28  
+**Mobile Play beta note:** 2026-08-02 — StoreDesk Mobile set to **`0.0.1+1`** / release **`0.0.1-beta1`**; signed **AAB** build path verified. Other module SHA tables below may still reflect the July audit until a full re-audit.
 **Scope:** Parent repository plus all five pinned submodules
-**Source of truth:** Local `production` checkouts, parent gitlinks, GitHub repository/release/workflow APIs, manifests, READMEs, and local artifact inspection
+**Source of truth:** Local checkouts, parent gitlinks, GitHub repository/release/workflow APIs, manifests, READMEs, and local artifact inspection
 
 ## Status labels
 
@@ -43,7 +44,7 @@ The parent snapshot is internally aligned, but it is not release-ready until Git
 | Desktop package | **Not built** — `store-desk-electron/release/` is absent; no `Desktop Release Build` workflow run |
 | Docker | Not applicable; native Electron packaging is expected |
 
-Included modules: Electron/React/MUI shell, product and variant setup, vendors and vendor prices, invoice upload/review, pricing rules/comparison, Mobile Access pairing/download UI, live read-only Commander Price Book, Cost Analysis, POS Reports, and T-Log transactions.
+Included modules: Electron/React/MUI shell, product and variant setup, vendors and vendor prices, pricing rules/comparison, live read-only Commander Price Book, Cost Analysis, POS Reports, T-Log transactions, organization user access. **Removed from UI:** invoice upload/review, Mobile Access APK URL / pairing QR.
 
 Known blockers: no Windows installer or macOS DMG has been produced from this SHA, and no formal tag/GitHub Release exists.
 
@@ -71,21 +72,22 @@ Known blockers: persistent production use still requires local MongoDB configura
 
 | Item | Status |
 | --- | --- |
-| Module status | **Partial** |
+| Module status | **Partial** (Play beta artifact ready; E2E device/Play rollout pending) |
 | Path / repository | `store-desk-mobile/` — `TRUPALIX9/store-desk-mobile` |
-| Version | `1.0.4+5` (`pubspec.yaml`) |
-| Branch / default branch | Local `production`; GitHub default `production` |
-| HEAD | `5d6956cc490253174c0eb829d210f0641a64f299` |
-| Latest tag / release | None / none |
-| CI | **Ready** — current SHA passed on `production` and `develop` |
-| APK | **Ready** — local release APK exists |
-| AAB | **Not built** — no local app bundle exists |
-| Release workflow | **Not built** — no `Android APK Build` workflow run and no GitHub Release |
+| Version | **`0.0.1+1`** (`pubspec.yaml`) — Play release name **`0.0.1-beta1`** |
+| Package / label | `com.storedesk` / launcher **StoreDesk** |
+| Brand | Kit colors `#1A63F4` / `#00A87B`; assets in `docs/brand/` + parent `brand-kit/` |
+| Branch / default branch | `production` + `develop` (work often on `develop`) |
+| Latest tag / release | None on GitHub; first Play beta is operator upload |
+| CI | **Ready** — workflows on `production` and `develop` |
+| APK | **Ready** path — sideload / Worker `downloads/storedesk-buddy.apk` |
+| AAB | **Ready** path — `flutter build appbundle --release` (Play upload) |
+| Release workflow | APK artifact workflow exists; Play upload still **manual** |
 | Docker | Not applicable; Flutter Android/iOS platform packaging |
 
-Included modules: pairing/manual connection, secure token and server URL storage, home, barcode scan/manual entry, product search/result, vendor-price comparison, suggested selling price, invoice image/PDF upload, generated barcode display, and settings.
+Included modules: pairing/manual connection, secure token and server URL storage, home, barcode scan/manual entry, product search/result, vendor-price comparison, suggested selling price, generated barcode display, settings, brand-aligned theme, Play demo mode. **No** mobile invoice upload in current beta (desktop Invoice Upload / Review Queue only).
 
-Known blockers: no physical Android device validation is recorded, no AAB exists for Play distribution, and iOS packaging/distribution is not built.
+Known blockers: physical Android + Play Console rollout validation is operator-owned; iOS / TestFlight not in this beta; setup-v1 AppUser/Hub path still incomplete vs LAN pairing.
 
 ## StoreDesk Web — marketing and licenses
 

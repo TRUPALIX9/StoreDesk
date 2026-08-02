@@ -2,7 +2,7 @@
 
 This document explains **what StoreDesk is**, **what it does**, and **how the parts connect** in practice.
 
-For agent/team ops see [`agent-team-guide.md`](./agent-team-guide.md) (full) and `.cursor/TEAM.md` (short org chart). For gap backlog see `docs/system-map.md`. For the full product spec see root `AGENTS.md`.
+For agent/team ops see [`agent-team-guide.md`](./agent-team-guide.md) (full) and `.cursor/TEAM.md` (short org chart). For gap backlog see `docs/system-map.md`. For the full product spec see root `AGENTS.md`. Brand tokens and logos: [`../brand-kit/README.md`](../brand-kit/README.md) (primary `#1A63F4`, secondary `#00A87B`).
 
 ---
 
@@ -15,8 +15,8 @@ It helps the store owner and staff:
 - See **daily POS sales** (often synced from Google Sheets)
 - Browse **live Verifone Commander PLUs** and local vendor costs
 - Keep a **Price Book** / **Cost Analysis** sheet (UPC-centered sell + vendor columns)
-- Upload **invoices**, review extracted lines, and save confirmed **vendor prices**
-- Pair **StoreDesk Mobile** on a phone (LAN today; cloud-relayed later)
+- Manage **organization users** provisioned with the store license in StoreDesk Web (no local APK URL or pairing QR)
+- Run **StoreDesk** on a phone (Play beta) with AppUser login against the assigned Worker
 - Manage **store licenses** and agent keys on StoreDesk Web (Vercel + Atlas M0)
 
 It is **not** a stock / inventory-count system.
@@ -25,13 +25,14 @@ It is **not** a stock / inventory-count system.
 |----------|----------------|
 | Products, variants, UPCs | On-hand quantity |
 | Vendor costs and history | “Add stock” / “reduce stock” |
-| Invoice review → save prices | Low-stock / reorder alerts |
-| Suggested selling price from margin/markup | Warehouse locations / stock movements |
-| POS sales summary, analytics, sale tax helpers | Direct phone → MongoDB |
+| Manual vendor prices / Price Book costs | Invoice upload/review UI (removed from desktop) |
+| Suggested selling price from margin/markup | Low-stock / reorder alerts |
+| POS sales summary, analytics, sale tax helpers | Warehouse locations / stock movements |
+| Org AppUsers from Web license | Direct phone → MongoDB; local APK QR / pairing codes |
 
 ---
 
-## 2. The three apps
+## 2. The apps
 
 Everything lives in one parent Git repo with **submodules**:
 
@@ -40,22 +41,29 @@ StoreDesk/                          ← parent (docs, scripts, submodule pointer
 ├── store-desk-electron/            ← StoreDesk (desktop)
 ├── store-desk-worker/              ← StoreDesk Worker (edge API)
 ├── store-desk-mobile/              ← StoreDesk Mobile (phone)
-└── store-desk-web/                 ← StoreDesk Web (marketing + licenses)
+├── store-desk-web/                 ← StoreDesk Web (marketing + licenses)
+├── store-desk-cloud-backend/       ← Cloud Hub (WSS)
+└── brand-kit/                      ← logos + color tokens
 ```
 
 | Name | Tech | Job |
 |------|------|-----|
 | **StoreDesk** | Electron + React + MUI | Admin / ops desktop UI |
-| **StoreDesk Worker** | Node + Express + local Mongo | Edge API (catalog, Commander, invoices) |
-| **StoreDesk Mobile** | Flutter | Phone helper (LAN now; Hub later) |
+| **StoreDesk Worker** | Node + Express + local Mongo | Edge API (catalog, Commander, vendor prices) |
+| **StoreDesk Mobile** | Flutter | Phone helper — AppUser login, scan/search/prices. Play/launcher label **StoreDesk** |
 | **StoreDesk Web** | Next.js on Vercel | Product site + store license admin (Atlas) |
+| **Cloud Hub** | Node on Cloud Run | WSS rooms for multi-store relay (Epic 1+) |
 
 Product branding:
 
 - Desktop = **StoreDesk**
 - API = **StoreDesk Worker**
-- Phone = **StoreDesk Mobile** (not “Buddy”)
+- Phone = **StoreDesk** on device; **StoreDesk Mobile** in docs/repos (not “Buddy”)
 - Web = **StoreDesk Web**
+- Relay = **StoreDesk Cloud Hub**
+- Visual kit = `brand-kit/` (lockup + mark + color tokens)
+
+Phone distribution: see [`mobile-flow.md`](./mobile-flow.md) (Play AAB; access via org AppUser / license, not desktop pairing QR).
 
 ### Target cloud shape (migration)
 
@@ -64,7 +72,7 @@ Phone / Desktop  →  Cloud Hub (WSS)  →  Edge Agent on store PC  →  local M
 Admin browser    →  StoreDesk Web     →  Atlas (licenses only)
 ```
 
-Keep `:4310` until Desktop + Mobile dual-mode through the Hub is proven. No Redis in Phase 0–1.(never “StoreDesk Mobile”)
+Keep `:4310` until Desktop + Mobile dual-mode through the Hub is proven. No Redis in Phase 0–1.
 
 ---
 
@@ -76,11 +84,12 @@ Keep `:4310` until Desktop + Mobile dual-mode through the Hub is proven. No Redi
 │  (Electron, PC)     │────────►│  http://0.0.0.0:4310     │
 │  localhost:4310     │  JWT    │                          │
 └─────────────────────┘         │  • catalog / prices      │
-                                │  • invoices / review     │
-┌─────────────────────┐  Wi‑Fi  │  • POS daily / sheets    │
-│  StoreDesk Mobile    │────────►│  • mobile pair + lookup  │
-│  (phone)            │  token  │  • optional Mongo blob   │
-│  http://LAN_IP:4310 │         └──────────────────────────┘
+                                │  • POS daily / sheets    │
+┌─────────────────────┐  Wi‑Fi  │  • mobile AppUser lookup │
+│  StoreDesk Mobile   │────────►│  • vendor prices         │
+│  scan/search/prices │  LAN    │  • optional Mongo blob   │
+│  AppUser login      │  token  └──────────────────────────┘
+│  http://LAN_IP:4310 │
 └─────────────────────┘
 ```
 
@@ -96,8 +105,8 @@ Rules:
 
 | Client | Auth |
 |--------|------|
-| Desktop | User login → JWT stored in the app → sent as `Authorization: Bearer …` |
-| Buddy | Scan pairing QR (or enter server URL + code) → device access token saved in secure storage |
+| Desktop | Organization AppUser login (provisioned with Web license) → JWT |
+| Mobile | Same AppUser model — sign in on phone; no pairing QR / APK URL from desktop |
 
 ---
 
@@ -112,11 +121,11 @@ Sidebar (current Electron nav):
 3. **Transactions** — paginated ticket cards from Commander T-Log (`vtransset`)  
 4. **Price Book** — live Verifone Commander PLUs on open/Refresh (`vPLUs`) plus local vendor-cost overlays (manual add overlay supported)  
 5. **Cost Analysis** — same live sell prices vs vendor case/per-item costs and margins  
-6. **Settings** — account, server URL test, data dump/reseed, Sheets/GTC, **More tools** (vendors, invoice upload/review, mobile pairing, etc.)
+6. **Settings** — account, server URL test, data dump/reseed, Sheets/GTC, **More tools** (vendors, pricing rules, user access, etc.)
 
 Commander details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). Full LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md). Use **`npm run dev:embedded`** in Electron for Price Book / POS Reports / Transactions (not yet fully mirrored on standalone `store-desk-worker`).
 
-Extra pages still exist as routes (dashboard, vendors, invoice review, lottery placeholder) but are **not** jammed into the main nav.
+Extra pages still exist as routes (dashboard, vendors, lottery placeholder) but are **not** jammed into the main nav.
 
 ### 4.2 StoreDesk Worker — what it stores and serves
 
@@ -124,9 +133,7 @@ The server is the **source of truth** for:
 
 - Products and product variants (UPC, pack size, codes)
 - Vendors and vendor price history
-- Invoices, invoice line items, review status
 - Pricing rules / sell-price suggestions
-- Mobile pairing codes and devices
 - POS daily rows (often imported from Sheets)
 - Price Book entries (UPC sheet with named vendor columns)
 
@@ -136,11 +143,11 @@ Runtime note: today much of the live data is an **in-memory store**. If Mongo is
 
 Typical flow:
 
-1. Install APK (Android) from a download QR shown on desktop (or other install path).
-2. Open Buddy → **Link / pair** using the desktop pairing QR (server URL + short-lived code).
-3. After pairing: scan barcodes, search catalog, view vendor prices, upload an invoice photo/PDF for **desktop review**.
+1. Install from Google Play (or sideload if needed) — **not** from a desktop APK QR.
+2. Sign in as an **organization AppUser** created when the store license was provisioned in StoreDesk Web.
+3. Scan barcodes, search catalog, and view vendor prices.
 
-Buddy should stay simple: big taps, scan-first, clear connection status.
+Keep the phone simple: big taps, scan-first, clear connection status.
 
 ---
 
@@ -165,20 +172,9 @@ Open Price Book → live Commander vPLUs (+ local overlays)
 
 Details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md). Suggested sell from pricing rules (margin ≥ 100% rejected) still applies on the Product/Variant path; Price Book Cost Analysis shows margin vs overlay costs.
 
-### C. Invoice → confirmed vendor price (critical rule)
+### C. Vendor costs (no invoice UI)
 
-```txt
-Upload PDF/image
-  → create Invoice + ExtractionJob
-  → extract line items (today: sample/stub extraction — not full OCR yet)
-  → match to products (UPC / SKU / codes / name)
-  → human review / edit
-  → confirm ready rows
-  → create VendorPrice records (history preserved)
-  → update “current” vendor price + selling suggestion
-```
-
-**Never** save raw extraction straight as final vendor price. Review always comes first. Confirming prices does **not** change inventory quantities (there are none).
+Vendor costs are entered **manually** (Vendor Prices / Price Book overlays). Invoice upload and extraction review were removed from StoreDesk desktop and mobile.
 
 ### D. Price Book
 
@@ -191,13 +187,13 @@ Live Commander PLU (name, UPC, mod, dept, sell, unit)
 
 This sits beside the Product/Variant model. Unifying them is a future product decision. See [`verifone-commander-price-book.md`](./verifone-commander-price-book.md).
 
-### E. Pair StoreDesk Mobile
+### E. Phone / desktop access (org license)
 
 ```txt
-Desktop Settings → Mobile Access / Link phone
-  → show APK download QR (Android)
-  → show pairing QR (serverUrl + code + expiry)
-  → Buddy scans → saves URL + token → ready on LAN
+StoreDesk Web: create org + store license
+  → provision AppUsers for that organization
+  → Desktop / Mobile sign in as those users
+  → no APK download URL, no pairing QR on the store PC
 ```
 
 ---
@@ -212,13 +208,10 @@ High-level entities (conceptual):
 | **ProductVariant** | Specific pack/size/UPC (e.g. 12-pack 12 oz) |
 | **Vendor** | Where you buy (Costco, Hackney, …) |
 | **VendorPrice** | One priced observation; history kept, not silently overwritten |
-| **Invoice / InvoiceItem** | Upload + lines waiting for review |
 | **PricingRule** | How to suggest sell price (margin / markup / rounding) |
-| **MobileDevice** | Paired Buddy handset |
+| **AppUser / assignment** | Org user from Web license (desktop + mobile login) |
 | **POS daily row** | One day’s sales totals from sheet/import |
 | **Price Book entry** | UPC-centric row with vendor cost columns |
-
-Matching priority for invoice lines (simplified): UPC → SKU → internal barcode → internal code → vendor code → exact name → fuzzy name → no match. Low confidence stays in review.
 
 ---
 
@@ -247,7 +240,7 @@ Typical machine setup:
 
    Default `dev` expects the **external** server on 4310.
 
-4. Phone: install Buddy, open Mobile Access / link tools on desktop, scan pairing QR on the same Wi‑Fi.
+4. Phone: install from Play, sign in as an org AppUser from the Web license (same Wi‑Fi / Hub as assigned).
 
 Parent repo clone reminder:
 
@@ -285,8 +278,8 @@ An operator can:
 1. Open StoreDesk on the PC with Server green in the header.
 2. Use **POS** for yesterday’s sales and tax prep.
 3. Use **Price Book** (live Commander + Refresh) and **Cost Analysis** to find an item and compare vendor costs.
-4. Under **Settings**, sync Sheets, pair a phone, or open invoice review when needed.
-5. On Buddy, scan a UPC and see best vendor / suggested sell without walking back to the office PC.
+4. Under **Settings** / **User access**, manage org users (provisioned with the Web license). Sync Sheets when needed.
+5. On the phone, sign in and scan a UPC to see best vendor / suggested sell.
 
 All of that stays **on the local network** — no required cloud backend.
 
@@ -303,7 +296,7 @@ All of that stays **on the local network** — no required cloud backend.
 | `docs/api-contract.md` | HTTP API surfaces |
 | `docs/database-schema.md` | Entity fields |
 | `docs/wireframes.md` | Screen wireframes |
-| `docs/mobile-flow.md` | Buddy pairing/scan (may lag live router) |
+| `docs/mobile-flow.md` | Mobile AppUser login / scan (Play beta) |
 | `docs/ui-architecture.md` | Desktop UI system |
 | `docs/system-map.md` | Gaps, dual-server notes, IA lock |
 | `docs/sprint-plan.md` / `sprint-status.md` | Delivery status |
@@ -312,4 +305,4 @@ All of that stays **on the local network** — no required cloud backend.
 
 ## 11. One-sentence summary
 
-**StoreDesk is the store’s local command center for POS visibility, catalog/vendor costs, invoice-confirmed prices, and a paired phone helper — running entirely through StoreDesk Worker on the LAN, without stock-count inventory.**
+**StoreDesk is the store’s local command center for POS visibility, catalog/vendor costs, and org-licensed desktop/phone access — running through StoreDesk Worker on the LAN (Hub later), without stock-count inventory or invoice upload.**

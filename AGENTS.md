@@ -24,8 +24,11 @@ The goal is to build a professional, themed, production-quality app for:
 - Invoice extraction review
 - Suggested selling/setup prices
 - Mobile barcode scanning
-- Mobile invoice upload
 - Future lottery setup
+
+**Access model:** Desktop and Mobile sign in as **organization AppUsers** provisioned when the store **license** is created in StoreDesk Web. Do **not** add APK download URLs or pairing QR flows on desktop.
+
+**Removed from current product UI:** Invoice upload/review (desktop + mobile), Mobile Access APK URL / pairing QR. Vendor prices stay manual / Price Book. Do not re-add without a Work Order.
 
 This is **not** a stock-count inventory system.
 
@@ -69,15 +72,13 @@ Build a local-first system where the store owner can:
 2. Add product variants such as 12 pack, 24 pack, 8 oz, 1 gal, 500 ct, etc.
 3. Add vendors.
 4. Save vendor prices manually.
-5. Upload invoices from desktop or mobile.
-6. Review extracted invoice items before saving.
-7. Match invoice items by UPC, SKU, vendor code, internal barcode, or name.
-8. Save confirmed vendor price history.
-9. Compare true cost across vendors.
-10. Calculate price per pack, price per item, and price per base unit.
-11. Suggest a selling price using margin or markup rules.
-12. Pair StoreDesk Mobile mobile app using QR.
-13. Let the phone scan barcodes, search products, compare prices, and upload invoices.
+5. Enter vendor prices manually (or via Price Book overlays).
+6. Compare true cost across vendors.
+7. Calculate price per pack, price per item, and price per base unit.
+8. Suggest a selling price using margin or markup rules.
+9. Provision organization AppUsers when the store license is created in StoreDesk Web.
+10. Pair is **not** used — desktop and phone sign in as those org users.
+11. Let the phone scan barcodes, search products, and compare prices.
 
 ---
 
@@ -468,10 +469,11 @@ Scanner Screen
 Product Result Screen
 Vendor Prices Screen
 Product Search Screen
-Upload Invoice Screen
 Show Barcode Screen
 Settings Screen
 ```
+
+Do **not** require Upload Invoice on mobile for the current beta.
 
 ---
 
@@ -1488,7 +1490,6 @@ Developer/debug info
 │                            │
 │ [ Scan Barcode ]           │
 │ [ Search Product ]         │
-│ [ Upload Invoice ]         │
 │ [ Recent Lookups ]         │
 │                            │
 │ Recent                     │
@@ -1540,7 +1541,6 @@ Developer/debug info
 │                            │
 │ [ View All Vendor Prices ] │
 │ [ Show Barcode ]           │
-│ [ Upload Invoice ]         │
 └────────────────────────────┘
 ```
 
@@ -1584,28 +1584,6 @@ Developer/debug info
 │ Red Bull 24pk              │
 │ Best: Costco $38.99        │
 │ Sell: $54.99               │
-└────────────────────────────┘
-```
-
-## Upload Invoice
-
-```txt
-┌────────────────────────────┐
-│ Upload Invoice             │
-├────────────────────────────┤
-│ Vendor                     │
-│ [ Select Vendor ▼ ]        │
-│                            │
-│ Invoice Date               │
-│ [ 06/07/2026 ]             │
-│                            │
-│ [ Take Photo ]             │
-│ [ Pick Image ]             │
-│ [ Pick PDF ]               │
-│                            │
-│ Selected: invoice.jpg      │
-│                            │
-│ [ Upload For Review ]      │
 └────────────────────────────┘
 ```
 
@@ -1704,11 +1682,12 @@ Complete when:
 
 ```txt
 - Desktop invoice upload works
-- Mobile invoice upload works
 - Review rows are created
 - User confirms rows
 - VendorPrice records are created
 ```
+
+(Mobile invoice upload is **not** required for current mobile beta.)
 
 ## MVP 4 — Mobile QR Setup
 
@@ -1841,7 +1820,7 @@ The owner can manage products, vendors, invoices, vendor prices, and pricing rul
 
 StoreDesk Mobile is the phone helper app.
 
-Employees can scan products, search items, view best vendor price, view suggested selling price, and upload invoices.
+Employees can scan products, search items, view best vendor price, and view suggested selling price. Invoice upload/review stays on the desktop.
 
 Everything runs locally through StoreDesk Worker on the same Wi-Fi.
 

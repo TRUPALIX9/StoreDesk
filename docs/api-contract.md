@@ -362,8 +362,8 @@ Alias: `/api/prices` mirrors `/api/vendor-prices`.
 | GET | `/api/mobile/vendor-prices/:variantId/best` |
 | GET | `/api/mobile/pricing/suggestion/:variantId` |
 | GET | `/api/mobile/vendors` |
-| POST | `/api/mobile/invoices/upload` |
-| GET | `/api/mobile/invoices/:invoiceId/status` |
+| POST | `/api/mobile/invoices/upload` | _(legacy — Worker may still expose; current Flutter client does not use)_ |
+| GET | `/api/mobile/invoices/:invoiceId/status` | _(legacy — unused by current Flutter client)_ |
 | GET | `/api/mobile/review-queue` |
 
 These routes are reachable only through an assignment-scoped Hub session issued by `/api/v1/app-auth/*`. The legacy `/api/mobile/pair/request` and `/api/mobile/pair/confirm` routes are retired from the target contract and must not be used by new Electron/Mobile flows.

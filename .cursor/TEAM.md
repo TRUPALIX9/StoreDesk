@@ -71,11 +71,14 @@ Closest `AGENTS.md` wins for Codex/Cursor directory context:
 | agent-team | `.cursor/skills/agent-team/` |
 | work-order | `.cursor/skills/work-order/` |
 | handoff | `.cursor/skills/handoff/` |
+| context-budget | `.cursor/skills/context-budget/` |
 | storedesk-ui | `.cursor/skills/storedesk-ui/` |
 | mui | `.cursor/skills/mui/` |
 | react-dev | `.cursor/skills/react-dev/` |
 
 Codex mirrors (thin pointers): `.codex/skills/*/SKILL.md`.
+
+**Context:** use `context-budget` + root `.cursorignore` so agents do not load `node_modules/`, `dist/`, `build/`, lockfiles, APKs, or secrets into the prompt.
 
 ## Git branches and CI
 
