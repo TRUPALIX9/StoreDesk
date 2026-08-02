@@ -16,11 +16,32 @@ Compact reference for local `.env`, GitHub Actions secrets, Vercel, and Cloud Ru
 | Bucket | Use for |
 |--------|---------|
 | Local `.env` / `.env.local` | Store PC Worker, Electron (incl. embedded API), local Hub, Web admin |
-| GitHub Actions secrets | Deploy credentials + optional Atlas sync (Cloud Hub repo) |
+| GitHub Actions secrets | Parent submodule checkout PAT; Cloud Hub deploy credentials + optional Atlas sync |
 | GitHub Actions variables | Non-secret GCP project / region / service names |
 | GCP Secret Manager → Cloud Run | Runtime Atlas URI for Hub |
 | Vercel project env | StoreDesk Web production |
 | Vite `VITE_*` | **Client-bundled** — visible in renderer / built JS. Never put passwords, SMTP, Mongo, or agent keys in `VITE_*`. |
+
+---
+
+## 0. Parent `StoreDesk` (GitHub Actions — private submodules)
+
+Parent CI (`.github/workflows/ci.yml`) checks out all five submodules recursively. The default `GITHUB_TOKEN` only covers `TRUPALIX9/StoreDesk` itself, so private sibling clones fail with “Repository not found.”
+
+| Name | Type | Required | Purpose |
+|------|------|----------|---------|
+| `SUBMODULES_PAT` | Secret | **Yes** (parent CI) | Token used by `actions/checkout@v4` (`token:` + `submodules: recursive`) to clone private submodule remotes |
+
+**Create the secret** on `TRUPALIX9/StoreDesk` → Settings → Secrets and variables → Actions → New repository secret. Name must be exactly `SUBMODULES_PAT`.
+
+**Token options (pick one):**
+
+1. **Fine-grained PAT** (preferred): Resource owner `TRUPALIX9`; grant **Contents: Read-only** on private repos `store-desk-electron`, `store-desk-worker`, `store-desk-mobile`, `store-desk-cloud-backend`. If `storedesk-dev/StoreDesk-web` is private for the runner, also grant that org/repo Contents read (or keep Web public so no extra grant is needed).
+2. **Classic PAT**: scope `repo` (full private-repo read). Broader than needed; rotate if leaked.
+
+Do not commit the token. Do not put it in workflow YAML, `.env`, or docs examples. Rotate and update the secret if the PAT expires or is revoked.
+
+After the secret is set, re-run parent CI on `develop` / `production`; the verify-layout step expects each submodule directory to contain its package manifest.
 
 ## Setup v1 credential ownership and storage
 
@@ -230,6 +251,7 @@ Without `MONGODB_URI`, test-only memory fixtures may be used locally. Setup-v1 f
 | `VITE_*` | Yes (API URL only) | — | — | — | — |
 | `NEXT_PUBLIC_*` | — | — | — | Site URL only | — |
 | GitHub deploy secrets | — | — | — | (Vercel separate) | `GCP_SA_KEY` (+ URI) |
+| Parent CI submodule PAT | `SUBMODULES_PAT` on `TRUPALIX9/StoreDesk` (not per-app) | | | | |
 | Cloud Run / Secret Manager | — | — | — | — | `MONGODB_URI` |
 
 ---

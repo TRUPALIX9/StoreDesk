@@ -23,7 +23,7 @@
 | Branch / default branch | Local `production`; GitHub default `production` |
 | Audited base HEAD | `87ceadcc9a7de63211522c0e7a430b1691a45825` |
 | Submodule set | **Ready** — all five parent gitlinks match the inspected local submodule HEADs |
-| CI | **Blocked** — `production` and `develop` run `30235477928` / `30235478055` failed while recursively checking out private `TRUPALIX9` submodules |
+| CI | **Blocked** — awaiting Actions secret `SUBMODULES_PAT`; workflow already passes that token into recursive checkout (see `docs/env-by-project.md` §0). Prior failures: runs `30235477928` / `30235478055` |
 | Packaging | Parent is not packaged; it coordinates independently released repositories |
 
 The parent snapshot is internally aligned, but it is not release-ready until GitHub Actions can authenticate to the private Electron, Worker, Mobile, and Cloud Hub repositories. The public StoreDesk Web submodule checks out successfully.
@@ -144,7 +144,7 @@ The two APK files are byte-identical. The Worker copy is intentionally preserved
 | Mobile → Worker | **Partial** | Pairing, protected APIs, LAN URL, and byte-identical served APK are present; physical-device test remains pending. |
 | Worker → Cloud Hub | **Partial** | Outbound WSS and `/api/` relay code exist; the refreshed Hub SHA adds Cloud Run startup and deployment fixes, but no successful deployed-Hub end-to-end test is recorded. |
 | Web → Cloud Hub identity | **Partial** | Both use the Atlas Store/license identity concept; Hub deployment is absent and current Web SHA is preview-only. |
-| Parent GitHub Actions → private submodules | **Blocked** | Default `GITHUB_TOKEN` cannot clone separate private `TRUPALIX9` repositories during recursive checkout. Use a least-privilege GitHub App or token secret for checkout. |
+| Parent GitHub Actions → private submodules | **Blocked** (ops) | Workflow expects `secrets.SUBMODULES_PAT` on checkout; operator must add that Actions secret (see `docs/env-by-project.md` §0). Default `GITHUB_TOKEN` alone cannot clone private sibling repos. |
 
 ## Conservative cleanup result
 

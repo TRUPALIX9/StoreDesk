@@ -10,8 +10,11 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
+      # Default GITHUB_TOKEN cannot clone private sibling submodule repos.
+      # Requires repo secret SUBMODULES_PAT — see docs/env-by-project.md.
       - uses: actions/checkout@v4
         with:
+          token: ${{ secrets.SUBMODULES_PAT }}
           submodules: recursive
 
       - name: Verify parent layout
@@ -22,4 +25,10 @@ jobs:
           test -d store-desk-worker
           test -d store-desk-web
           test -d store-desk-cloud-backend
+          # Recursive checkout must populate content, not empty gitlink dirs
+          test -f store-desk-electron/package.json
+          test -f store-desk-worker/package.json
+          test -f store-desk-mobile/pubspec.yaml
+          test -f store-desk-web/package.json
+          test -f store-desk-cloud-backend/package.json
           echo "Parent StoreDesk layout OK"

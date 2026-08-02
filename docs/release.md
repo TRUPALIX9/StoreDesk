@@ -15,6 +15,8 @@ Flow:
 2. Promote with a PR from `develop` → `production`.
 3. CI runs on pushes and PRs targeting both `production` and `develop`.
 
+Parent CI recursively checks out private app submodules. The default `GITHUB_TOKEN` cannot clone those sibling repos — set repository secret **`SUBMODULES_PAT`** on `TRUPALIX9/StoreDesk` (fine-grained Contents read on private `TRUPALIX9` submodules, or classic `repo` scope). See `docs/env-by-project.md` §0.
+
 Do not use `main` — it has been replaced by `production`.
 
 ## Environment
