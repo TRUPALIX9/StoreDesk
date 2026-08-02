@@ -29,7 +29,7 @@ There are **not two products**. There is one API on port **4310**, but historica
 
 **What you should use today:** one server — **`store-desk-worker`** on `4310`. Electron’s default `npm run dev` is `dev:external` and expects that.
 
-**Why keep calling it a gap:** the embedded copy is a fork. Features (Price Book, Mongo blob persist) can land on one and not the other. Two processes fighting over `4310` also fails. Recommendation: keep **only** `store-desk-worker`; treat Electron `src/server` as legacy until removed.
+**Why keep calling it a gap:** the embedded copy is a **legacy dual-support** fork. Price Book/Commander HTTP is now on Worker ([WO-20260801](./work-orders/WO-20260801-worker-pricebook-cloud-mimic.md)); keep embed until Phase 3 thin/delete. Two processes fighting over `4310` still fails — use Worker only for default `npm run dev`.
 
 ## How the system connects
 
@@ -48,7 +48,7 @@ StoreDesk Mobile (Flutter)
 | Electron | `localhost:4310` or Vite `/api` proxy | Mongo directly |
 | Buddy | `http://LAN_IP:4310` | `localhost` on phone; Mongo |
 
-Default Electron `npm run dev` expects **external** `store-desk-worker`. Embedded `src/server` still exists and can drift (Price Book / persistence).
+Default Electron `npm run dev` expects **external** `store-desk-worker` for Price Book / POS Reports / Transactions. Embedded `src/server` remains a legacy fallback (`dev:embedded`) and can still drift on non-ported features.
 
 ## Core journeys
 
@@ -72,7 +72,7 @@ Decide later: merge Price Book into Variant+VendorPrice, or keep both with clear
 
 | Pri | Gap | Owner | Fill |
 |-----|-----|-------|------|
-| P0 | Dual Express servers drift | tech-lead | One server; thin or delete Electron embed |
+| P0 | Dual Express servers drift | frontend-electron (+ backend Phase 1 done) | [WO-20260801](./work-orders/WO-20260801-worker-pricebook-cloud-mimic.md): Worker owns Price Book/Commander HTTP; Electron default client uses Worker; embed = legacy until Phase 3 thin/delete |
 | P0 | Invoice extraction is sample-only | backend-server | Real PDF/OCR path |
 | P0 | Buddy Home removed; Inventory naming | mobile-buddy + ui-ux | Restore helper home; rename Products |
 | P1 | Spec API aliases (`confirm-prices`, DELETE, mobile product/variant) | tech-lead + backend | Aliases + missing routes |

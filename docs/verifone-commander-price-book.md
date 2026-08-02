@@ -1,19 +1,17 @@
 # Verifone Commander / Price Book integration
 
-StoreDesk reads **live PLUs** from Verifone Commander (Sapphire / ConfigClient NAXML `vPLUs`) and merges them with **local vendor-cost overlays**. Selling price on Commander is never written back from StoreDesk.
+StoreDesk reads **live PLUs** from Verifone Commander (Sapphire / ConfigClient NAXML `vPLUs`) and merges them with **local vendor-cost overlays**. Price Book HTTP lives on **StoreDesk Worker**; Electron is the UI client. Optional sell-price write-back uses Commander `uPLUs` from Price Book only.
 
 | Item | Location |
 |------|----------|
-| Primary implementation | `store-desk-electron/` (embedded Express + UI) |
-| Routes | `store-desk-electron/src/server/routes/priceBook.routes.ts` |
-| Live list / merge | `store-desk-electron/src/server/services/priceBook.service.ts` |
-| Commander protocol | `store-desk-electron/src/server/services/commanderPlu.service.ts` |
-| Types | `store-desk-electron/src/shared/types.ts` |
+| **HTTP SoT (Worker)** | `store-desk-worker/src/routes/priceBook.routes.ts` + `services/commander*.ts` / `priceBook.service.ts` |
+| Dual-support embed (legacy) | `store-desk-electron/src/server/` (same routes; use only with `npm run dev:embedded`) |
+| Types | Worker + Electron `src/shared/types.ts` |
 | UI | `PriceBookPage.tsx`, `CostAnalysisPage.tsx`, `PriceBookFilterBar.tsx` |
 | Probe scripts | `scripts/commander-*.js` |
-| Related WOs | `WO-20260720-live-commander-price-book`, `WO-20260720-cost-analysis-page`, `WO-20260720-remove-excel-catalog-seed` |
+| Related WOs | `WO-20260801-worker-pricebook-cloud-mimic`, `WO-20260720-live-commander-price-book`, `WO-20260720-cost-analysis-page` |
 
-**Runtime note:** Price Book APIs live on the **Electron embedded server** today (`npm run dev:embedded`). Default `npm run dev` talks to standalone `store-desk-worker`, which does **not** yet mirror these routes. See `docs/system-map.md` (dual Express gap).
+**Runtime note:** Default Electron **`npm run dev`** (`dev:external`) talks to Worker on `:4310` for all Price Book / Commander / POS report routes. **`npm run dev:embedded`** is a legacy fallback that runs Electron’s copy of Express — do not run both on 4310. See [`WO-20260801`](./work-orders/WO-20260801-worker-pricebook-cloud-mimic.md) and `docs/system-map.md`.
 
 ---
 
@@ -29,17 +27,20 @@ StoreDesk reads **live PLUs** from Verifone Commander (Sapphire / ConfigClient N
 | Open a PLU by UPC + modifier | Price Book “Open by UPC” |
 | Save **vendor costs** (101, Sam’s Club, Global, Hackney, Gandhi, Custom) + optional expiry | Edit dialog → local overlay only |
 | Add a manual overlay row (no Commander PLU) | Price Book **Add overlay** |
+| Optional Commander sell-price update (`uPLUs`) / batch price | Price Book PLU dialog |
 | Compare sell vs vendor case / per-item cost and margin | **Cost Analysis** (`/cost-analysis`) |
+| **Backup PLU** — save full raw Commander `vPLUs` XML locally | Price Book header button |
 
 ### In scope vs out of scope
 
 | In scope | Out of scope |
 |----------|----------------|
-| Read-only Commander `vPLUs` | Commander `uPLUs` (or any write-back) — **not implemented** |
+| Live Commander `vPLUs` on Worker `:4310` | Automated restore UI (manual for now) |
 | Local vendor-cost overlays keyed by UPC + modifier | Excel / Hop-In POS catalog seed (removed) |
 | Optional offline cache via `POST …/commander/sync` (API only; demoted UX) | Stock quantity / inventory |
 | Live merge for Cost Analysis | StoreDesk Buddy Price Book (not wired to this API) |
-| Electron embedded API | Port to `store-desk-worker` (follow-up) |
+| Full-catalog raw XML backup (`POST …/commander/backup`) on Worker | Removing Electron embed in the same change as first Worker port (kept dual) |
+| Optional `uPLUs` sell-price write from Price Book | |
 
 ---
 
@@ -54,17 +55,18 @@ StoreDesk reads **live PLUs** from Verifone Commander (Sapphire / ConfigClient N
                              │ HTTP  /api/price-book*
                              ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ Embedded Express (store-desk-electron/src/server)           │
+│ StoreDesk Worker :4310 (SoT)                                │
 │   priceBook.routes → priceBook.service → commanderPlu       │
 │   Local store: priceBookEntries (overlays + optional cache) │
+│   Legacy dual: Electron src/server when dev:embedded only   │
 └───────────────┬─────────────────────────────┬───────────────┘
                 │ HTTPS NAXML                 │ in-memory /
-                │ vPLUs read-only             │ optional Mongo blob
+                │ vPLUs (+ optional uPLUs)    │ optional Mongo blob
                 ▼                             ▼
 ┌───────────────────────────┐    ┌────────────────────────────┐
 │ Verifone Commander        │    │ Local overlays             │
 │ CGILink validate/release  │    │ vendor* + expiry           │
-│ NAXML cmd=vPLUs           │    │ keyed upc::modifier        │
+│ NAXML cmd=vPLUs / uPLUs   │    │ keyed upc::modifier        │
 └───────────────────────────┘    └────────────────────────────┘
 ```
 
@@ -186,11 +188,32 @@ From `commanderPlu.service.ts` — only these tags are read from each `<domain:P
 | `upc` | `upc` | Leading zeros removed |
 | `upcModifier` | `upcModifier` | Numeric string (e.g. `000` → `"0"`) |
 | `description` | `description` | Maps to entry `name` |
-| `department` | `department` | |
+| `department` | `department` | Sysid code (e.g. `10`), not display name |
 | `price` | `price` | → `sellingPrice` |
 | `sellUnit` | `SellUnit` | Default 1 |
+| `fees` | `fees` / `fee` | Array of fee sysids |
+| `pcode` | `pcode` | Product / network code |
+| `taxRates` | `taxRates` / `taxRate@sysid` | Array of tax sysids |
+| `taxableRebate` | `taxableRebate/amount` | |
+| `maxQtyPerTrans` | `maxQtyPerTrans` | |
 
-Observed sample (probe download, not an official schema doc): `scripts/commander-downloads/plu-8037-0.xml` also contains `fees`, `pcode`, `taxRates`, `taxableRebate`, `maxQtyPerTrans` — **StoreDesk ignores** those fields today.
+Observed sample (live `vPLUs`, e.g. UPC 8037): nested tags include
+`<fees><fee>0</fee></fees>`, `<pcode>0</pcode>`,
+`<taxRates><domain:taxRate sysid="1"/></taxRates>`,
+`<taxableRebate><amount>…</amount></taxableRebate>`, `<maxQtyPerTrans>…</maxQtyPerTrans>`.
+`department` is a **sysid code** (e.g. `10`), not the display name.
+
+StoreDesk parses these for the Commander PLU modal. Name resolution:
+
+| Field | Lookup source | Notes |
+|-------|---------------|--------|
+| Department | Ruby `vrubyrept&reptname=department` (`vs:deptBase sysid` → name) + persisted `known-departments.json` `byCode` | No `vdeptcfg` permission for MANAGER |
+| Tax rates | CGILink `vtaxratecfg` | Full list with rates |
+| Fees | CGILink `vfeecfg` | Full list; `0` = None |
+| Product code (`pcode`) | — | No view command for this role; raw code shown |
+
+API: `GET /api/price-book/commander/lookups`, `GET /api/price-book/commander/lookup` (full PLU + labels).
+uPLUs write still patches price / description / SellUnit / department only — fees/tax/pcode preserved in raw XML.
 
 Namespace used in requests: `urn:vfi-sapphire:np.domain.2001-07-01`.
 
@@ -198,21 +221,22 @@ Namespace used in requests: `urn:vfi-sapphire:np.domain.2001-07-01`.
 
 ## 5. Environment & auth
 
-### Commander env (`store-desk-electron/.env.example`)
+### Commander env (`store-desk-worker/.env.example`; same vars on Electron embed)
 
 | Variable | Required | Default / notes |
 |----------|----------|-----------------|
 | `COMMANDER_PASSWORD` | **Yes** to enable live | If unset → `configured: false`, local overlays only |
 | `COMMANDER_HOST` | No | `https://192.168.31.11` |
 | `COMMANDER_USER` | No | `MANAGER` |
+| `PLU_BACKUP_DIR` | No | Worker/Electron local PLU XML backup folder |
 
 Placeholders only in docs — never commit real passwords. TLS uses `rejectUnauthorized: false` (LAN appliances often use self-signed certs).
 
-Dev tip: `npm run dev:embedded` loads embedded server + env.
+Dev tip: put `COMMANDER_*` on **Worker** `.env` for default `npm run dev`. Legacy `npm run dev:embedded` loads Electron’s own `.env` instead.
 
 ### JWT / auth bypass
 
-Price Book routes sit under `/api/price-book` and use the embedded server’s global auth middleware (`optionalGlobalAuth` / `requireAuth`).
+Price Book routes sit under `/api/price-book` and use Worker (or embed) global auth middleware (`optionalGlobalAuth` / `requireAuth`).
 
 | Flag | Behavior |
 |------|----------|
@@ -221,13 +245,13 @@ Price Book routes sit under `/api/price-book` and use the embedded server’s gl
 | `AUTH_DISABLED=false` | Require Bearer JWT even in development |
 | `VITE_AUTH_DISABLED` | Frontend mirror for ProtectedRoute |
 
-See `store-desk-electron/src/server/utils/isAuthDisabled.ts` and `src/auth/isAuthDisabled.ts`.
+See Worker/Electron `isAuthDisabled` helpers under `src/server/utils` or Worker middleware.
 
 ---
 
 ## 6. API documentation
 
-Base path: **`/api/price-book`**. Mounted in `store-desk-electron/src/server/index.ts`.
+Base path: **`/api/price-book`**. Mounted in `store-desk-worker/src/index.ts` (SoT). Dual mount: `store-desk-electron/src/server/index.ts` when embedded.
 
 Client wrappers: `store-desk-electron/src/api/client.ts` (`api.priceBook*`).
 
@@ -303,6 +327,40 @@ Optional **offline cache** (demoted; not primary UI). Still **read-only** `vPLUs
 ```
 
 Preserves existing vendor overlays when upserting Commander snapshots (`upsertFromCommander`).
+
+### `POST /api/price-book/commander/backup`
+
+Full-catalog **raw NAXML** backup from `vPLUs` (every tag inside each `<domain:PLU>` block is preserved — fees, taxRates, pcode, etc.). Pages Commander until complete (unless `maxPages` is set).
+
+**Body (optional):** `{ pageSize?: number; maxPages?: number }`
+
+**Disk path** (cwd of embedded server, usually `store-desk-electron/`):
+
+| File | Role |
+|------|------|
+| `data/plu-backups/backup-plu-YYYYMMDD-HHmmss.xml` | Timestamped snapshot |
+| `data/plu-backups/backup-plu.xml` | Latest pointer (overwritten each run) |
+
+Override directory with `PLU_BACKUP_DIR`. Folder is under gitignored `data/`.
+
+**Response:**
+
+```ts
+{
+  ok: true;
+  pluCount: number;
+  path: string;        // stamped file
+  latestPath: string;  // backup-plu.xml
+  pageSize: number;
+  ofPages: number;
+  fetchedPages: number;
+  truncated: boolean;
+  host: string;
+  createdAt: string;
+}
+```
+
+**Restore:** not automated in StoreDesk yet — keep the XML for manual Commander import / future `uPLUs` restore.
 
 ### `GET /api/price-book/by-upc/:upc?modifier=0`
 
@@ -390,9 +448,20 @@ Do not treat these as certified Verifone API docs.
    `GET {host}/cgi-bin/CGILink?cmd=releaseCredential&cookie=…`  
    Always attempted in `finally` after validate.
 
-### Write commands
+### Write commands (`uPLUs`)
 
-`scripts/commander-plu.js` mentions update gated behind `CONFIRM_WRITE` and is **not** exercised in StoreDesk app code. Electron services call **`vPLUs` only**. No `uPLUs` implementation in `store-desk-electron/src/server`.
+StoreDesk can update Commander sell price from **Price Book** via:
+
+`PUT /api/price-book/commander/plu` → NAXML `cmd=uPLUs`
+
+Implementation (`commanderPlu.service.ts`):
+
+1. `vPLUs` lookup for the UPC+modifier  
+2. Patch `<price>` (and optional `<description>` / `<SellUnit>`) inside the **raw** `<domain:PLU>` XML so ignored tags (`fees`, `pcode`, `taxRates`, …) are preserved  
+3. `uPLUs` write of `<domain:PLUs>…patched PLU…</domain:PLUs>`  
+4. Re-read with `vPLUs` to confirm  
+
+Cost Analysis vendor overlays remain local-only and do **not** call `uPLUs`.
 
 ### Probe / helper scripts
 
@@ -455,6 +524,7 @@ Read-only comparison page (edits happen on Price Book dialog).
 
 | WO | Status (as of docs pass) | Role |
 |----|--------------------------|------|
+| `WO-20260801-worker-pricebook-cloud-mimic` | **done** (Phase 1–2) | Worker SoT + Electron external client |
 | `WO-20260720-electron-price-book-plu` | **superseded** | Initial PLU wiring + catalog seed era |
 | `WO-20260720-remove-excel-catalog-seed` | **done** | Removed Excel catalog SoT |
 | `WO-20260720-live-commander-price-book` | **in_review** | Live SoT + Refresh; overlays |
@@ -466,9 +536,16 @@ Read-only comparison page (edits happen on Price Book dialog).
 ## 10. Quick start (developers)
 
 ```powershell
-cd store-desk-electron
+# Terminal 1 — Worker (SoT)
+cd store-desk-worker
 # Copy .env.example → .env; set COMMANDER_PASSWORD (and HOST/USER if needed)
-npm run dev:embedded
+npm run dev
+
+# Terminal 2 — Electron client
+cd store-desk-electron
+npm run dev
 ```
 
-Open **Price Book** → list should show `live: true` behavior (Refresh works). Use **Cost Analysis** for vendor margins. Confirm with `npm run check`.
+Open **Price Book** → list should show `live: true` behavior when Commander is reachable (Refresh works). Use **Cost Analysis** for vendor margins. Confirm with `npm run check` in both repos.
+
+Legacy only: `npm run dev:embedded` inside Electron (do not also run Worker on 4310).
