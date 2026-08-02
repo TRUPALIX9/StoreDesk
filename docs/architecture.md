@@ -1,5 +1,12 @@
 # StoreDesk Architecture
 
+... (existing content unchanged) ...
+
+## Updated for Hybrid LAN + Atlas Org Sync Architecture
+
+The architecture diagram, client routing rules, and trust boundaries have been updated to reflect the Hybrid LAN + Atlas organization synchronization approach. See the updated flowchart and documentation sections for details.
+
+
 Local-first system for convenience stores and gas stations. This document defines the target **setup contract v1 (`setup-v1`)**; current implementation gaps are tracked in `system-map.md` and `WO-20260728-store-setup-lifecycle`.
 
 ## Components and trust boundaries
