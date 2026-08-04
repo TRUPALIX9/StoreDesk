@@ -14,7 +14,7 @@ Related: [`store-desk-mobile/README.md`](../store-desk-mobile/README.md) · [`ho
 |-------|-----|
 | StoreDesk (Electron) | Desktop ops (POS, Price Book, Cost Analysis). **No** invoice UI, **no** APK URL, **no** pairing QR |
 | StoreDesk Worker | API the phone talks to (`:4310`); local Mongo; optional Hub agent |
-| StoreDesk Mobile | Scan / search / prices after **AppUser** login |
+| StoreDesk Mobile | Analytics, Reports, Price Book (PLU), and Cost Analysis after **AppUser** login |
 | StoreDesk Web | Creates org + license and provisions organization users used by desktop/mobile |
 | Cloud Hub | Later dual-mode path; not required for LAN beta |
 
@@ -61,10 +61,6 @@ cd store-desk-mobile
 flutter build appbundle --release
 ```
 
-### B. Sideload (optional)
-
-APK sideload may still exist for internal builds, but **desktop does not show an APK QR or download URL**. Prefer Play for store staff.
-
 ---
 
 ## 4. Day-to-day journeys
@@ -73,29 +69,37 @@ APK sideload may still exist for internal builds, but **desktop does not show an
 
 1. Open StoreDesk on the phone.
 2. Sign in as an org AppUser (from Web license), or use demo credentials for Play review.
-3. Use Home: Scan, Search, Settings.
+3. Access side drawer for navigation: Dashboard, Analytics, Sales Tax, Price Book, Reports, Settings.
 
-### Scan / lookup
+### Dashboard & Analytics
 
-1. Scan (or manual code).
-2. Worker resolves variant by UPC / code.
-3. Show product, best vendor, costs, suggested sell.
-4. Optional: all vendor prices, show barcode.
+1. **Dashboard**: View today's total sales. Tabbed donut charts for **TAX** (High/Low breakdown), **DEPT** (Sales by category), and **GAS** (Card vs Cash).
+2. **Live Transactions**: Scroll through the latest receipts. Tap any row to see the **Transaction Detail** (line items, tax breakdown, payment method).
+3. **Analytics**: Deep-dive into sales volume trends and daily metrics.
 
-### Search
+### Price Book & Cost Analysis
 
-1. Search name / UPC / internal code.
-2. Open a result → same product surfaces as scan.
+1. **Price Book List**: Search catalog or view "Recently Added" items.
+2. **Item Detail**: Tap an item to see its two-tab workspace:
+    - **PLU**: POS setup (Selling Price, Department, High/Low Tax Category).
+    - **Cost Analysis**: Ranked list of vendor costs (Sam's Club, Global, Hackney, etc.) with **BEST COST** highlight.
+3. **Edit**: Quick action to update item info or add new items via UPC scan.
 
-### Invoice upload
+### Reports (Verifone Commander)
 
-Not on mobile or desktop StoreDesk UI. Use manual vendor prices / Price Book overlays.
+1. Select **Reports** from the drawer.
+2. Retrieve real-time data from Commander:
+    - **Financial**: Z-Report (Close of Day), Sales Summary, Tax Report.
+    - **Inventory**: Top Sellers, Price Book Export, Fuel Sales.
+    - **Audit**: Void Audits, Cashier Performance.
 
-### Settings
+### Sales Tax & Settings
 
-- View connection / session  
-- Test connection  
-- Sign out / clear session  
+1. **Sales Tax**: Automated tracking of High/Low tax obligations and net taxable sales.
+2. **Settings**: 
+    - Configure **GA Tax Profile** (Georgia Tax Center) for automated filing.
+    - View saved GTC info (Account type, STI number).
+    - Manage store connection and user session.
 
 ---
 

@@ -68,6 +68,29 @@ Desktop copies live under `store-desk-electron/public/brand/`.
 
 1. `eng-manager` opens WO (`review-gate` for redesigns).
 2. `ui-ux-designer` critiques if visual.
-3. `frontend-electron` implements with `react-dev` → `mui` → `storedesk-ui`.
-4. `qa-verifier` runs Electron checks.
+3. `frontend-electron` implements (Desktop) or `mobile-flutter` (Mobile).
+4. `qa-verifier` runs checks.
 5. `docs-scribe` updates this file if the system changed.
+
+---
+
+## StoreDesk Mobile (Flutter) Architecture
+
+### Design Principles
+- **Modern Material 3**: High use of elevated cards, large border radii (16.0), and semantic icons.
+- **One-Handed Navigation**: Side drawer (65% width) with compact brand header.
+- **Data Density**: Tabbed analytics views, segmented controls, and clear hierarchical labels.
+- **Consistent Branding**: Same blue/green tokens and horizontal logo lockup as Web.
+
+### Key Components
+- **MainShell**: Dynamic AppBar title + Store Selector + Side Drawer navigation.
+- **Analytics Cards**: Tabbed segmented donut charts (Tax, Dept, Gas) with 2-column grid legends.
+- **Transaction Audit**: Receipt-style detail views with deep-linking back to the catalog.
+- **Price Book Workspace**: Unified Catalog -> Item Detail (PLU & Cost Analysis tabs) -> Edit Form flow.
+
+### Implementation Stack
+- **Framework**: Flutter / Dart (Null Safe)
+- **State Management**: Riverpod (for repository providers and search state)
+- **Routing**: go_router (StatefulShellRoute for tab/drawer persistence)
+- **Charts**: fl_chart (custom donut implementations)
+- **Icons**: flutter_lucide (standardized)
