@@ -71,7 +71,7 @@ Health:
 
 APK route (after APK is copied):
 
-- http://localhost:4310/downloads/storedesk-buddy.apk
+- http://localhost:4310/downloads/storedesk-mobile.apk
 
 If APK is missing, the server returns **404 JSON** with build instructions.
 
@@ -116,7 +116,7 @@ Suggested “What’s new” text lives in [`store-desk-mobile/README.md`](../st
 cd store-desk-mobile
 flutter build apk --release
 cp build/app/outputs/flutter-apk/app-release.apk \
-  ../store-desk-worker/downloads/storedesk-buddy.apk
+  ../store-desk-worker/downloads/storedesk-mobile.apk
 ```
 
 Verify:
@@ -191,7 +191,7 @@ Remotes:
 - [ ] Server `npm run ci` passes (16 tests)
 - [ ] Mobile CI passes on GitHub Actions (or locally with Flutter)
 - [ ] Desktop installer builds
-- [ ] APK built and copied to `downloads/storedesk-buddy.apk` (LAN path)
+- [ ] APK built and copied to `downloads/storedesk-mobile.apk` (LAN path)
 - [ ] APK download route returns 200
 - [ ] Play AAB built for current `pubspec` version; internal track notes ready
 - [ ] Pairing works on real Android device

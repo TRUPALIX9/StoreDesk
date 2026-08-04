@@ -58,7 +58,7 @@ Product branding:
 
 - Desktop = **StoreDesk**
 - API = **StoreDesk Worker**
-- Phone = **StoreDesk** on device; **StoreDesk Mobile** in docs/repos (not “Buddy”)
+- Phone = **StoreDesk** on device; **StoreDesk Mobile** in docs/repos
 - Web = **StoreDesk Web**
 - Relay = **StoreDesk Cloud Hub**
 - Visual kit = `brand-kit/` (lockup + mark + color tokens)
@@ -98,7 +98,7 @@ Rules:
 1. **One real backend:** `store-desk-worker` on port **4310**, listening on **`0.0.0.0`** so phones on LAN can connect.
 2. Desktop may use `http://localhost:4310` (or Vite’s `/api` proxy in dev).
 3. The phone **must** use the PC’s **LAN IP** (e.g. `http://192.168.1.25:4310`). On a phone, `localhost` means the phone itself — that will never reach the store PC.
-4. Buddy **never** talks to MongoDB. Only the server does.
+4. The phone **never** talks to MongoDB. Only the server does.
 5. PC must be on, server running, same Wi‑Fi, firewall allowing **4310**.
 
 ### Auth in short

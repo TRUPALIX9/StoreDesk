@@ -54,7 +54,7 @@ Every agent must obey these. They are also in root `AGENTS.md`.
 |---------|-----------|
 | **StoreDesk** (desktop) | “StoreDesk Desktop” as product name |
 | **StoreDesk Worker** | “the API” alone in user-facing copy |
-| **StoreDesk Buddy** | “StoreDesk Mobile” |
+| **StoreDesk Mobile** | “StoreDesk Mobile” |
 
 ### Scope
 
@@ -70,7 +70,7 @@ Every agent must obey these. They are also in root `AGENTS.md`.
 
 ```txt
 StoreDesk (PC)  ──localhost:4310──►  StoreDesk Worker (:4310, 0.0.0.0)
-StoreDesk Buddy ──LAN_IP:4310────►  StoreDesk Worker
+StoreDesk Mobile ──LAN_IP:4310────►  StoreDesk Worker
                                          │
                                          ▼
                                     MongoDB (local only)
@@ -79,7 +79,7 @@ StoreDesk Buddy ──LAN_IP:4310────►  StoreDesk Worker
 1. Server listens on **port 4310** and **`0.0.0.0`** (LAN phones).
 2. Desktop may use `http://localhost:4310`.
 3. Phone **must** use the PC LAN IP — never `localhost` on the phone.
-4. Buddy **never** connects to MongoDB.
+4. StoreDesk Mobile **never** connects to MongoDB.
 5. No hosted backend / hosted Mongo unless the user explicitly asks.
 
 ### Invoice → price flow
@@ -153,7 +153,7 @@ electron   server    buddy
 | Tech Lead | `.cursor/agents/tech-lead.md` | Cross-repo architecture, API contracts, spikes |
 | Frontend Electron | `.cursor/agents/frontend-electron.md` | `store-desk-electron/` UI + MUI |
 | Backend Server | `.cursor/agents/backend-server.md` | `store-desk-worker/` API + models + services |
-| Mobile Buddy | `.cursor/agents/mobile-buddy.md` | `store-desk-mobile/` Flutter |
+| StoreDesk Mobile | `.cursor/agents/mobile-storedesk.md` | `store-desk-mobile/` Flutter |
 | UI/UX Designer | `.cursor/agents/ui-ux-designer.md` | Design critique (readonly by default) |
 | QA Verifier | `.cursor/agents/qa-verifier.md` | Module checks, pass/fail + residual risk |
 | Docs Scribe | `.cursor/agents/docs-scribe.md` | `docs/`, folder `AGENTS.md`, skill/doc sync |
@@ -167,7 +167,7 @@ electron   server    buddy
 | Visual redesign / layout critique | `ui-ux-designer` then implementer |
 | Electron pages / theme / MUI | `frontend-electron` |
 | Routes, Mongo, services, pairing | `backend-server` |
-| Flutter screens / scan / pair | `mobile-buddy` |
+| Flutter screens / scan / auth | `mobile-storedesk` |
 | “Did CI / checks pass?” | `qa-verifier` |
 | Docs, maps, contract text | `docs-scribe` |
 

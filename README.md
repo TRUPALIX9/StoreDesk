@@ -34,13 +34,12 @@ Local-first edge ops for convenience stores and gas stations, with an optional c
 **Data rule:** Catalog, Commander, invoices, and vendor prices stay on the store PC. Atlas holds licenses / org registry / setup credentials only (~M0).
 
 ```txt
-Today (proven):
-  Desktop ──HTTP──► Worker :4310 ──► local Mongo
-  Phone   ──LAN───► Worker :4310
-  Browser ──► Web (Vercel) ──► Atlas (licenses)
+Primary Mode (setup-v1 / Cloud-First):
+  Clients (Desktop/Mobile) ──► Hub WSS ──► Worker :4310 ──► local Mongo
 
-Target (setup-v1 / dual-mode):
-  Clients ──► Hub WSS ──► Worker :4310
+Legacy LAN Mode (fallback):
+  Desktop ──HTTP──► Worker :4310
+  Phone   ──LAN───► Worker :4310
 ```
 
 ---
@@ -189,19 +188,19 @@ See [`store-desk-mobile/README.md`](store-desk-mobile/README.md) for Play AAB / 
 | Path | Artifact | Audience |
 |------|----------|----------|
 | **Google Play beta** | AAB `0.0.1-beta1` (`com.storedesk`) | Internal / closed testers |
-| **LAN sideload** | APK → `store-desk-worker/downloads/storedesk-buddy.apk` | In-store QR from desktop |
+| **LAN sideload** | APK → `store-desk-worker/downloads/storedesk-mobile.apk` | In-store QR from desktop |
 
 ```bash
 # Play
 cd store-desk-mobile && flutter build appbundle --release
 
-# Worker download QR (legacy filename required)
+# Worker download QR
 flutter build apk --release
 cp build/app/outputs/flutter-apk/app-release.apk \
-  ../store-desk-worker/downloads/storedesk-buddy.apk
+  ../store-desk-worker/downloads/storedesk-mobile.apk
 ```
 
-Download URL after copy: `http://<LAN_IP>:4310/downloads/storedesk-buddy.apk`
+Download URL after copy: `http://<LAN_IP>:4310/downloads/storedesk-mobile.apk`
 
 ---
 
@@ -246,7 +245,7 @@ Use kit colors in UI; keep business logic in services, not pages.
 | Empty submodule folders | `git submodule update --init --recursive` |
 | Detached HEAD in submodule | `git checkout develop` or `production` inside the submodule |
 | Mobile cannot reach Worker | Same Wi‑Fi; use LAN IP, not localhost; firewall allows 4310 |
-| APK route 404 | Build APK and copy to `store-desk-worker/downloads/storedesk-buddy.apk` |
+| APK route 404 | Build APK and copy to `store-desk-worker/downloads/storedesk-mobile.apk` |
 | Parent CI cannot clone apps | Set `SUBMODULES_PAT` — see `docs/env-by-project.md` |
 
 ---
