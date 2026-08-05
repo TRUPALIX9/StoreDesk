@@ -33,6 +33,7 @@ Track StoreDesk migration from local-first to cloud-relayed multi-store (Web + A
 | WO-20260726-cloud-hub-foundation | 8 | done — pushed `https://github.com/TRUPALIX9/store-desk-cloud-backend` |
 | WO-20260726-edge-agent-outbound-wss | 13 | done (live Hub E2E pending org repo) |
 | WO-20260726-desktop-dual-mode | 8 | in_progress (D1/D2 done; D3 Hub client blocked on org repo) |
+| WO-20260801-worker-pricebook-cloud-mimic | 13 | **done** — Worker Price Book SoT + Electron default external client |
 
 ## Later epics
 

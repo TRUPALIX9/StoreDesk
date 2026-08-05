@@ -123,7 +123,9 @@ Sidebar (current Electron nav):
 5. **Cost Analysis** — same live sell prices vs vendor case/per-item costs and margins  
 6. **Settings** — account, server URL test, data dump/reseed, Sheets/GTC, **More tools** (vendors, pricing rules, user access, etc.)
 
-Commander details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). Full LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md). Use **`npm run dev:embedded`** in Electron for Price Book / POS Reports / Transactions (not yet fully mirrored on standalone `store-desk-worker`).
+Commander details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md), [`verifone-commander-reports.md`](./verifone-commander-reports.md). Full LLM brief: [`storedesk-gemini-project-brief.md`](./storedesk-gemini-project-brief.md).
+
+**Price Book / POS Reports / Transactions APIs** live on **StoreDesk Worker** `:4310` ([`WO-20260801-worker-pricebook-cloud-mimic`](./work-orders/WO-20260801-worker-pricebook-cloud-mimic.md)). Default Electron **`npm run dev`** talks to Worker (`dev:external`). Electron **`npm run dev:embedded`** is a legacy dual-support fallback only.
 
 Extra pages still exist as routes (dashboard, vendors, lottery placeholder) but are **not** jammed into the main nav.
 
@@ -181,8 +183,8 @@ Vendor costs are entered **manually** (Vendor Prices / Price Book overlays). Inv
 ```txt
 Live Commander PLU (name, UPC, mod, dept, sell, unit)
   + local vendor overlays (101, Sam’s, Global, Hackney, Gandhi, Custom, expiry)
-  → Electron embedded /api/price-book (not yet mirrored on store-desk-worker)
-  → Price Book edit dialog saves overlays only (no Commander write-back)
+  → StoreDesk Worker /api/price-book (HTTP SoT on :4310)
+  → overlays via PUT/POST; optional Commander sell-price write via /commander/plu
 ```
 
 This sits beside the Product/Variant model. Unifying them is a future product decision. See [`verifone-commander-price-book.md`](./verifone-commander-price-book.md).
