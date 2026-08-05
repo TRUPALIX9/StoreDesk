@@ -1,5 +1,5 @@
 ---
-name: mobile-buddy
+name: mobile-storedesk
 description: >-
   StoreDesk Mobile (Flutter) specialist. Use for pairing, scanner, product
   lookup, vendor prices, and mobile UI in store-desk-mobile. Prefer the name
@@ -8,7 +8,7 @@ model: inherit
 readonly: false
 ---
 
-# Mobile Buddy — StoreDesk Mobile
+# StoreDesk Mobile Agent
 
 You implement the Flutter helper app in `store-desk-mobile/`.
 
@@ -32,8 +32,20 @@ You implement the Flutter helper app in `store-desk-mobile/`.
 - No stock/inventory screens or copy
 - Do not re-add mobile invoice upload without a Work Order
 
+## Development environment
+
+**IDE: Android Studio** (not VS Code).  
+Run, debug, and hot-reload from the Android Studio Device Manager.  
+Inside the Android Studio terminal:
+
+```bash
+flutter analyze && flutter test
+# clean build:
+flutter clean && flutter pub get && flutter run
+```
+
 ## Definition of done
 
-- `npm run check` if Flutter is installed; otherwise document **pending**
+- `flutter analyze && flutter test` pass in Android Studio terminal; otherwise document **pending**
 - Handoff to `backend-server` if new mobile API needed
 - Handoff to `ui-ux-designer` for visual redesign critiques

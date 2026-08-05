@@ -1,6 +1,8 @@
 # StoreDesk Agent Team
 
-Cursor-only runtime. Codex CLI uses the same `AGENTS.md` + `.codex/skills/` mirrors.
+Cursor runtime: `.cursor/agents/*` + `.cursor/skills/*` + `.cursor/rules/*`  
+Antigravity (AGY) runtime: `.agents/` (mirrors + extends the Cursor team)  
+Codex CLI: root / folder `AGENTS.md` + `.codex/skills/*` (thin pointers)  
 **Do not use Claude Code / `.claude/`.**
 
 Full human + agent guide (flows, rules, skills, WO/handoff): **`docs/agent-team-guide.md`**.
@@ -17,23 +19,31 @@ Full human + agent guide (flows, rules, skills, WO/handoff): **`docs/agent-team-
     ┌─────────┼─────────┐
     │         │         │
 frontend   backend   mobile
-electron   server    buddy
+electron   server    storedesk
     │         │         │
     └────┬────┴────┬────┘
          │         │
     qa-verifier  docs-scribe
 ```
 
-| Role | Agent file | Owns |
-|------|------------|------|
-| Engineering Manager | `.cursor/agents/eng-manager.md` | Intake, priority, work orders, handoffs, unblock |
-| Tech Lead | `.cursor/agents/tech-lead.md` | Cross-repo architecture, API contracts, spikes |
-| Frontend (Electron) | `.cursor/agents/frontend-electron.md` | `store-desk-electron/` UI + MUI |
-| Backend (Server) | `.cursor/agents/backend-server.md` | `store-desk-worker/` API + models |
-| Mobile (StoreDesk Mobile) | `.cursor/agents/mobile-buddy.md` | `store-desk-mobile/` Flutter |
-| UI/UX Designer | `.cursor/agents/ui-ux-designer.md` | Design critique (readonly by default) |
-| QA Verifier | `.cursor/agents/qa-verifier.md` | `npm run ci` / Flutter checks / regressions |
-| Docs Scribe | `.cursor/agents/docs-scribe.md` | `docs/`, folder `AGENTS.md`, skills sync |
+| Role | Cursor agent | AGY skill | Owns |
+|------|-------------|-----------|------|
+| Engineering Manager | `eng-manager.md` | `skills/eng-manager/SKILL.md` | Intake, priority, work orders, handoffs, unblock |
+| Tech Lead | `tech-lead.md` | `skills/tech-lead/SKILL.md` | Cross-repo architecture, API contracts, spikes |
+| Frontend (Electron) | `frontend-electron.md` | `skills/frontend-electron/SKILL.md` | `store-desk-electron/` UI + MUI |
+| Backend (Server) | `backend-server.md` | `skills/backend-server/SKILL.md` | `store-desk-worker/` API + models |
+| Mobile (StoreDesk Mobile) | `mobile-storedesk.md` | `skills/mobile-flutter/SKILL.md` | `store-desk-mobile/` Flutter + **Android Studio** |
+| UI/UX Designer | `ui-ux-designer.md` | `skills/ui-ux-designer/SKILL.md` | Design critique (readonly by default) |
+| QA Verifier | `qa-verifier.md` | `skills/qa-verifier/SKILL.md` | CI checks / Flutter analyze / regressions |
+| Docs Scribe | `docs-scribe.md` | `skills/docs-scribe/SKILL.md` | `docs/`, folder `AGENTS.md`, skills sync |
+
+## Mobile development environment
+
+Mobile branch uses **Android Studio** (not VS Code):
+
+- Run / debug / hot-reload via Android Studio Device Manager
+- CI check from Android Studio terminal: `flutter analyze && flutter test`
+- AGY skill: `.agents/skills/mobile-flutter/SKILL.md`
 
 ## Operating model
 
@@ -57,6 +67,7 @@ Closest `AGENTS.md` wins for Codex/Cursor directory context:
 | Path | Purpose |
 |------|---------|
 | `/AGENTS.md` | Product master (scope, entities, APIs, non-negotiables) |
+| `/.agents/AGENTS.md` | AGY team org chart + routing |
 | `/docs/AGENTS.md` | Human + agent docs map |
 | `/scripts/AGENTS.md` | Catalog/invoice data scripts |
 | `/tools/AGENTS.md` | Parent tooling helpers |
@@ -64,21 +75,19 @@ Closest `AGENTS.md` wins for Codex/Cursor directory context:
 | `/store-desk-worker/AGENTS.md` | API map |
 | `/store-desk-mobile/AGENTS.md` | StoreDesk Mobile app map |
 
-## Skills (Cursor canonical)
+## Skills (Cursor canonical / AGY mirrors)
 
-| Skill | Path |
-|-------|------|
-| agent-team | `.cursor/skills/agent-team/` |
-| work-order | `.cursor/skills/work-order/` |
-| handoff | `.cursor/skills/handoff/` |
-| context-budget | `.cursor/skills/context-budget/` |
-| storedesk-ui | `.cursor/skills/storedesk-ui/` |
-| mui | `.cursor/skills/mui/` |
-| react-dev | `.cursor/skills/react-dev/` |
+| Skill | Cursor path | AGY path |
+|-------|-------------|---------|
+| agent-team | `.cursor/skills/agent-team/` | `.agents/skills/eng-manager/` |
+| work-order | `.cursor/skills/work-order/` | `.agents/skills/work-order/` |
+| handoff | `.cursor/skills/handoff/` | `.agents/skills/handoff/` |
+| context-budget | `.cursor/skills/context-budget/` | `.agents/skills/context-budget/` |
+| storedesk-ui | `.cursor/skills/storedesk-ui/` | — (Electron only) |
+| mui | `.cursor/skills/mui/` | — (Electron only) |
+| react-dev | `.cursor/skills/react-dev/` | — (Electron only) |
 
-Codex mirrors (thin pointers): `.codex/skills/*/SKILL.md`.
-
-**Context:** use `context-budget` + root `.cursorignore` so agents do not load `node_modules/`, `dist/`, `build/`, lockfiles, APKs, or secrets into the prompt.
+**Context:** use `context-budget` + root `.cursorignore` so agents do not load `node_modules/`, `dist/`, `build/`, lockfiles, APKs, `.gradle/`, `.dart_tool/`, or secrets into the prompt.
 
 ## Git branches and CI
 

@@ -39,8 +39,23 @@ List invoices needing review → open invoice → editable rows → match produc
 
 ## StoreDesk Mobile
 
-```txt
-Connect → Home → Scan | Search | Settings
-```
+### Navigation
+Side drawer (65% width) with Brand Logo Lockup Header. 
+Links: Dashboard, Analytics, Sales Tax, Price Book, Reports, Settings.
 
-Connect flow: scan pairing QR or enter server URL + code. Home shows connection status.
+### Dashboard
+- **Top Summary**: Today's Total Sales Amount.
+- **Tabbed Analytics**: Segmented control for TAX | DEPT | GAS views. Donut chart with centered total. Legends below in 2-column grid.
+- **Live Transactions**: Elevated cards with payment icons (Card/Cash), #ID, Amount, and precise receipt timestamp.
+
+### Price Book Item Page
+- **PLU Tab**: Retail Price (large), UPC, Department, Tax Category (High/Low).
+- **Cost Analysis Tab**: List of vendors. BEST COST highlighted with a badge. Per-item cost calculated.
+
+### Reports Page
+Categorized list of retrieval actions for Verifone Commander (Financial, Inventory, Audit).
+
+### Settings
+- Store Connection status and toggle.
+- **GA Tax Profile**: GTC account connection section + saved info (STI number, etc.).
+- Log out / Unlink action.

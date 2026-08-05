@@ -241,7 +241,7 @@ This QR lets an Android phone download the StoreDesk Mobile APK.
 Example target:
 
 ```txt
-http://192.168.1.25:4000/downloads/storedesk-buddy.apk
+http://192.168.1.25:4000/downloads/storedesk-mobile.apk
 ```
 
 Desktop should label this clearly:
@@ -1721,7 +1721,7 @@ Runtime is **Cursor** (`.cursor/`) and **Codex** (`.codex/` + folder `AGENTS.md`
 
 - **Full guide:** `docs/agent-team-guide.md` (flows, rules, skills, WO/handoff)
 - Org chart / management styles: `.cursor/TEAM.md`
-- Agents: `.cursor/agents/` (`eng-manager`, `tech-lead`, `frontend-electron`, `backend-server`, `mobile-buddy`, `ui-ux-designer`, `qa-verifier`, `docs-scribe`)
+- Agents: `.cursor/agents/` (`eng-manager`, `tech-lead`, `frontend-electron`, `backend-server`, `mobile-storedesk`, `ui-ux-designer`, `qa-verifier`, `docs-scribe`)
 - Skills: `.cursor/skills/` (`agent-team`, `work-order`, `handoff`, `mui`, `react-dev`, `storedesk-ui`)
 - Work orders: `docs/work-orders/`
 - Folder maps: nearest `AGENTS.md` under `docs/`, `scripts/`, `tools/`, and each submodule

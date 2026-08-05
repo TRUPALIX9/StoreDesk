@@ -32,7 +32,7 @@ You coordinate the StoreDesk agent team. You rarely write production code unless
 |---------------|----------|
 | Electron UI / MUI / pages | `frontend-electron` (+ `ui-ux-designer` for redesign) |
 | API / Mongo / services | `backend-server` |
-| Flutter Buddy | `mobile-buddy` |
+| StoreDesk Mobile | `mobile-storedesk` |
 | Cross-repo contract | `tech-lead` first |
 | Docs / AGENTS maps | `docs-scribe` |
 | “Does this pass?” | `qa-verifier` |
