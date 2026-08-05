@@ -9,6 +9,8 @@ on:
 jobs:
   build-unified:
     runs-on: windows-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout Code with Submodules
@@ -50,3 +52,13 @@ jobs:
         with:
           name: StoreDesk-Setup-Windows
           path: store-desk-electron/release/*.exe
+
+      - name: Create GitHub Release for StoreDesk Setup
+        if: github.ref == 'refs/heads/production'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v0.0.1"
+          name: "StoreDesk v0.0.1"
+          files: store-desk-electron/release/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
