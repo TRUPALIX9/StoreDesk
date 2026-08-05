@@ -1,0 +1,52 @@
+name: Build Unified Setup Installer
+
+on:
+  push:
+    branches:
+      - production
+      - develop
+
+jobs:
+  build-unified:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout Code with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install & Compile Worker Binary
+        working-directory: ./store-desk-worker
+        run: |
+          npm install
+          npm run build
+          npm install -g pkg
+          # Compile the worker into a single executable for Windows
+          pkg dist/index.js -t node20-win-x64 -o ../store-desk-electron/build/worker.exe
+
+      - name: Install & Package Electron App
+        working-directory: ./store-desk-electron
+        run: |
+          npm install
+          # For develop branch, just verify the build works without creating installers
+          if ("${{ github.ref }}" -eq "refs/heads/develop") {
+            npm run build
+          } else {
+            npm run package
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Upload StoreDesk Setup Artifact
+        if: github.ref == 'refs/heads/production'
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoreDesk-Setup-Windows
+          path: store-desk-electron/release/*.exe
