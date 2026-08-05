@@ -14,7 +14,7 @@ jobs:
       # Requires repo secret SUBMODULES_PAT — see docs/env-by-project.md.
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.SUBMODULES_PAT }}
+          token: ${{ secrets.SUBMODULES_PAT || secrets.PAT_TOKEN || github.token }}
           submodules: recursive
 
       - name: Verify parent layout
