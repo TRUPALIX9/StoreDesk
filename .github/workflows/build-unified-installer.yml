@@ -28,8 +28,8 @@ jobs:
           npm install
           npm run build
           npm install -g pkg
-          # Compile the worker into a single executable for Windows
-          pkg dist/index.js -t node20-win-x64 -o ../store-desk-electron/build/worker.exe
+          mkdir -p ../store-desk-electron/build
+          pkg dist/index.js -t node18-win-x64 -o ../store-desk-electron/build/worker.exe
 
       - name: Install & Package Electron App
         working-directory: ./store-desk-electron
