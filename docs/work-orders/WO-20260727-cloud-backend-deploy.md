@@ -1,6 +1,7 @@
 # WO-20260727-cloud-backend-deploy
 
-- **Status:** ready
+- **Status:** ~~ready~~ **superseded**
+- **Superseded by:** `WO-20260812-hub-e2micro-migration` (migration from Cloud Run to GCP e2-micro VM)
 - **Management:** collaborative
 - **Priority:** P1
 - **Requester:** user
@@ -10,7 +11,9 @@
 
 ## Goal
 
-Take Epic 1 Cloud Hub (`store-desk-cloud-backend` on `production`) from “Docker stub” to a live **Cloud Run** deployment with Atlas auth, then point a Worker agent at `wss://…/ws` for outbound join — without breaking LAN `:4310`.
+~~Take Epic 1 Cloud Hub (`store-desk-cloud-backend` on `production`) from “Docker stub” to a live **Cloud Run** deployment with Atlas auth, then point a Worker agent at `wss://…/ws` for outbound join — without breaking LAN `:4310`.~~
+
+> **NOTE:** Cloud Run deployment is superseded. The Hub now deploys to a **GCP e2-micro VM** with PM2 + Cloudflare Tunnel. See `WO-20260812-hub-e2micro-migration` and the rewritten `docs/cloud-backend-deploy.md`.
 
 Full step-by-step: **`docs/cloud-backend-deploy.md`**.
 

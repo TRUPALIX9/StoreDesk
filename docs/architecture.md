@@ -18,7 +18,7 @@ Local-first system for convenience stores and gas stations. This document define
 | **StoreDesk Mobile** | Flutter, phone | AppUser client with assignment-scoped Hub session; no pairing QR/manual Worker selection and never accesses MongoDB, Atlas, or Commander directly |
 | **StoreDesk service manager** | Bundled native helper, store PC | Privileged install/service/update/rollback/diagnostics boundary |
 | **StoreDesk Web** | Next.js + Atlas, Vercel | Internal support/admin control plane for organizations, subscriptions, stores/installations, setup-key delivery, EULA audit, approval metadata, and credential rotation |
-| **StoreDesk Cloud Hub** | Node.js WSS, Cloud Run | Authenticated store-room relay; no catalog, Commander, or invoice persistence |
+| **StoreDesk Cloud Hub** | Node.js WSS, **GCP e2-micro VM** (PM2 + Cloudflare Tunnel) | Authenticated persistent store-room relay; no catalog, Commander, or invoice persistence. PM2 ensures 24/7 uptime. Cloudflare Tunnel provides SSL without static IP or certbot. |
 
 ```txt
 StoreDesk / StoreDesk Mobile ── AppUser login + selected assignment ──► short-lived Hub client session
@@ -118,7 +118,7 @@ The Worker's first bootstrap/sync is control-plane metadata only: immutable `org
 
 | Component | Runtime |
 |-----------|---------|
-| StoreDesk Cloud Hub | Cloud Run container, one instance/session affinity in Phase 0–1; no Redis |
+| StoreDesk Cloud Hub | GCP e2-micro VM (Always Free Tier), PM2 single instance, Cloudflare Tunnel |
 | StoreDesk Worker / service manager | Native managed services on store PC |
 | StoreDesk | Native desktop installer |
 | StoreDesk Mobile | Flutter APK/iOS distribution |

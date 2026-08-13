@@ -24,6 +24,7 @@ No `Inventory`, `StockMovement`, or stock-related collections.
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | name | string | indexed, text search |
 | brand | string | indexed |
 | category | string | indexed |
@@ -38,6 +39,7 @@ No `Inventory`, `StockMovement`, or stock-related collections.
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | productId | ObjectId → Product | required |
 | variantName | string | e.g. "12 Pack - 12 oz cans" |
 | upc | string | sparse unique |
@@ -58,6 +60,7 @@ No `Inventory`, `StockMovement`, or stock-related collections.
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | name | string | required, text search |
 | contactPerson, phone, email, address, website | string | optional |
 | paymentTerms | string | optional |
@@ -73,6 +76,7 @@ Price history per vendor + variant. Never silently overwrite old rows; use `isCu
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | vendorId | ObjectId → Vendor | required |
 | variantId | ObjectId → ProductVariant | required |
 | invoiceItemId | ObjectId → InvoiceItem | optional |
@@ -91,6 +95,7 @@ Index: `{ vendorId, variantId, isCurrentPrice }`
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | vendorId, vendorName | | required |
 | invoiceNumber | string | optional |
 | invoiceDate | string | required |
@@ -108,6 +113,7 @@ One extracted invoice row.
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | invoiceId, vendorId | ObjectId | required |
 | lineNumber | number | |
 | rawItemText, extractedName | string | |
@@ -138,6 +144,7 @@ One extracted invoice row.
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | name | string | required |
 | scope | enum | global, category, product, variant |
 | category | string | when scope = category |
@@ -156,6 +163,7 @@ Paired StoreDesk Buddy instance.
 
 | Field | Type | Notes |
 |-------|------|-------|
+| organizationId, storeId | string | required |
 | deviceName | string | |
 | deviceType | string | e.g. android, ios |
 | deviceId | string | optional hardware id |
@@ -165,3 +173,24 @@ Paired StoreDesk Buddy instance.
 | permissions | object | canScanProducts, canUploadInvoices, canViewPrices, canViewPricingRules |
 | lastSeenAt | Date | optional |
 | active | boolean | default true |
+
+---
+
+## PriceBookEntry
+
+Local overlays for Commander PLUs. 
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | string | synthetic id `pb_{upc}_{mod}` |
+| organizationId, storeId | string | required |
+| upc | string | required, stripped leading zeros |
+| upcModifier | string | default `"0"` |
+| name | string | description |
+| department | string | optional |
+| sellingPrice | number | required |
+| sellUnit | number | optional |
+| source | enum | `commander`, `manual` |
+| vendorSamsClub, vendorGlobal, vendorHackney, vendor101, vendorGandhi, vendorCustom | object | local cost slots |
+
+*Persistence Note:* `appStatePersistence.service.ts` uses a compound unique key (`organizationId`, `storeId`, `upc`, `upcModifier`) when upserting to resolve `E11000` duplicate key conflicts across synced instances.

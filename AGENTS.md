@@ -126,6 +126,31 @@ Use:
 - flutter_riverpod
 - dio
 - flutter_secure_storage
+
+## Cloud Hub: StoreDesk Cloud Hub
+
+**Deployment target: GCP Compute Engine `e2-micro` VM (Always Free Tier).**
+
+Do NOT target Cloud Run for the Cloud Hub. Use:
+
+- Node.js 20
+- Express (HTTP) + `ws` (WebSocket)
+- PM2 process manager (`ecosystem.config.cjs`) — always-on, autorestart
+- Cloudflare Tunnel (`cloudflared`) — SSL termination, no static IP, no certbot
+- MongoDB Atlas (Mongoose) — entity sync + auth only
+- PM2 memory ceiling: `--max-old-space-size=512` (guards 1 GB VM RAM)
+
+**Hub non-negotiables:**
+
+- The Hub is a **lightweight JSON router only** — no catalog, Commander XML, or invoice data on the Hub process or Atlas
+- Run exactly **1 PM2 instance** (fork mode) — no cluster/multi-instance without Redis
+- Heartbeat interval: `60000` ms (relaxed from Cloud Run's 30 s — no timeout cap on VM)
+- Deploy CD: SSH via `scripts/deploy-vm.sh` and `.github/workflows/deploy-vm.yml` — never `gcloud run deploy`
+- Legacy `AGENT_KEY` hello supported while `HUB_ALLOW_LEGACY_AGENT_KEY=1`; disable to `0` after full v1 migration
+- `RELAY_SESSION_SECRET` must be set in production (`.env` on VM, OS-protected)
+- Never put `MONGODB_URI` or `RELAY_SESSION_SECRET` in Git, GitHub vars (only `VM_SSH_PRIVATE_KEY` secret)
+
+
 - mobile_scanner
 - image_picker
 - file_picker

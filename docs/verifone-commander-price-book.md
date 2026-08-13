@@ -155,6 +155,16 @@ sequenceDiagram
 
 Success message in UI: vendor costs saved locally; Commander sell price unchanged.
 
+### 3.5 Startup Auto-Seeding (Bulk Fetch)
+
+On Worker startup, if `COMMANDER_PASSWORD` is configured, it automatically initiates a background sync:
+1. `fetchCommanderPlusBulk`: Tries a single HTTP request with `pageSize=9999` to pull all PLUs efficiently (takes ~5–20s).
+2. Falls back to paginated parallel fetches if Commander caps the page size.
+3. Caches the raw result to disk (`backups/commander/plu_TIMESTAMP.json`).
+4. Upserts all items into the local Mongo `pricebookentries` collection.
+
+*Persistence Note:* `appStatePersistence.service.ts` uses a compound unique key (`organizationId`, `storeId`, `upc`, `upcModifier`) for these upserts to resolve duplicate key errors (`E11000`) caused by mismatched `_id` values when syncing from multiple sources. If an existing `_id` doesn't match but the UPC does, the record is updated gracefully.
+
 ---
 
 ## 4. Schema

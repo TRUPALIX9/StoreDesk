@@ -4,165 +4,151 @@
 
 # StoreDesk
 
-Local-first edge ops for convenience stores and gas stations, with an optional cloud control plane for multi-store licenses and relay.
+**StoreDesk** is an edge-first desktop and mobile system for convenience stores and gas stations. It acts as the store's local command center for POS visibility, cataloging, vendor costs, and organization-licensed access. 
 
-**StoreDesk is not an inventory system.** It focuses on products, retail prices, vendor costs, invoice extraction review, Commander Price Book / POS reports, and a phone helper — not stock counts or warehouse movements.
+It is designed with a **hybrid local-first architecture**: the system runs through a local edge API (StoreDesk Worker) that talks directly to the local Verifone Commander register and local MongoDB. This protects the store from internet outages. An optional cloud control plane (StoreDesk Web & Cloud Hub) synchronizes data and handles multi-store licenses, relaying connections for mobile apps.
 
-| Brand | Hex |
-|-------|-----|
-| Primary blue | `#1A63F4` |
-| Secondary green | `#00A87B` |
-| Kit | [`brand-kit/`](brand-kit/) |
-
-**New here?** [`docs/how-storedesk-works.md`](docs/how-storedesk-works.md)  
-**Architecture / gaps:** [`docs/system-map.md`](docs/system-map.md) · [`docs/architecture.md`](docs/architecture.md)  
-**Release snapshot:** [`docs/release-status.md`](docs/release-status.md) · process [`docs/release.md`](docs/release.md)  
-**Agent team:** [`.cursor/TEAM.md`](.cursor/TEAM.md) · [`docs/agent-team-guide.md`](docs/agent-team-guide.md)
+**Note:** StoreDesk is **not** an inventory system. It focuses on products, retail prices, vendor costs, Commander Price Book / POS reports, and Cost Analysis—not stock counts, warehouse locations, or reorder levels.
 
 ---
 
-## What each app does
+## 1. System Architecture & End-to-End Flow
 
-| App | Folder | Role |
-| --- | --- | --- |
-| **StoreDesk** | `store-desk-electron/` | Electron desktop admin — Price Book, Cost Analysis, POS, vendors, org user access (no invoices / no APK pairing) |
-| **StoreDesk Worker** | `store-desk-worker/` | Edge Express + local MongoDB on the store PC (`0.0.0.0:4310`) |
-| **StoreDesk Mobile** | `store-desk-mobile/` | Flutter phone helper — scan, search, vendor prices (no invoice upload). Play `com.storedesk` |
-| **StoreDesk Web** | `store-desk-web/` | Next.js marketing + Atlas license / control-plane admin (Vercel) |
-| **Cloud Hub** | `store-desk-cloud-backend/` | Outbound WSS rooms (Cloud Run) for multi-store relay |
+### The Applications
+StoreDesk is built as a single parent repository with submodules for each application component:
 
-**Data rule:** Catalog, Commander, invoices, and vendor prices stay on the store PC. Atlas holds licenses / org registry / setup credentials only (~M0).
+| App | Folder | Tech | Role |
+| --- | --- | --- | --- |
+| **StoreDesk Worker** | `store-desk-worker/` | Node.js + Express + local Mongo | **The Edge API.** Runs on the store PC (`0.0.0.0:4310`). This is the **Source of Truth** for the local store. It talks directly to Verifone Commander and local Mongo. |
+| **StoreDesk** | `store-desk-electron/` | Electron + React | **Desktop Admin UI.** Runs on the store PC. Features Price Book, Cost Analysis, POS sales, and user access. |
+| **StoreDesk Mobile** | `store-desk-mobile/` | Flutter | **Phone Helper.** Scan barcodes, search products, view vendor prices. Connects to the Worker via the Cloud Hub. |
+| **StoreDesk Web** | `store-desk-web/` | Next.js + Atlas | **Cloud Control Plane.** Central admin for managing subscriptions, stores, provisioning users, and licensing. |
+| **Cloud Hub** | `store-desk-cloud-backend/` | Node.js (WSS) + PM2 on GCP e2-micro VM | **Global Relay Engine.** Maintains persistent WebSocket channels (`wss://`) routing remote mobile/desktop requests to active Edge Workers. Cloudflare Tunnel provides SSL. No static IP needed. |
 
-```txt
-Primary Mode (setup-v1 / Cloud-First):
-  Clients (Desktop/Mobile) ──► Hub WSS ──► Worker :4310 ──► local Mongo
+### End-to-End Diagram
 
-Legacy LAN Mode (fallback):
-  Desktop ──HTTP──► Worker :4310
-  Phone   ──LAN───► Worker :4310
+```mermaid
+flowchart TD
+    subgraph Store_Local_Network["Store Local Network"]
+        Commander["Verifone Commander\n(Live POS Register)"]
+        Mongo["Local MongoDB\n(Fast Edge Storage)"]
+        
+        Worker["StoreDesk Worker\nEdge API (Port 4310)"]
+        Desktop["StoreDesk Desktop\n(Electron UI)"]
+        
+        Commander <-->|NAXML vPLUs| Worker
+        Mongo <-->|Read/Write| Worker
+        Worker <-->|HTTP| Desktop
+    end
+    
+    subgraph Cloud_Infrastructure["StoreDesk Cloud"]
+        Hub["Cloud Hub\nGCP e2-micro VM\nPM2 + Cloudflare Tunnel"]
+        Web["StoreDesk Web\n(Admin & Licensing)"]
+        Atlas["MongoDB Atlas\n(Multi-Store Sync)"]
+        
+        Web <-->|Manage Orgs/Licenses| Atlas
+        Hub <-->|Sync| Atlas
+    end
+    
+    Phone["StoreDesk Mobile\n(Flutter App)"]
+    
+    Worker <==>|Two-Way Data Sync\n& Outbound Session| Hub
+    Phone <==>|Client Session| Hub
 ```
 
 ---
 
-## Repository model
+## 2. Core Data Flows
 
-Parent: https://github.com/TRUPALIX9/StoreDesk  
+### A. Verifone Commander Auto-Seeding
+When the **StoreDesk Worker** starts on the local PC, it immediately connects to the Verifone Commander register to pull the latest pricing data.
+1. **Bulk Fetch**: The worker uses `fetchCommanderPlusBulk`, fetching the entire PLU list in a single, high-speed request (`pageSize=9999`), taking ~5-20 seconds.
+2. **Local Backup**: The raw XML payload is saved to local disk (`backups/commander/`) so the system can boot instantly in the future even if the Commander is offline.
+3. **Delta Hash Check**: Each PLU is MD5-hashed (`name|dept|sell|sellUnit`). Only changed items are upserted to Mongo and pushed to Atlas — reducing sync traffic from ~15 MB to a few KB.
+4. **Mongo Upsert**: Upserted using a compound unique key (`organizationId, storeId, upc, upcModifier`) to gracefully update existing records without duplicate key errors.
 
-| Submodule | Remote |
-|-----------|--------|
-| Electron | https://github.com/TRUPALIX9/store-desk-electron |
-| Worker | https://github.com/TRUPALIX9/store-desk-worker |
-| Mobile | https://github.com/TRUPALIX9/store-desk-mobile |
-| Web | https://github.com/storedesk-dev/StoreDesk-web |
-| Cloud Hub | https://github.com/TRUPALIX9/store-desk-cloud-backend |
+### B. Two-Way Cloud Sync
+Data generated on the Edge (like newly entered Vendor Costs or fresh Commander PLUs) is synchronized to the Cloud seamlessly.
+- **Worker → Atlas**: The Worker establishes an outbound WSS session to the **Cloud Hub** (persistent, no timeout cap on e2-micro). Only hash-changed PLU deltas are pushed, minimizing bandwidth.
+- **Atlas → Worker**: The Hub executes a two-way sync, pulling down changes from Atlas and merging them into the local MongoDB.
 
-Each submodule has its own history, CI, and releases. The parent tracks which commits make a coherent StoreDesk snapshot.
+### C. Live On-Demand Mobile Price Check
+When a user scans an item in StoreDesk Mobile:
+1. Mobile emits `LIVE_PRICE_REQ { storeId, upc, requestId }` over WSS to the Cloud Hub.
+2. Hub routes the frame to the store's active Worker agent peer.
+3. Worker queries local Mongo/Commander → returns `{ upc, sellPrice, vendorCost, margin }` in sub-100ms.
+4. Hub relays `LIVE_PRICE_RES` back to the mobile client.
 
-**Branches (all repos):** `production` (stable / default) · `develop` (integration). Do not use `main`.
+### D. Client Access (Desktop & Mobile)
+- **Desktop**: Connects directly to the Worker over the local network (`http://127.0.0.1:4310`). Lightning fast and resilient to internet drops.
+- **Mobile**: Users log into the Mobile app as an `AppUser` provisioned via StoreDesk Web. The app connects to the **Cloud Hub**, which securely relays requests to their assigned StoreDesk Worker.
 
+---
+
+## 3. Software Lifecycle (Setup-v1)
+
+StoreDesk employs a strict, secure provisioning lifecycle designed to protect store data and manage multi-tenant environments.
+
+### The Lifecycle States
 ```txt
-StoreDesk/
-|-- store-desk-electron/
-|-- store-desk-worker/
-|-- store-desk-mobile/
-|-- store-desk-web/
-|-- store-desk-cloud-backend/
-|-- brand-kit/                 # logos + color tokens
-|-- docs/                      # architecture, APIs, WO, release
-|-- scripts/
-|-- AGENTS.md                  # product master for agents
-|-- README.md
-|-- .gitmodules
-`-- .cursor/                   # agents, skills, rules (Codex: .codex/)
+not_installed → installed → awaiting_activation → active
+                                      │            ├→ degraded
+                                      │            ├→ suspended
+                                      │            └→ updating
+                                      └────────────→ awaiting_activation
 ```
 
----
+### 1. Provisioning (StoreDesk Web)
+- A central admin creates an **Organization** and a **Store** in StoreDesk Web.
+- The admin provisions a **WorkerInstallation** for that store.
+- A **Setup Key** (one-time, short-lived credential) is generated and emailed to the site contact.
 
-## Current status (high level)
+### 2. Activation (Store PC)
+- The user installs the StoreDesk Electron app on the store PC.
+- Since the Worker is in `awaiting_activation`, the app asks the user to input their Emailed **Setup Key** and accept the EULA.
+- The Worker redeems the setup key with StoreDesk Web. In exchange, it receives a permanent, sealed **Worker Credential**. The setup key is burned.
+- The Worker reaches the `active` state and establishes its outbound connection to the Cloud Hub.
 
-Updated: **2026-08-02**. For SHAs and CI detail see [`docs/release-status.md`](docs/release-status.md).
-
-| Area | State |
-|------|--------|
-| Desktop + Worker LAN MVP | Usable — products, vendors, prices, Commander Price Book / POS reports, Cost Analysis (invoice UI + pairing QR removed; org users via Web license) |
-| Mobile LAN | Usable — pair/connect, scan, search, vendor prices (invoice upload is desktop-only) |
-| Mobile Play | **First beta** — version **`0.0.1+1`**, release name **`0.0.1-beta1`**, AAB for Play; APK still for Worker QR sideload |
-| Web licenses | Partial — marketing + Atlas admin; setup-v1 hierarchy on `develop` |
-| Cloud Hub | Deployed path exists on Cloud Run; dual-mode / assignment E2E still in progress |
-| Setup lifecycle | Vertical slices on `develop`; full acceptance not closed |
-
-Active work often lives on **`develop`**; **`production`** is the older shipped LAN baseline.
+### 3. AppUser Login
+- Staff do not use the Worker Credential. Instead, central admins provision **AppUsers** with specific **Assignments** (e.g., Jane has access to Store #12).
+- Jane logs into StoreDesk Mobile or Desktop. Her client securely connects to the Cloud Hub, which verifies her assignment and routes her session to the correct active Worker.
 
 ---
 
-## Clone
+## 4. Local Development
 
+### Prerequisites
+- Node.js & npm
+- Flutter SDK (for mobile)
+- Local MongoDB instance running on `mongodb://127.0.0.1:27017`
+
+### Repository Setup
+Since the apps are separated into submodules, you must clone recursively:
 ```bash
 git clone --recurse-submodules https://github.com/TRUPALIX9/StoreDesk.git
 cd StoreDesk
 ```
+*(If already cloned: `git submodule update --init --recursive`)*
 
-If already cloned without submodules:
-
-```bash
-git submodule update --init --recursive
-```
-
-Prefer `develop` for ongoing feature work:
-
+We use `develop` for integration and `production` for stable releases.
 ```bash
 git checkout develop
 git submodule foreach 'git checkout develop && git pull'
 ```
 
----
+### Running the System Locally
 
-## Working with submodules
-
-Commit inside the submodule first, push, then bump the parent pointer:
-
-```bash
-cd store-desk-worker
-git checkout develop
-git pull
-# …edit, commit, push…
-cd ..
-git add store-desk-worker
-git commit -m "Bump store-desk-worker submodule pointer"
-git push origin develop
-```
-
----
-
-## Local architecture
-
-| Component | Connection |
-| --- | --- |
-| MongoDB | `mongodb://127.0.0.1:27017/storedesk` |
-| StoreDesk Worker | `http://localhost:4310` (binds `0.0.0.0`) |
-| StoreDesk desktop | `http://127.0.0.1:4310` |
-| StoreDesk Mobile | `http://YOUR_LAN_IP:4310` — never `localhost` on the phone |
-
-Health:
-
-- `http://localhost:4310/api/health`
-- `http://localhost:4310/api/mobile/health`
-
----
-
-## Running locally
-
-**Worker**
-
+**1. StoreDesk Worker (The Edge API)**
+Must be running for the UI to work!
 ```bash
 cd store-desk-worker
 npm install
-cp .env.example .env   # or copy on Windows
+cp .env.example .env   # Set your COMMANDER_PASSWORD here!
 npm run dev
 ```
+*(Runs on `0.0.0.0:4310`)*
 
-**Desktop**
-
+**2. StoreDesk Desktop (Electron UI)**
 ```bash
 cd store-desk-electron
 npm install
@@ -170,8 +156,7 @@ cp .env.example .env
 npm run dev
 ```
 
-**Mobile**
-
+**3. StoreDesk Mobile (Flutter App)**
 ```bash
 cd store-desk-mobile
 npm install
@@ -179,86 +164,19 @@ npm run setup:flutter
 flutter run
 ```
 
-See [`store-desk-mobile/README.md`](store-desk-mobile/README.md) for Play AAB / sideload APK detail.
-
 ---
 
-## Android distribution
+## 5. Documentation Map
 
-| Path | Artifact | Audience |
-|------|----------|----------|
-| **Google Play beta** | AAB `0.0.1-beta1` (`com.storedesk`) | Internal / closed testers |
-| **LAN sideload** | APK → `store-desk-worker/downloads/storedesk-mobile.apk` | In-store QR from desktop |
-
-```bash
-# Play
-cd store-desk-mobile && flutter build appbundle --release
-
-# Worker download QR
-flutter build apk --release
-cp build/app/outputs/flutter-apk/app-release.apk \
-  ../store-desk-worker/downloads/storedesk-mobile.apk
-```
-
-Download URL after copy: `http://<LAN_IP>:4310/downloads/storedesk-mobile.apk`
-
----
-
-## Quality checks
-
-| Repo | Fast | Full CI |
-| --- | --- | --- |
-| Electron | `npm run check` | `npm run ci` |
-| Worker | `npm run check` | `npm run ci` |
-| Mobile | `npm run check` | `npm run ci` |
-| Web | `npm run check` | `npm run ci` |
-| Cloud Hub | `npm run check` | `npm run ci` |
-
----
-
-## Brand kit
-
-| Asset | Path |
-|-------|------|
-| Lockup | [`brand-kit/logo-lockup-horizontal.svg`](brand-kit/logo-lockup-horizontal.svg) |
-| Mark | [`brand-kit/logo-mark.svg`](brand-kit/logo-mark.svg) |
-| Tokens | [`brand-kit/README.md`](brand-kit/README.md) |
-
-Use kit colors in UI; keep business logic in services, not pages.
-
----
-
-## Git rules
-
-- Commit app changes inside the correct submodule; then update the parent pointer.
-- Do not merge submodule trees into the parent as normal files.
-- Do not convert to an npm monorepo or delete `.gitmodules` by hand.
-- Do not force push unless explicitly instructed.
-- Keep secrets out of git (`key.properties`, `*.jks`, service-account JSON, real `.env`).
-
----
-
-## Troubleshooting
-
-| Issue | Fix |
-| --- | --- |
-| Empty submodule folders | `git submodule update --init --recursive` |
-| Detached HEAD in submodule | `git checkout develop` or `production` inside the submodule |
-| Mobile cannot reach Worker | Same Wi‑Fi; use LAN IP, not localhost; firewall allows 4310 |
-| APK route 404 | Build APK and copy to `store-desk-worker/downloads/storedesk-mobile.apk` |
-| Parent CI cannot clone apps | Set `SUBMODULES_PAT` — see `docs/env-by-project.md` |
-
----
-
-## Documentation map
+For deep dives into specific domains, refer to the following documentation:
 
 | Doc | Contents |
 |-----|----------|
-| [`AGENTS.md`](AGENTS.md) | Full product spec + non-negotiables |
-| [`docs/how-storedesk-works.md`](docs/how-storedesk-works.md) | Human end-to-end guide |
-| [`docs/system-map.md`](docs/system-map.md) | Connections + gap plan |
-| [`docs/api-contract.md`](docs/api-contract.md) | HTTP / Hub surfaces |
-| [`docs/mobile-flow.md`](docs/mobile-flow.md) | Phone journeys + Play beta |
-| [`docs/release.md`](docs/release.md) | Branching, APK/AAB, checklist |
-| [`docs/work-orders/`](docs/work-orders/) | Active Work Orders |
-| [`.cursor/skills/context-budget/`](.cursor/skills/context-budget/) | Keep agent context off `node_modules` / `build` |
+| [`AGENTS.md`](AGENTS.md) | Full product spec + non-negotiables. |
+| [`docs/system-map.md`](docs/system-map.md) | Gaps, dual-server notes, and detailed IA lock. |
+| [`docs/architecture.md`](docs/architecture.md) | Detailed technical architecture notes. |
+| [`docs/api-contract.md`](docs/api-contract.md) | HTTP / Hub surfaces and relay contracts. |
+| [`docs/database-schema.md`](docs/database-schema.md) | Mongo Entity fields (Products, Variants, Vendors, etc). |
+| [`docs/verifone-commander-price-book.md`](docs/verifone-commander-price-book.md) | Commander / Price Book / Cost Analysis E2E + API details. |
+| [`docs/verifone-commander-reports.md`](docs/verifone-commander-reports.md) | Commander T-Log / closed daily & shift `vtransset` schema. |
+| [`docs/release.md`](docs/release.md) | Branching, APK/AAB, and release checklists. |

@@ -1,10 +1,10 @@
 # StoreDesk Cloud Hub — Deploy Guide
 
-Durable ops guide for **`store-desk-cloud-backend`** (Epic 1 WSS hub). Source of truth for deploy steps; keep in sync with the submodule README and `Dockerfile`.
+**Deployment target:** GCP Compute Engine `e2-micro` VM (Always Free Tier)  
+**Source:** `store-desk-cloud-backend` submodule  
+**WO:** `WO-20260812-hub-e2micro-migration`
 
-**Branch:** deploy from submodule `production` (CI runs on `production` / `develop`).
-
-**Repo:** `https://github.com/TRUPALIX9/store-desk-cloud-backend`
+> **DEPRECATED PATH:** Cloud Run (`WO-20260727-cloud-backend-deploy`) is superseded. The Dockerfile is kept for local testing only.
 
 ---
 
@@ -12,344 +12,295 @@ Durable ops guide for **`store-desk-cloud-backend`** (Epic 1 WSS hub). Source of
 
 | Item | Detail |
 |------|--------|
-| Role | Outbound-friendly **WebSocket hub**: store rooms, agent/client presence, `AGENT_KEY` auth |
+| Role | Persistent WebSocket hub: store rooms, agent/client presence, relay |
 | HTTP | `GET /health`, `GET /` (text hint) |
-| WebSocket | Path `/ws` — JSON protocol v0 (`hello` → `welcome`, `ping`/`pong`, `relay`) |
-| Rooms | In-memory `store_{STORE_ID}` — **no Redis** in Epic 1 |
-| Auth | Atlas `Store` collection (`storeId` + `agentKey` + `status`); if `MONGODB_URI` unset → memory demo only |
-| Default port | **8080** (`PORT`) |
-| Bind | `0.0.0.0` |
+| WebSocket | Path `/ws` — JSON protocol v0/v1 (`hello` → `welcome`, `ping/pong`, `relay`, `sync.pull`, `sync.delta`, `LIVE_PRICE_REQ/RES`) |
+| Rooms | In-memory `store_{storeId}__{workerInstallationId}` — **no Redis** |
+| Auth | Legacy: Atlas `Store` collection (`storeId` + `agentKey`). v1: HMAC-SHA256 relay session token (`RELAY_SESSION_SECRET`) |
+| Default port | **8080** (Cloudflare Tunnel proxies public → `localhost:8080`) |
+| Process manager | **PM2** — `ecosystem.config.cjs` |
+| SSL / public URL | **Cloudflare Tunnel** (`cloudflared`) — no static IP, no certbot |
 
-```txt
-StoreDesk Worker (store PC)  --outbound WSS-->  Cloud Hub  <--WSS--  clients (Desktop/Mobile later)
-        keeps :4310 LAN                                              role: agent | client
-Admin browser  -->  StoreDesk Web (Vercel)  -->  Atlas (licenses / STORE_ID / AGENT_KEY only)
 ```
-
-Catalog, Commander, and invoices stay on the store PC. Hub only relays opaque room messages.
+StoreDesk Mobile / Desktop
+    │  wss://hub.storedesk.com/ws
+    ▼
+Cloudflare Tunnel ──► localhost:8080 (e2-micro VM)
+                            │
+                     PM2 node dist/index.js  (--max-old-space-size=512)
+                            │
+                     Atlas (sync.pull / sync.delta)
+                            │
+                 ◄── outbound WSS ── StoreDesk Worker :4310
+                                           │
+                                      Local MongoDB
+                                           │
+                                    Verifone Commander
+```
 
 ---
 
-## Environment variables
+## Environment Variables
 
-From `.env.example`:
+### `store-desk-cloud-backend/.env` (on VM — OS-protected, not committed)
 
-| Variable | Required (prod) | Notes |
-|----------|-----------------|-------|
-| `PORT` | No (default `8080`) | Cloud Run sets `PORT`; container exposes 8080 |
-| `MONGODB_URI` | **Yes for production** | Same Atlas URI as StoreDesk Web license DB |
-| `HEARTBEAT_MS` | No (default `30000`) | Hub → client `ping` interval |
+| Variable | Required | Default | Notes |
+|----------|----------|---------|-------|
+| `PORT` | No | `8080` | Cloudflare Tunnel proxies to this; keep 8080 |
+| `MONGODB_URI` | **Yes (prod)** | — | Atlas URI (same as StoreDesk Web). Without this → demo memory auth only |
+| `HEARTBEAT_MS` | No | `60000` | Relaxed from Cloud Run's 30s — no timeout pressure on VM |
+| `RELAY_SESSION_SECRET` | **Yes (prod)** | — | HMAC-SHA256 secret for session tokens |
+| `HUB_ALLOW_LEGACY_AGENT_KEY` | No | `1` | Set to `0` to disable legacy `agentKey` hello after full v1 migration |
+| `NODE_MAX_OLD_SPACE_SIZE` | No | `512` | Set via PM2 `node_args` — guards 1 GB RAM on e2-micro |
 
-Without `MONGODB_URI` the hub seeds:
-
-```txt
-storeId: SD-DEMO01
-agentKey: sk_dev_demo_key
-```
-
-**Never ship production without Atlas** — demo keys would be accepted by anyone who can open `/ws`.
+> **Never leave prod Hub without `MONGODB_URI`** — unset → public demo key `sk_dev_demo_key` accepted by anyone.
 
 ---
 
-## How apps connect
+## Part 1: One-Time VM Provisioning
 
-### StoreDesk Worker (agent) — implemented
-
-Optional env on the store PC (`store-desk-worker/.env.example`):
-
-```txt
-HUB_WS_URL=wss://YOUR_HUB_HOST/ws
-STORE_ID=SD-…
-AGENT_KEY=sk_…
-```
-
-Worker keeps **HTTP `:4310`** and, when Hub env is set, opens outbound WSS as `role: "agent"`, then proxies `relay` payloads to loopback `/api/*`.
-
-Local smoke (Hub on same PC):
-
-```txt
-HUB_WS_URL=ws://127.0.0.1:8080/ws
-STORE_ID=SD-DEMO01
-AGENT_KEY=sk_dev_demo_key
-```
-
-### Electron / Mobile (clients)
-
-- **Today:** Desktop and Mobile talk to Worker on LAN (`localhost` / `LAN_IP:4310`).
-- **Hub client path:** Desktop dual-mode D3 still open (`WO-20260726-desktop-dual-mode`). Planned: `hello` with `role: "client"` + same `storeId` / `agentKey`, then `relay`.
-- Do **not** point phones at Hub until that path ships and is tested.
-
-### StoreDesk Web
-
-Creates/manages store license rows in Atlas. Hub reads the same `Store` shape (`storeId`, `agentKey`, `status`, …). Web itself does **not** connect to Hub WSS.
-
----
-
-## Deploy options (what the repo actually supports)
-
-| Path | In repo? | Verdict |
-|------|----------|---------|
-| **Docker → Google Cloud Run** | `Dockerfile` + README “Cloud Run” | **Best-supported / intended** |
-| **GitHub Actions → Cloud Run** | `.github/workflows/deploy-cloud-run.yml` | **CD on `production` push** — secrets in GitHub, not `.env` |
-| Raw Node (`npm run build` → `npm start`) | `package.json` scripts | Fine for local / same-PC Hub |
-| GitHub Actions CI | `.github/workflows/ci.yml` | `npm ci` + `npm run ci` (no deploy) |
-| Vercel | None | **Not suitable** — long-lived WSS + in-memory rooms ≠ serverless functions |
-| Railway / Fly / Render | No config files | Possible via same Docker image; not documented or tested here |
-
----
-
-## Recommended path: Cloud Run (checklist)
-
-Prereqs on your machine: **Docker** (or Cloud Build), **gcloud**, a GCP project, Atlas `MONGODB_URI`, and rights to push images / deploy Run.
-
-### 0. Preflight
+### 1.1 Create the VM (GCP Console or gcloud)
 
 ```bash
-cd store-desk-cloud-backend
+gcloud compute instances create storedesk-hub \
+  --machine-type=e2-micro \
+  --zone=us-east1-b \
+  --image-family=debian-12 \
+  --image-project=debian-cloud \
+  --boot-disk-size=30GB \
+  --tags=http-server,https-server
+```
+
+> Firewall rules for tags `http-server` / `https-server` allow ports 80 and 443 inbound — used only by `cloudflared` outbound tunnel, not directly by Node.js.
+
+### 1.2 Install Node.js 20 + PM2
+
+SSH into the VM then:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs git
+sudo npm install -g pm2
+
+# Log directory
+sudo mkdir -p /var/log/storedesk
+sudo chown $USER /var/log/storedesk
+```
+
+### 1.3 Install Cloudflare Tunnel (`cloudflared`)
+
+```bash
+wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb
+rm cloudflared-linux-amd64.deb
+
+# Authenticate (opens browser)
+cloudflared tunnel login
+
+# Create tunnel — note the UUID printed
+cloudflared tunnel create storedesk-hub
+
+# Route DNS CNAME  hub.storedesk.com → <TUNNEL_UUID>.cfargotunnel.com
+cloudflared tunnel route dns storedesk-hub hub.storedesk.com
+```
+
+Create `/etc/cloudflared/config.yml`:
+
+```yaml
+tunnel: <TUNNEL_UUID>
+credentials-file: /root/.cloudflared/<TUNNEL_UUID>.json
+
+ingress:
+  - hostname: hub.storedesk.com
+    service: http://localhost:8080
+  - service: http_status:404
+```
+
+Install as system service (auto-starts on reboot):
+
+```bash
+sudo cloudflared service install
+sudo systemctl enable cloudflared
+sudo systemctl start cloudflared
+sudo systemctl status cloudflared
+```
+
+### 1.4 Deploy the Hub App
+
+```bash
+# Clone the hub repo
+git clone https://github.com/TRUPALIX9/store-desk-cloud-backend.git /opt/storedesk/hub
+cd /opt/storedesk/hub
 git checkout production
-git pull
-npm ci
-npm run ci
-```
 
-Confirm Dockerfile builds locally (if Docker installed):
+# Install and build
+npm ci --omit=dev
+npm run build
 
-```bash
-docker build -t storedesk-hub .
-docker run --rm -p 8080:8080 -e MONGODB_URI="your-atlas-uri" storedesk-hub
-# curl http://127.0.0.1:8080/health
-```
-
-### 1. GCP one-time setup
-
-```bash
-gcloud auth login
-gcloud config set project YOUR_GCP_PROJECT_ID
-
-gcloud services enable \
-  run.googleapis.com \
-  artifactregistry.googleapis.com \
-  cloudbuild.googleapis.com
-
-gcloud artifacts repositories create storedesk \
-  --repository-format=docker \
-  --location=us-central1 \
-  --description="StoreDesk images"
-```
-
-Store Atlas URI as a secret (prefer Secret Manager over plain env):
-
-```bash
-echo -n "mongodb+srv://..." | gcloud secrets create MONGODB_URI --data-file=-
-# grant Cloud Run runtime SA access to the secret (console or IAM)
-```
-
-### 2. Build & push image
-
-```bash
-# from store-desk-cloud-backend/
-gcloud builds submit \
-  --tag us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/storedesk/cloud-hub:latest
-```
-
-### 3. Deploy (critical Run flags)
-
-Epic 1 rooms are **in-memory**. You must keep peers on one instance:
-
-```bash
-gcloud run deploy storedesk-cloud-hub \
-  --image us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/storedesk/cloud-hub:latest \
-  --region us-central1 \
-  --platform managed \
-  --port 8080 \
-  --session-affinity \
-  --max-instances 1 \
-  --min-instances 0 \
-  --cpu 1 \
-  --memory 512Mi \
-  --allow-unauthenticated \
-  --set-secrets=MONGODB_URI=MONGODB_URI:latest \
-  --set-env-vars=HEARTBEAT_MS=30000
-```
-
-Notes:
-
-- **`--session-affinity` + `--max-instances 1`** — required until a Redis/scale-out epic.
-- **`--allow-unauthenticated`** — edge is open; real auth is `AGENT_KEY` on `hello`. Tighten with Cloud Armor / IAM later if needed.
-- Cloud Run gives **HTTPS**; clients use **`wss://SERVICE_URL/ws`** (not `ws://`).
-
-Capture the service URL from the deploy output.
-
-### 4. Verify
-
-```bash
-curl -sS "https://YOUR_RUN_HOST/health"
-# expect: {"ok":true,"service":"storedesk-cloud-hub","atlas":true,...}
-```
-
-WebSocket smoke (Node one-liner / `wscat`): send
-
-```json
-{"type":"hello","role":"agent","storeId":"SD-…","agentKey":"sk_…"}
-```
-
-Expect `welcome` with `room: "store_SD-…"`. Bad key → close **4401**.
-
-### 5. Point a Worker at Hub
-
-On the store PC Worker `.env`:
-
-```txt
-HUB_WS_URL=wss://YOUR_RUN_HOST/ws
-STORE_ID=SD-…
-AGENT_KEY=sk_…   # must match Atlas Store.agentKey
-```
-
-Restart Worker; confirm health / logs show Hub `welcome`. Catalog still on `:4310`.
-
-### 6. Rollback
-
-```bash
-gcloud run services update-traffic storedesk-cloud-hub \
-  --region us-central1 \
-  --to-revisions PREVIOUS_REVISION=100
-```
-
-Or redeploy a known-good image tag.
-
----
-
-## GitHub secrets → Cloud Run (automatic deploy)
-
-**Yes — store env/secrets in GitHub Actions, not in git.** Never commit `.env`. The workflow reads GitHub secrets / variables and deploys to Cloud Run.
-
-| Store secrets in… | Use for… |
-|-------------------|----------|
-| **GitHub Actions secrets** | Deploy credentials (`GCP_SA_KEY` or WIF) + optional `MONGODB_URI` sync |
-| **GCP Secret Manager** | Runtime `MONGODB_URI` bound with `--set-secrets` (preferred for the app) |
-| **GitHub Actions variables** (non-secret) | Project / region / service / Artifact Registry names |
-
-**Alternative (often better for GCP-only ops):** skip putting `MONGODB_URI` in GitHub; create the secret once in Secret Manager, and let the workflow only build/push/deploy while referencing `MONGODB_URI=MONGODB_URI:latest`. Auth can also be Cloud Build + WIF instead of a JSON key in GitHub.
-
-### Workflow
-
-- Path: `store-desk-cloud-backend/.github/workflows/deploy-cloud-run.yml`
-- Triggers: **push to `production`**, or Actions → **Deploy Cloud Run** → **Run workflow**
-- What it does: auth → build/push image to Artifact Registry → optional Secret Manager sync → `gcloud run deploy` with session affinity + `--max-instances 1` + `--set-secrets=MONGODB_URI=MONGODB_URI:latest`
-
-### Required GitHub configuration
-
-In the **`store-desk-cloud-backend`** repo (not the parent):
-
-**Settings → Secrets and variables → Actions → Secrets**
-
-| Secret | Required | Purpose |
-|--------|----------|---------|
-| `GCP_SA_KEY` | **Yes** (v1) | JSON key for a deployer service account (see IAM below) |
-| `MONGODB_URI` | Recommended | If set, workflow writes/updates GCP Secret Manager `MONGODB_URI` before deploy. If unset, deploy still uses the existing GCP secret. |
-
-**Settings → Secrets and variables → Actions → Variables** (optional; defaults match current ops)
-
-| Variable | Default if unset | Purpose |
-|----------|------------------|---------|
-| `GCP_PROJECT_ID` | `store-desk-499322` | GCP project |
-| `GCP_REGION` | `us-central1` | Region |
-| `CLOUD_RUN_SERVICE` | `storedesk-cloud-backend` | Cloud Run service name |
-| `GCP_AR_REPOSITORY` | `storedesk` | Artifact Registry Docker repo |
-
-### How to add secrets in the GitHub UI
-
-1. Open https://github.com/TRUPALIX9/store-desk-cloud-backend/settings/secrets/actions  
-2. **New repository secret** → name `GCP_SA_KEY` → paste the full service-account JSON → Save.  
-3. (Optional) **New repository secret** → name `MONGODB_URI` → paste `mongodb+srv://…` → Save.  
-4. (Optional) **Variables** tab → set `GCP_PROJECT_ID` / `GCP_REGION` / etc. if you are not using the defaults.
-
-### One-time GCP IAM for the deployer SA
-
-Create a service account used only by GitHub (example name `github-cloud-hub-deployer`), grant:
-
-- `roles/run.admin` (deploy Cloud Run)
-- `roles/artifactregistry.writer` (push images)
-- `roles/iam.serviceAccountUser` on the Cloud Run runtime SA
-- `roles/secretmanager.admin` **or** `secretmanager.secretAccessor` + `secretmanager.secretVersionAdder` (if syncing `MONGODB_URI` from GitHub)
-
-Create a JSON key → paste into GitHub secret `GCP_SA_KEY`. Prefer rotating / moving to WIF later (below).
-
-Ensure the **Cloud Run runtime** service account can read Secret Manager secret `MONGODB_URI` (`roles/secretmanager.secretAccessor`).
-
-### Redeploy trigger
-
-- **Automatic:** `git push origin production` (after merge/commit on `production`).  
-- **Manual:** GitHub → **Actions** → **Deploy Cloud Run** → **Run workflow**.  
-- Watch the job log for `Deployed: https://…` then `curl https://…/health` (expect `atlas: true`).
-
-### Preferred later: Workload Identity Federation (no JSON key)
-
-Long-lived `GCP_SA_KEY` works but is less ideal. Upgrade path:
-
-1. Create a Workload Identity Pool + Provider for GitHub (`token.actions.githubusercontent.com`), bound to this repo.  
-2. Allow the pool principal to impersonate the deployer SA.  
-3. Add GitHub secrets `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_SERVICE_ACCOUNT`.  
-4. In `deploy-cloud-run.yml`, comment out the `credentials_json` auth step and uncomment the WIF auth block.  
-5. Delete `GCP_SA_KEY` from GitHub and disable the JSON key in GCP.
-
-### What not to do
-
-- Do **not** commit `.env` or put Atlas URIs in the repo.  
-- Do **not** put all app env only in GitHub and skip Secret Manager unless you accept plain `--set-env-vars` (visible to anyone with Cloud Run view). Prefer `--set-secrets`.  
-- Do **not** use Vercel env for this service (Hub is not a Vercel app).
-
----
-
-## Alternate: local / same-PC Node (no cloud)
-
-```bash
-cd store-desk-cloud-backend
+# Configure secrets
 cp .env.example .env
-# optional: set MONGODB_URI
-npm install
-npm run dev          # or: npm run build && npm start
+nano .env   # Set MONGODB_URI, RELAY_SESSION_SECRET, PORT=8080, HEARTBEAT_MS=60000
+
+# Start with PM2
+pm2 start ecosystem.config.cjs
+pm2 startup          # prints a sudo command — run it to register pm2 as systemd service
+# (run the printed sudo command)
+pm2 save
 ```
 
-- Health: `http://localhost:8080/health`
-- WS: `ws://localhost:8080/ws`
+### 1.5 Verify
 
-Useful for Worker outbound smoke before Cloud Run.
+```bash
+# Health check through Cloudflare Tunnel
+curl -sf https://hub.storedesk.com/health | python3 -m json.tool
+# Expect: { "ok": true, "atlas": true, "heartbeatMs": 60000 }
 
----
-
-## Security notes
-
-1. **Secrets** — never commit `.env`; only `MONGODB_URI` (+ optional heartbeat) in Cloud Run. Mark Secret Manager secrets write-restricted.
-2. **Always set `MONGODB_URI` in prod** — unset → public demo `sk_dev_demo_key`.
-3. **Transport** — production clients must use **WSS**; `agentKey` travels in the first JSON message.
-4. **Auth surface** — validation is equality on `Store.agentKey` + reject `suspended`. No JWT on Hub yet; close codes `4400` / `4401`.
-5. **CORS** — HTTP surface is health/root only; no CORS middleware. Do not expose broad HTTP APIs on this process without an allowlist.
-6. **Scale** — do not raise `max-instances` above 1 without a shared room store (Redis etc.).
-7. **Atlas** — Hub and Web share license data only (~M0); never put catalog/Commander data in Atlas.
-8. **Worker keys** — treat `AGENT_KEY` like a device secret on the store PC; rotate via Web/Atlas if compromised.
+# WebSocket smoke (requires wscat: npm install -g wscat)
+wscat -c wss://hub.storedesk.com/ws
+# Send: {"type":"hello","role":"agent","storeId":"SD-HERO01","agentKey":"sk_live_harshil_hero_key"}
+# Expect: {"type":"welcome","room":"store_SD-HERO01",...}
+```
 
 ---
 
-## Production blockers / gaps
+## Part 2: CD — Automatic Deploy on `production` Push
 
-| Gap | Impact |
-|-----|--------|
-| Cloud Run deploy never done (ops follow-up on WO foundation) | No public Hub URL yet |
-| `MONGODB_URI` + live Atlas `Store` rows must exist | Without them, only demo auth or “unknown store” |
-| CD needs GitHub `GCP_SA_KEY` (+ optional `MONGODB_URI`) configured once | Until then: manual `gcloud builds submit` + `run deploy` |
-| Electron Hub client (D3) unfinished | Desktop cannot use Hub relay yet |
-| Mobile Hub path later | Phones stay on LAN `:4310` |
-| `gcloud` / Docker may be missing on operator PC | Install before first deploy |
-| No Fly/Railway/Vercel configs | Do not assume platform auto-detect beyond Docker |
-| In-memory rooms | Multi-instance / multi-region break presence & relay |
+### GitHub Actions: `.github/workflows/deploy-vm.yml`
+
+Triggers on push to `production` branch. SSH into VM, pulls latest code, rebuilds, and hot-reloads PM2.
+
+**Required GitHub configuration** (in `store-desk-cloud-backend` repo → Settings → Secrets/Variables):
+
+| Key | Type | Value |
+|-----|------|-------|
+| `VM_SSH_PRIVATE_KEY` | **Secret** | Ed25519 private key matching VM's `~/.ssh/authorized_keys` |
+| `VM_HOST` | Variable | `hub.storedesk.com` (or VM IP during setup) |
+| `VM_USER` | Variable | OS user on VM (e.g. `storedesk`) |
+
+> **Remove `GCP_SA_KEY`** from GitHub secrets after migration — it is no longer needed for Hub deploys.
+
+### One-time SSH key setup on VM
+
+```bash
+# On your LOCAL machine — generate a deploy key
+ssh-keygen -t ed25519 -C "github-deploy-storedesk-hub" -f ~/.ssh/storedesk_hub_deploy
+
+# Copy public key to the VM
+ssh-copy-id -i ~/.ssh/storedesk_hub_deploy.pub <VM_USER>@<VM_IP>
+
+# Add the private key content to GitHub secret VM_SSH_PRIVATE_KEY
+cat ~/.ssh/storedesk_hub_deploy
+```
+
+### Manual deploy (without CD)
+
+```bash
+./scripts/deploy-vm.sh hub.storedesk.com storedesk
+# Or SSH directly:
+ssh storedesk@hub.storedesk.com "cd /opt/storedesk/hub && git pull && npm ci --omit=dev && npm run build && pm2 reload ecosystem.config.cjs --update-env && pm2 save"
+```
 
 ---
 
-## Related docs
+## Part 3: PM2 Management Commands
 
-- Submodule: `store-desk-cloud-backend/README.md`, `AGENTS.md`, `Dockerfile`
-- Env inventory (all projects): `docs/env-by-project.md`
-- WOs: `docs/work-orders/WO-20260726-cloud-hub-foundation.md`, `WO-20260727-cloud-backend-deploy.md`
-- Worker outbound: `docs/work-orders/WO-20260726-edge-agent-outbound-wss.md`
-- Architecture: `docs/architecture.md`, `docs/how-storedesk-works.md`
+```bash
+# Status
+pm2 status
+pm2 logs storedesk-hub --lines 50
+
+# Reload (zero-downtime restart)
+pm2 reload ecosystem.config.cjs --update-env
+
+# Hard restart
+pm2 restart storedesk-hub
+
+# Stop
+pm2 stop storedesk-hub
+
+# View memory usage (important on 1 GB VM)
+pm2 monit
+```
+
+---
+
+## Part 4: Rollback
+
+```bash
+# Rollback to previous Git commit on VM
+ssh storedesk@hub.storedesk.com << 'EOF'
+  cd /opt/storedesk/hub
+  git log --oneline -5     # find the good commit
+  git checkout <COMMIT_SHA>
+  npm run build
+  pm2 reload ecosystem.config.cjs
+EOF
+```
+
+---
+
+## Part 5: Point a Worker at the Hub
+
+On the **store PC** `store-desk-worker/.env`:
+
+```env
+# Update to new VM hostname
+HUB_WS_URL=wss://hub.storedesk.com/ws
+STORE_ID=SD-HERO01
+AGENT_KEY=sk_live_harshil_hero_key   # must match Atlas Store.agentKey
+```
+
+Restart Worker (`npm run dev` or service restart). Confirm logs show:
+```
+[hub] connecting wss://hub.storedesk.com/ws as SD-HERO01
+[hub] welcome room=store_SD-HERO01
+[hub] Connected. Initiating two-way pull sync...
+```
+
+---
+
+## Part 6: How Apps Connect
+
+### StoreDesk Worker (agent)
+
+Opens outbound WSS as `role: "agent"`. On `welcome` it flushes offline deltas and issues `sync.pull` for all entity types. Relay requests from mobile/desktop are forwarded to `http://127.0.0.1:4310/api/*` and the response is sent back over WSS.
+
+### StoreDesk Mobile / Desktop (clients)
+
+Authenticate with `hello` using a JWT `sessionToken` (`role: "app_user"`). Send `relay.request` frames. Hub routes to the store's agent peer. Live price checks use the new `LIVE_PRICE_REQ { storeId, upc, requestId }` frame type.
+
+---
+
+## Part 7: Security Notes
+
+1. **Never commit `.env`** — set secrets on the VM only via SSH.
+2. **Always set `MONGODB_URI` in prod** — without it, demo key `sk_dev_demo_key` is public.
+3. **Transport** — Cloudflare Tunnel provides HTTPS/WSS termination. Node.js binds `localhost:8080` only (not public).
+4. **Auth surface** — legacy `agentKey` equality check + `RELAY_SESSION_SECRET` HMAC-SHA256 JWT. Set `HUB_ALLOW_LEGACY_AGENT_KEY=0` after full v1 migration.
+5. **Memory ceiling** — `--max-old-space-size=512` in PM2 prevents OOM on 1 GB VM. Hub is I/O-bound; 512 MB is generous.
+6. **Scale** — Do not run multiple instances without Redis. Single PM2 `fork` instance is correct for in-memory rooms.
+7. **Atlas** — Hub and Web share license data only (~M0). Never put catalog/Commander/invoice data in Atlas.
+8. **Cloudflare** — Tunnel credentials file (`<UUID>.json`) is root-only on VM. Rotate via `cloudflared tunnel rotate-secret` if compromised.
+
+---
+
+## Part 8: Gap Backlog
+
+| Gap | Impact | Priority |
+|-----|--------|----------|
+| Delta hashing not yet committed | All 17,500 PLUs synced to Atlas on every restart (~15 MB instead of ~KB) | P1 |
+| `LIVE_PRICE_REQ` not yet in hub.ts | Mobile live price check route incomplete | P1 |
+| Mobile Hub path not wired in Flutter | Phones still use LAN :4310 | P1 |
+| Electron Hub client (D3) unfinished | Desktop cannot use Hub relay | P2 |
+| `HUB_ALLOW_LEGACY_AGENT_KEY` still `1` | Legacy `agentKey` accepted (migration compatibility) | P2 after v1 |
+
+---
+
+## Related Docs
+
+- `docs/work-orders/WO-20260812-hub-e2micro-migration.md` — active WO
+- `docs/work-orders/WO-20260727-cloud-backend-deploy.md` — superseded Cloud Run WO
+- `docs/env-by-project.md` — all env vars by project
+- `docs/architecture.md` — component trust boundaries
+- `store-desk-cloud-backend/ecosystem.config.cjs` — PM2 config
+- `store-desk-cloud-backend/scripts/deploy-vm.sh` — manual deploy script
