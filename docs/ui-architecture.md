@@ -59,10 +59,15 @@ PageShell
 5. **Flat surfaces** — outlined Paper; no glow KPI kits; brand blue `#1A63F4` / green `#00A87B` only (`brand-kit/`).
 6. **One search** — page FilterBar only for that list.
 
-## Brand
+## Brand & Aesthetic Styling
 
 Assets: `brand-kit/` (canonical: `logo-mark.svg`, `logo-lockup-horizontal.svg`, `app-icon.ico`).  
 Desktop copies live under `store-desk-electron/public/brand/`.
+
+### Electron Glassmorphism Theme Architecture
+- **Navigation Chrome**: Floating backdrop-blur header (`bg-white/80 backdrop-blur-xl`) with subtle gradient borders (`border-white/40`) and active nav pill chips matching Next.js web design aesthetics.
+- **Palette**: Deep navy primary (`#0E43D8` / `#1A63F4`), vibrant emerald accent (`#00A87B` / `#28C88B`), soft gray page wash (`#F4F6F9`), dark slate typography (`#1E293B`).
+- **Automated Sync Indicators**: Replaced manual PLU refresh buttons in `PriceBookPage.tsx` with automated live background sync status badges powered by Worker PLU auto-fetch.
 
 ## Agent workflow (UI change)
 

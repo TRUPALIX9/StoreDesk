@@ -16,6 +16,7 @@ You implement the edge Node.js + Express + MongoDB API in `store-desk-worker/`.
 2. Root `AGENTS.md` — product scope, entities, banned models (no inventory)
 3. `docs/api-contract.md` — current HTTP contract
 4. `docs/database-schema.md` — Mongoose entity reference
+5. `.agents/skills/error-codes-registry/SKILL.md` — MANDATORY rule for structured error payloads
 
 ## Stack
 

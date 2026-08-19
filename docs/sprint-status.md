@@ -55,16 +55,18 @@ Catalog/data:
 - Demo product/variant seed remains for invoice review flows (small, not the 16k sheet).
 - Vendor costs are seeded only from invoice data; unknown costs are not invented.
 
-Toolchain/build:
+- Android release APK built and signed; mobile version bumped to 0.0.3+3 with Play App Signing workflows.
 
-- Git installed and connected.
-- GitHub auth working for `TRUPALIX9`.
-- Flutter 3.44.1 installed under `tools/flutter`.
-- OpenJDK 17 installed.
-- Android Studio installed.
-- Android SDK command-line tools, platform tools, SDK 36, SDK 35, build tools, CMake, and NDK installed by Flutter/SDK manager.
-- Mobile checks pass locally through `npm run ci`.
-- Android release APK built and copied to `store-desk-worker/downloads/storedesk-buddy.apk`.
+Automated PLU & Cloud Hub Engine:
+
+- Automated startup fetch and seeding of local Verifone Commander PLU backups in `store-desk-worker`.
+- Real-time Cloud Hub WSS delta sync integration for `PriceBookEntry` and license enforcement.
+- UPC barcode lookup normalization across `findPriceBookByUpc` and duplicate checks.
+
+Desktop & Web UI:
+
+- `store-desk-electron` navigation refactored with glassmorphism design aesthetics.
+- `store-desk-web` Next.js 15 App Router dynamic sitemap (`sitemap.xml`), `robots.txt`, and Schema.org JSON-LD structured data implemented and verified via static production build.
 
 ## Verified
 

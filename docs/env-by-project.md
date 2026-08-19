@@ -1,6 +1,6 @@
 # StoreDesk — Environment variables by project
 
-Compact reference for local `.env`, GitHub Actions secrets, Vercel, and Cloud Run / Secret Manager.
+Compact reference for local `.env`, GitHub Actions secrets, Vercel, and GCP VM OS-protected files.
 
 **Rules**
 
@@ -18,7 +18,7 @@ Compact reference for local `.env`, GitHub Actions secrets, Vercel, and Cloud Ru
 | Local `.env` / `.env.local` | Store PC Worker, Electron (incl. embedded API), local Hub, Web admin |
 | GitHub Actions secrets | Parent submodule checkout PAT; Cloud Hub deploy credentials + optional Atlas sync |
 | GitHub Actions variables | Non-secret GCP project / region / service names |
-| GCP Secret Manager → Cloud Run | Runtime Atlas URI for Hub |
+| GCP VM OS-protected file | Runtime Atlas URI + relay secret for production Hub |
 | Vercel project env | StoreDesk Web production |
 | Vite `VITE_*` | **Client-bundled** — visible in renderer / built JS. Never put passwords, SMTP, Mongo, or agent keys in `VITE_*`. |
 
@@ -199,40 +199,33 @@ Notes:
 
 ## 5. `store-desk-cloud-backend` (Cloud Hub WSS)
 
-Copy `.env.example` → `.env` for local. Production: **Cloud Run** + **Secret Manager**. Deploy CD: submodule GitHub Actions (see `docs/cloud-backend-deploy.md`).
+**Deployment:** GCP `e2-micro` VM + **PM2** + **Cloudflare Tunnel**. Replaces Cloud Run. Full runbook: `docs/cloud-backend-deploy.md`.
 
-### Runtime (app)
+### Runtime (`.env` on VM — OS-protected, not committed)
 
-| Variable | Local | Cloud Run | Purpose | Example |
-|----------|-------|-----------|---------|---------|
-| `PORT` | Optional | Injected by Run | Listen port | `8080` |
-| `MONGODB_URI` | Optional (local tests) | **Required** | Atlas control-plane identity, entitlement, approval, and credential hashes | `mongodb+srv://…` |
-| `HEARTBEAT_MS` | Optional | Optional | Hub→client ping interval | `30000` |
-
-Without `MONGODB_URI`, test-only memory fixtures may be used locally. Setup-v1 forbids a built-in shared demo credential on any public URL.
+| Variable | Required | Default | Purpose |
+|----------|----------|---------|--------|
+| `PORT` | No | `8080` | Cloudflare Tunnel proxies public → `localhost:8080` |
+| `MONGODB_URI` | **Yes (prod)** | — | Atlas control-plane: Store identity, entitlement, entity sync |
+| `HEARTBEAT_MS` | No | `60000` | Hub→client ping interval (relaxed from 30s — no Cloud Run timeout) |
+| `RELAY_SESSION_SECRET` | **Yes (prod)** | — | HMAC-SHA256 secret for v1 relay session JWT verification |
+| `HUB_ALLOW_LEGACY_AGENT_KEY` | No | `1` | Set `0` to disable legacy `agentKey` hello after v1 migration |
+| `NODE_MAX_OLD_SPACE_SIZE` | No | `512` | Set via PM2 `node_args` — guards 1 GB RAM on e2-micro |
 
 ### GitHub Actions (`store-desk-cloud-backend` repo)
 
 | Name | Type | Required | Purpose |
 |------|------|----------|---------|
-| `GCP_SA_KEY` | Secret | Yes (v1 JSON key) | Deployer service-account JSON |
-| `MONGODB_URI` | Secret | Recommended | Sync into GCP Secret Manager before deploy |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Secret | Alt to SA key | WIF (preferred later) |
-| `GCP_SERVICE_ACCOUNT` | Secret | With WIF | Deployer SA email |
-| `GCP_PROJECT_ID` | Variable | Optional | Default `store-desk-499322` |
-| `GCP_REGION` | Variable | Optional | Default `us-central1` |
-| `CLOUD_RUN_SERVICE` | Variable | Optional | Default `storedesk-cloud-backend` |
-| `GCP_AR_REPOSITORY` | Variable | Optional | Default `storedesk` |
+| `VM_SSH_PRIVATE_KEY` | **Secret** | **Yes** | Ed25519 private key for SSH deploy to e2-micro VM |
 
-### GCP / Cloud Run binding
+| Name | Type | Required | Purpose |
+|------|------|----------|---------|
+| `VM_HOST` | Variable | **Yes** | Public hostname (e.g. `hub.storedesk.com`) |
+| `VM_USER` | Variable | **Yes** | OS user on VM (e.g. `storedesk`) |
 
-| Name | Where | Purpose |
-|------|-------|---------|
-| `MONGODB_URI` | Secret Manager → `--set-secrets` | Runtime Atlas URI |
-| `HEARTBEAT_MS` | Cloud Run env (plain OK) | Heartbeat |
-| `PORT` | Platform | Do not override unless necessary |
+> **Remove from GitHub after migration:** `GCP_SA_KEY`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `GCP_PROJECT_ID`, `GCP_REGION`, `CLOUD_RUN_SERVICE`, `GCP_AR_REPOSITORY` — no longer used.
 
-**Belongs in:** local `.env` for smoke; **Secret Manager** for prod Atlas; **GitHub secrets** for deploy auth (+ optional URI sync). Not Vercel. Not Vite.
+**Belongs in:** local `.env` for smoke; **VM `.env` file** (OS-protected) for prod Atlas; **GitHub VM secrets** for CD. Not Vercel. Not Cloud Run.
 
 ---
 
@@ -250,15 +243,16 @@ Without `MONGODB_URI`, test-only memory fixtures may be used locally. Setup-v1 f
 | Organization/store/installation IDs | Assignment/session claims | **Sealed canonical IDs** | Assignment/session claims | Hierarchy authority | Presence/relay isolation |
 | `VITE_*` | Yes (API URL only) | — | — | — | — |
 | `NEXT_PUBLIC_*` | — | — | — | Site URL only | — |
-| GitHub deploy secrets | — | — | — | (Vercel separate) | `GCP_SA_KEY` (+ URI) |
+| GitHub deploy secrets | — | — | — | (Vercel separate) | `VM_SSH_PRIVATE_KEY` (+ host/user vars) |
 | Parent CI submodule PAT | `SUBMODULES_PAT` on `TRUPALIX9/StoreDesk` (not per-app) | | | | |
-| Cloud Run / Secret Manager | — | — | — | — | `MONGODB_URI` |
+| e2-micro VM `.env` | — | — | — | — | `MONGODB_URI`, `RELAY_SESSION_SECRET`, `HEARTBEAT_MS=60000` |
 
 ---
 
 ## Related docs
 
-- `docs/cloud-backend-deploy.md` — Hub Cloud Run + GitHub secrets
+- `docs/cloud-backend-deploy.md` — Hub e2-micro VM + PM2 + Cloudflare Tunnel runbook
 - `docs/storedesk-gemini-project-brief.md` — env placeholders (Commander + Electron)
 - Submodule `.env.example` files (canonical lists)
-- Submodule READMEs: Worker Hub section; Web env table; Cloud Hub Cloud Run section
+- Submodule READMEs: Worker Hub section; Web env table; Cloud Hub VM section
+- `docs/work-orders/WO-20260812-hub-e2micro-migration.md` — active WO

@@ -14,22 +14,16 @@ code unless asked explicitly.
 
 ## Read first
 
-1. `.agents/AGENTS.md` — team context
-2. Root `AGENTS.md` — theme requirements (navy + green, Material UI, Material 3)
-3. `docs/ui-architecture.md` — Electron UI system (PageShell, SectionCard, etc.)
-4. `docs/wireframes.md` — reference wireframes
+1. `DESIGN.md` — The ultimate source of truth for StoreDesk's Stripe-inspired design language. ALWAYS read this file before providing feedback.
+2. `.agents/AGENTS.md` — team context
+3. Root `AGENTS.md` — theme requirements
+4. `docs/ui-architecture.md` — Electron UI system (PageShell, SectionCard, etc.)
+5. `docs/wireframes.md` — reference wireframes
 
 ## Desktop design system (Electron / MUI)
 
-| Token | Value |
-|-------|-------|
-| Primary | Navy `#1A3F7A` |
-| Accent / Success | Green `#1FA35C` |
-| Warning | Amber |
-| Error | Red |
-| Background | Light gray |
-| Card surface | White |
-| Text | Dark gray |
+**Important:** Your exact color tokens, typography rules, and component specs are located in `DESIGN.md`. 
+StoreDesk uses a Stripe-inspired premium aesthetic (deep navy, crisp white cards, tabular numbers, precise shadows).
 
 - Light mode first; dark mode stub in theme but not wired
 - Rounded buttons, status badges, clean tables
@@ -49,7 +43,7 @@ A design brief with:
 
 1. Layout critique (what's wrong)
 2. Component recommendations (which existing components to use)
-3. Color / spacing tokens to use
+3. Reference to specific tokens from `DESIGN.md` (e.g. `{colors.canvas-soft}`)
 4. Interaction notes (hover states, loading states)
 5. "Hand off to `frontend-electron` / `mobile-flutter` with these specs"
 

@@ -118,14 +118,19 @@ Known blockers: promote the current SHA to Vercel Production and align the GitHu
 | Branch / default branch | Local `production`; GitHub default `production` |
 | HEAD | `f1f23d82c38429de7013c2b189bce204bdac7336` |
 | Latest tag / release | None / none |
-| CI | **Partial** — prior pinned SHA `751afb6` passed; the refreshed `f1f23d8` deploy-workflow SHA was not reverified during the original audit |
-| Local build | Not retained (`store-desk-cloud-backend/dist/` absent); prior SHA was CI-verified and `f1f23d8` remains to be reverified |
-| Container | **Partial** — multi-stage Node 20 `Dockerfile` exists; Docker is not installed locally, so no local image was verified |
-| Deployment | **Partial** — a Cloud Run revision was attempted but failed startup; the listen-before-Atlas fix and deploy workflow are now pinned, but no successful redeploy is recorded |
+| CI | **Partial** — prior pinned SHA `751afb6` passed; `f1f23d8` pending reverification |
+| Local build | Not retained (`dist/` absent) |
+| **Deployment target** | **e2-micro VM** (GCP Always Free) + PM2 + Cloudflare Tunnel — **replaces Cloud Run** |
+| Container (Dockerfile) | Kept for local smoke only; **not production deploy path** |
+| Cloud Run | **Deprecated** — `WO-20260727-cloud-backend-deploy` superseded by `WO-20260812-hub-e2micro-migration` |
 
-Included modules: `/health`, `/ws`, Atlas `AGENT_KEY` validation, agent/client store rooms, presence, ping/pong, room relay without Redis, listen-before-Atlas startup handling, and GitHub Actions deployment to Cloud Run.
+Included modules: `/health`, `/ws`, Atlas auth, agent/client store rooms, presence, ping/pong, relay, `sync.pull`, `sync.delta`, `LIVE_PRICE_REQ/RES` (planned), PM2 `ecosystem.config.cjs`, Cloudflare Tunnel config, SSH deploy script + GitHub Actions CD.
 
-Known blockers: complete a successful Cloud Run deploy with one instance plus session affinity for current in-memory room correctness, reverify CI for `f1f23d8`, and verify end-to-end Worker relay.
+Known blockers (as of 2026-08-12):
+- VM not yet provisioned (operator ops step)
+- `ecosystem.config.cjs` + `deploy-vm.sh` + `deploy-vm.yml` not yet committed to submodule
+- `LIVE_PRICE_REQ` handler not yet in `hub.ts`
+- Delta hashing not yet committed to Worker
 
 ## Android artifacts
 
@@ -144,8 +149,8 @@ The two APK files are byte-identical. The Worker copy is intentionally preserved
 | Parent → all submodules | **Ready** | Every parent gitlink equals the inspected local HEAD listed above. |
 | Desktop → Worker | **Ready** | Both target local Worker port `4310`; pinned SHAs have green CI. |
 | Mobile → Worker | **Partial** | Pairing, protected APIs, LAN URL, and byte-identical served APK are present; physical-device test remains pending. |
-| Worker → Cloud Hub | **Partial** | Outbound WSS and `/api/` relay code exist; the refreshed Hub SHA adds Cloud Run startup and deployment fixes, but no successful deployed-Hub end-to-end test is recorded. |
-| Web → Cloud Hub identity | **Partial** | Both use the Atlas Store/license identity concept; Hub deployment is absent and current Web SHA is preview-only. |
+| Worker → Cloud Hub | **Partial** | Outbound WSS and `/api/` relay code exist. Hub migration to e2-micro VM planned (`WO-20260812-hub-e2micro-migration`); VM not yet provisioned. |
+| Web → Cloud Hub identity | **Partial** | Both use the Atlas Store/license identity concept; Hub VM deployment pending. |
 | Parent GitHub Actions → private submodules | **Blocked** (ops) | Workflow expects `secrets.SUBMODULES_PAT` on checkout; operator must add that Actions secret (see `docs/env-by-project.md` §0). Default `GITHUB_TOKEN` alone cannot clone private sibling repos. |
 
 ## Conservative cleanup result
