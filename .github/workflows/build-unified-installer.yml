@@ -41,13 +41,13 @@ jobs:
           
       - name: Rename Windows Artifact
         working-directory: ./store-desk-electron/release
-        run: Get-ChildItem -Filter *.exe | Rename-Item -NewName "StoreDesk Windows Setup.exe"
+        run: Get-ChildItem -Filter *.exe | Rename-Item -NewName "StoreDesk.Windows.Setup.exe"
 
       - name: Upload StoreDesk Setup Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StoreDesk-Setup-Windows
-          path: store-desk-electron/release/StoreDesk Windows Setup.exe
+          path: store-desk-electron/release/StoreDesk.Windows.Setup.exe
 
   build-android:
     runs-on: ubuntu-latest
