@@ -4,11 +4,11 @@
 
 # StoreDesk
 
-**StoreDesk** is an edge-first desktop and mobile system for convenience stores and gas stations. It acts as the store's local command center for POS visibility, cataloging, vendor costs, and organization-licensed access. 
+**StoreDesk** is a local-first desktop and mobile system for convenience stores and gas stations. It acts as the store's local command center for POS visibility, cataloging, vendor costs, and Google Sheets sales reporting.
 
-It is designed with a **hybrid local-first architecture**: the system runs through a local edge API (StoreDesk Worker) that talks directly to the local Verifone Commander register and local MongoDB. This protects the store from internet outages. An optional cloud control plane (StoreDesk Web & Cloud Hub) synchronizes data and handles multi-store licenses, relaying connections for mobile apps.
+It is designed with a **hybrid local-first architecture**: the system runs through a **Local Store Connection** (StoreDesk Worker) that talks directly to the local Verifone Commander register. This protects the store from internet outages. An optional cloud connection synchronizes reports directly into Google Sheets and relays connections for the **StoreDesk Mobile Scanner**.
 
-**Note:** StoreDesk is **not** an inventory system. It focuses on products, retail prices, vendor costs, Commander Price Book / POS reports, and Cost Analysis—not stock counts, warehouse locations, or reorder levels.
+**Note:** StoreDesk is **not** an inventory system. It focuses on products, retail prices, vendor costs, Google Sheets reports, and Cost Analysis—not stock counts, warehouse locations, or reorder levels.
 
 ---
 
@@ -19,11 +19,11 @@ StoreDesk is built as a single parent repository with submodules for each applic
 
 | App | Folder | Tech | Role |
 | --- | --- | --- | --- |
-| **StoreDesk Worker** | `store-desk-worker/` | Node.js + Express + local Mongo | **The Edge API.** Runs on the store PC (`0.0.0.0:4310`). This is the **Source of Truth** for the local store. It talks directly to Verifone Commander and local Mongo. |
-| **StoreDesk** | `store-desk-electron/` | Electron + React | **Desktop Admin UI.** Runs on the store PC. Features Price Book, Cost Analysis, POS sales, and user access. |
-| **StoreDesk Mobile** | `store-desk-mobile/` | Flutter | **Phone Helper.** Scan barcodes, search products, view vendor prices. Connects to the Worker via the Cloud Hub. |
-| **StoreDesk Web** | `store-desk-web/` | Next.js + Atlas | **Cloud Control Plane.** Central admin for managing subscriptions, stores, provisioning users, and licensing. |
-| **Cloud Hub** | `store-desk-cloud-backend/` | Node.js (WSS) + PM2 on GCP e2-micro VM | **Global Relay Engine.** Maintains persistent WebSocket channels (`wss://`) routing remote mobile/desktop requests to active Edge Workers. Cloudflare Tunnel provides SSL. No static IP needed. |
+| **StoreDesk Worker** | `store-desk-worker/` | Node.js + Express | **Local Store Connection.** Runs on the store PC (`0.0.0.0:4310`). This is the Source of Truth. It talks directly to Verifone Commander and local Mongo. |
+| **StoreDesk** | `store-desk-electron/` | Electron + React | **Desktop Dashboard.** Runs on the store PC. Features Price Book, Cost Analysis, POS sales, and Invoice Review. |
+| **StoreDesk Mobile** | `store-desk-mobile/` | Flutter | **StoreDesk Mobile Scanner.** Turn any phone into a price checker. Scan barcodes, search products, view vendor prices. |
+| **StoreDesk Web** | `store-desk-web/` | Next.js + Atlas | **Web Dashboard.** Central admin for managing subscriptions, stores, and licensing. |
+| **Cloud Hub** | `store-desk-cloud-backend/` | Node.js (WSS) + PM2 | **Reporting Sync.** Synchronizes Commander reports directly into Google Sheets and relays connections for mobile apps. |
 
 ### End-to-End Diagram
 
