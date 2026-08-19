@@ -119,11 +119,8 @@ jobs:
           git fetch origin production
           git checkout -B production origin/production
           
-          # Replace the version in the APK and EXE URLs using sed
-          sed -i "s|releases/download/v[0-9]*\.[0-9]*\.[0-9]*/|releases/download/${TAG_NAME}/|g" "$FILE"
-          
-          # Ensure the EXE file name points to the standard one we rename it to
-          sed -i "s|StoreDesk\.Setup\.[0-9]*\.[0-9]*\.[0-9]*\.exe|StoreDesk%20Windows%20Setup.exe|g" "$FILE"
+          # Replace the constant value using sed
+          sed -i "s|export const LATEST_RELEASE_TAG = \".*\";|export const LATEST_RELEASE_TAG = \"${TAG_NAME}\";|g" "$FILE"
           
           # Commit the changes back to store-desk-web repository to trigger Vercel
           git add "$FILE"
