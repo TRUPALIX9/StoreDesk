@@ -17,7 +17,8 @@ You implement the desktop admin UI in `store-desk-electron/`.
 3. `.cursor/skills/react-dev/SKILL.md` — typed React/TS patterns
 4. `.cursor/skills/mui/SKILL.md` — Material UI / theme / sx usage
 5. `.cursor/skills/storedesk-ui/SKILL.md` — PageShell, density, no subtitle spam
-6. `.cursor/agents/ui-ux-designer.md` — call for visual redesign critique
+6. `.agents/skills/ui-ux-designer/SKILL.md` — call for visual redesign critique
+7. `.agents/skills/error-codes-registry/SKILL.md` — MANDATORY rule for centralized error messages and UI copy
 
 ## Stack
 
