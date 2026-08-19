@@ -2,16 +2,14 @@ name: Build Unified Setup Installer
 
 on:
   push:
-    branches:
-      - production
-      - develop
+    tags:
+      - 'v*.*.*'
 
 jobs:
-  build-unified:
+  build-windows:
     runs-on: windows-latest
     permissions:
       contents: write
-    
     steps:
       - name: Checkout Code with Submodules
         uses: actions/checkout@v4
@@ -37,28 +35,95 @@ jobs:
         working-directory: ./store-desk-electron
         run: |
           npm install
-          # For develop branch, just verify the build works without creating installers
-          if ("${{ github.ref }}" -eq "refs/heads/develop") {
-            npm run build
-          } else {
-            npm run package
-          }
+          npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: Rename Windows Artifact
+        working-directory: ./store-desk-electron/release
+        run: Get-ChildItem -Filter *.exe | Rename-Item -NewName "StoreDesk Windows Setup.exe"
+
       - name: Upload StoreDesk Setup Artifact
-        if: github.ref == 'refs/heads/production'
         uses: actions/upload-artifact@v4
         with:
           name: StoreDesk-Setup-Windows
-          path: store-desk-electron/release/*.exe
+          path: store-desk-electron/release/StoreDesk Windows Setup.exe
 
-      - name: Create GitHub Release for StoreDesk Setup
-        if: github.ref == 'refs/heads/production'
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_PAT || secrets.PAT_TOKEN || github.token }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Build APK
+        working-directory: ./store-desk-mobile
+        run: flutter build apk --release
+        
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoreDesk-Mobile-Android
+          path: store-desk-mobile/build/app/outputs/flutter-apk/app-release.apk
+
+  release-and-update-vercel:
+    needs: [build-windows, build-android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_PAT || secrets.PAT_TOKEN || github.token }}
+      
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: StoreDesk-Setup-Windows
+          path: ./release-assets
+      
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: StoreDesk-Mobile-Android
+          path: ./release-assets
+
+      - name: Create GitHub Release for StoreDesk
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v0.0.1"
-          name: "StoreDesk v0.0.1"
-          files: store-desk-electron/release/*.exe
+          tag_name: ${{ github.ref_name }}
+          name: StoreDesk ${{ github.ref_name }}
+          files: ./release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Vercel Download Link in Web Repo
+        working-directory: ./store-desk-web
+        run: |
+          FILE="src/app/download/DownloadClient.tsx"
+          TAG_NAME="${{ github.ref_name }}"
+          
+          # Replace the version in the APK and EXE URLs using sed
+          sed -i "s|releases/download/v[0-9]*\.[0-9]*\.[0-9]*/|releases/download/${TAG_NAME}/|g" "$FILE"
+          
+          # Ensure the EXE file name points to the standard one we rename it to
+          sed -i "s|StoreDesk\.Setup\.[0-9]*\.[0-9]*\.[0-9]*\.exe|StoreDesk%20Windows%20Setup.exe|g" "$FILE"
+          
+          # Commit the changes back to store-desk-web repository to trigger Vercel
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout production
+          git add "$FILE"
+          git commit -m "chore: auto-update download links to $TAG_NAME" || echo "No changes to commit"
+          git push origin production || echo "Nothing to push"
