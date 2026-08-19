@@ -108,21 +108,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update Vercel Download Link in Web Repo
-        working-directory: ./store-desk-web
-        run: |
-          FILE="src/app/download/DownloadClient.tsx"
-          TAG_NAME="${{ github.ref_name }}"
-          
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin production
-          git checkout -B production origin/production
-          
-          # Replace the constant value using sed
-          sed -i "s|export const LATEST_RELEASE_TAG = \".*\";|export const LATEST_RELEASE_TAG = \"${TAG_NAME}\";|g" "$FILE"
-          
-          # Commit the changes back to store-desk-web repository to trigger Vercel
-          git add "$FILE"
-          git commit -m "chore: auto-update download links to $TAG_NAME" || echo "No changes to commit"
-          git push origin production || echo "Nothing to push"

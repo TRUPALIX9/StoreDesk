@@ -1828,6 +1828,7 @@ If Flutter is not installed locally, do not fake success. Document it as pending
 - Backend and MongoDB are local-first — no hosted backend or hosted MongoDB unless explicitly asked.
 - Keep three separate Git submodule repos; do not merge into parent or convert to monorepo.
 - Commit app changes in the submodule; commit submodule pointer updates in the parent repo.
+- Before cutting a new release, always update the `LATEST_RELEASE_TAG` constant in `store-desk-web/src/app/download/DownloadClient.tsx` to match the new version tag.
 - Use themed UI packages.
 - Keep design professional and simple.
 ```
