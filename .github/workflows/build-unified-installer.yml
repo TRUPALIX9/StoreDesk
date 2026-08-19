@@ -34,7 +34,7 @@ jobs:
       - name: Install & Package Electron App
         working-directory: ./store-desk-electron
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
