@@ -6,6 +6,8 @@
 
 The architecture diagram, client routing rules, and trust boundaries have been updated to reflect the Hybrid LAN + Atlas organization synchronization approach. See the updated flowchart and documentation sections for details.
 
+A high-fidelity SVG diagram generated from D2 is available at [storedesk-architecture.svg](file:///Users/trupal/WORK/RCP/docs/diagrams/output/storedesk-architecture.svg) (Source: [storedesk-architecture.d2](file:///Users/trupal/WORK/RCP/docs/diagrams/storedesk-architecture.d2)).
+
 
 Local-first system for convenience stores and gas stations. This document defines the target **setup contract v1 (`setup-v1`)**; current implementation gaps are tracked in `system-map.md` and `WO-20260728-store-setup-lifecycle`.
 

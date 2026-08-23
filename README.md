@@ -27,6 +27,9 @@ StoreDesk is built as a single parent repository with submodules for each applic
 
 ### End-to-End Diagram
 
+> [!NOTE]
+> A high-fidelity vector version of this diagram is available at [storedesk-architecture.svg](file:///Users/trupal/WORK/RCP/docs/diagrams/output/storedesk-architecture.svg) (D2 Source: [storedesk-architecture.d2](file:///Users/trupal/WORK/RCP/docs/diagrams/storedesk-architecture.d2)).
+
 ```mermaid
 flowchart TD
     subgraph Store_Local_Network["Store Local Network"]

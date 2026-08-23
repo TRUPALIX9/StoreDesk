@@ -1,0 +1,181 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 300
+  }
+}
+
+direction: right
+
+classes: {
+  user: {
+    shape: person
+    style: {
+      fill: "#ffffff"
+      stroke: "#64748b"
+      shadow: true
+    }
+  }
+  cloud_node: {
+    style: {
+      fill: "#e0f2fe"
+      stroke: "#0284c7"
+      font-color: "#0369a1"
+      border-radius: 8
+      shadow: true
+    }
+  }
+  edge_node: {
+    style: {
+      fill: "#dcfce7"
+      stroke: "#16a34a"
+      font-color: "#15803d"
+      border-radius: 8
+      shadow: true
+    }
+  }
+  datastore_node: {
+    style: {
+      fill: "#f3e8ff"
+      stroke: "#9333ea"
+      font-color: "#7e22ce"
+      border-radius: 8
+      shadow: true
+    }
+  }
+  hardware_node: {
+    style: {
+      fill: "#ffedd5"
+      stroke: "#ea580c"
+      font-color: "#c2410c"
+      border-radius: 8
+      shadow: true
+    }
+  }
+  zone: {
+    style: {
+      stroke-dash: 5
+      stroke: "#475569"
+      fill: "#f8fafc"
+      border-radius: 12
+    }
+  }
+}
+
+# External Actors
+user_operator: "Store AppUser\n(Desktop/Mobile Client)" {
+  class: user
+  icon: "https://api.iconify.design/material-symbols:person.svg"
+}
+
+central_admin: "StoreDesk Support Admin" {
+  class: user
+}
+
+# Zone: Public Cloud Infrastructure
+cloud_infrastructure: "Public Cloud Infrastructure (Vercel & GCP)" {
+  class: zone
+
+  vercel_edge: "Vercel Edge Network\nNext.js Dashboard & Admin Portal" {
+    class: cloud_node
+    icon: "https://api.iconify.design/simple-icons:nextdotjs.svg"
+  }
+
+  gcp_vm_relay: "GCP Compute Engine\nNode.js WSS Cloud Hub (PM2)" {
+    class: cloud_node
+    icon: "https://api.iconify.design/simple-icons:googlecloud.svg"
+  }
+
+  atlas_cluster: "MongoDB Atlas Cluster\nManaged Multi-Tenant DB" {
+    class: datastore_node
+    icon: "https://api.iconify.design/simple-icons:mongodb.svg"
+  }
+}
+
+# Zone: Client Operating Environments
+client_devices: "Client Endpoints" {
+  class: zone
+
+  electron_desktop: "Client Workstation\nElectron + React + MUI App" {
+    class: cloud_node
+    icon: "https://api.iconify.design/simple-icons:electron.svg"
+  }
+
+  flutter_mobile: "Mobile Device\nFlutter Helper App" {
+    class: cloud_node
+    icon: "https://api.iconify.design/simple-icons:flutter.svg"
+  }
+}
+
+# Zone: On-Premise Store Edge Infrastructure
+store_edge_network: "On-Premise Store Network (Edge Site)" {
+  class: zone
+
+  win_service_manager: "Windows Service Manager\nNative Daemon / WinSW" {
+    class: edge_node
+    icon: "https://api.iconify.design/material-symbols:settings.svg"
+  }
+
+  edge_worker: "StoreDesk Worker Service\nNode.js / Express Edge Runtime" {
+    class: edge_node
+    icon: "https://api.iconify.design/simple-icons:nodedotjs.svg"
+  }
+
+  local_mongodb: "Local MongoDB Instance\nCanonical Store Catalog" {
+    class: datastore_node
+    icon: "https://api.iconify.design/simple-icons:mongodb.svg"
+  }
+
+  aes_config: "Secure Storage\nAES-256-GCM Sealed Config" {
+    class: datastore_node
+    icon: "https://api.iconify.design/material-symbols:lock.svg"
+  }
+
+  verifone_commander: "Verifone Commander\nPLUs, Reports, T-Log Engine" {
+    class: hardware_node
+    icon: "https://api.iconify.design/material-symbols:desktop-windows.svg"
+  }
+
+  ruby_registers: "Ruby 2 POS Registers\nCheckout Terminals (LAN)" {
+    class: hardware_node
+    icon: "https://api.iconify.design/material-symbols:shopping-cart.svg"
+  }
+}
+
+# Infrastructure Links & Network Paths
+central_admin -> cloud_infrastructure.vercel_edge: "HTTPS / Admin Provisioning"
+user_operator -> client_devices.electron_desktop: "Local Desktop Interaction"
+user_operator -> client_devices.flutter_mobile: "Wireless Scanning / View"
+
+cloud_infrastructure.vercel_edge -> cloud_infrastructure.atlas_cluster: "Auth & Tenancy Metadata" {
+  style: {stroke: "#9333ea"}
+}
+
+client_devices.electron_desktop -> cloud_infrastructure.gcp_vm_relay: "WSS Session Tunnel" {
+  style: {stroke: "#0284c7"; stroke-width: 2}
+}
+client_devices.flutter_mobile -> cloud_infrastructure.gcp_vm_relay: "WSS Session Tunnel" {
+  style: {stroke: "#0284c7"; stroke-width: 2}
+}
+cloud_infrastructure.gcp_vm_relay -> cloud_infrastructure.atlas_cluster: "Scope & Permission Verification" {
+  style: {stroke: "#9333ea"}
+}
+
+store_edge_network.edge_worker -> cloud_infrastructure.gcp_vm_relay: "Outbound WSS / Delta Sync Channel" {
+  style: {stroke: "#16a34a"; stroke-width: 2}
+}
+
+store_edge_network.win_service_manager -> store_edge_network.edge_worker: "Process Lifecycle (Start/Stop/Update)"
+store_edge_network.win_service_manager -> store_edge_network.aes_config: "Reads/Writes Secrets" {
+  style: {stroke: "#9333ea"; stroke-dash: 3}
+}
+store_edge_network.edge_worker -> store_edge_network.local_mongodb: "Reads/Writes Local Catalog" {
+  style: {stroke: "#9333ea"}
+}
+
+store_edge_network.edge_worker -> store_edge_network.verifone_commander: "TCP/IP Queries (PLUs & Reports)" {
+  style: {stroke: "#ea580c"; stroke-width: 2}
+}
+store_edge_network.verifone_commander -> store_edge_network.ruby_registers: "Pushes Updates & Pulls T-Logs (LAN)" {
+  style: {stroke: "#475569"}
+}
