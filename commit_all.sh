@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-submodules=("store-desk-electron" "store-desk-worker" "store-desk-mobile" "store-desk-cloud-backend" "store-desk-web")
+submodules=("store-desk-electron" "store-desk-worker" "store-desk-mobile" "store-desk-web")
 
 for sub in "${submodules[@]}"; do
   echo "==================== Processing $sub ===================="
