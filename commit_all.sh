@@ -7,7 +7,7 @@ for sub in "${submodules[@]}"; do
   echo "==================== Processing $sub ===================="
   cd "$sub"
   git add .
-  git commit --no-verify -m "chore: migrate and unified installer cleanup" || echo "No changes to commit in $sub"
+  git commit -m "chore: migrate and unified installer cleanup" || echo "No changes to commit in $sub"
   git push origin develop || echo "Failed to push develop in $sub"
   git checkout production || git checkout -b production
   git pull origin production || true
@@ -19,7 +19,7 @@ done
 
 echo "==================== Processing Parent Repo ===================="
 git add .
-git commit --no-verify -m "chore: migrate and unified installer cleanup" || echo "No changes in parent"
+git commit -m "chore: migrate and unified installer cleanup" || echo "No changes in parent"
 git push origin develop || echo "Failed to push develop in parent"
 git checkout production || git checkout -b production
 git pull origin production || true

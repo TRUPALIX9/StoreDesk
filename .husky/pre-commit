@@ -1,0 +1,49 @@
+#!/bin/sh
+
+echo "=================================================="
+echo "🚨 Running StoreDesk Pre-Commit Checks..."
+echo "=================================================="
+
+# 1. Check store-desk-worker
+echo "📁 [1/4] Checking store-desk-worker..."
+cd store-desk-worker
+npm run check
+if [ $? -ne 0 ]; then
+  echo "❌ Error in store-desk-worker checks!"
+  exit 1
+fi
+cd ..
+
+# 2. Check store-desk-electron
+echo "📁 [2/4] Checking store-desk-electron..."
+cd store-desk-electron
+npm run typecheck && npm run test
+if [ $? -ne 0 ]; then
+  echo "❌ Error in store-desk-electron checks!"
+  exit 1
+fi
+cd ..
+
+# 3. Check store-desk-web
+echo "📁 [3/4] Checking store-desk-web..."
+cd store-desk-web
+npx tsc --noEmit && npm run test
+if [ $? -ne 0 ]; then
+  echo "❌ Error in store-desk-web checks!"
+  exit 1
+fi
+cd ..
+
+# 4. Check store-desk-mobile
+echo "📁 [4/4] Checking store-desk-mobile..."
+cd store-desk-mobile
+flutter analyze && flutter test
+if [ $? -ne 0 ]; then
+  echo "❌ Error in store-desk-mobile checks!"
+  exit 1
+fi
+cd ..
+
+echo "=================================================="
+echo "✅ All checks passed! Proceeding with commit..."
+echo "=================================================="

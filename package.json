@@ -1,0 +1,12 @@
+{
+  "name": "store-desk-root",
+  "version": "1.0.0",
+  "description": "StoreDesk Parent Repository",
+  "private": true,
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.5"
+  }
+}
