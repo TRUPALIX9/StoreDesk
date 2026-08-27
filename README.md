@@ -23,7 +23,6 @@ StoreDesk is built as a single parent repository with submodules for each applic
 | **StoreDesk** | `store-desk-electron/` | Electron + React | **Desktop Dashboard.** Runs on the store PC. Features Price Book, Cost Analysis, POS sales, and Invoice Review. |
 | **StoreDesk Mobile** | `store-desk-mobile/` | Flutter | **StoreDesk Mobile Scanner.** Turn any phone into a price checker. Scan barcodes, search products, view vendor prices. |
 | **StoreDesk Web** | `store-desk-web/` | Next.js + Atlas | **Web Dashboard.** Central admin for managing subscriptions, stores, and licensing. |
-| **Cloud Hub** | `store-desk-cloud-backend/` | Node.js (WSS) + PM2 | **Reporting Sync.** Synchronizes Commander reports directly into Google Sheets and relays connections for mobile apps. |
 
 ### End-to-End Diagram
 

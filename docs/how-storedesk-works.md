@@ -42,7 +42,6 @@ StoreDesk/                          ← parent (docs, scripts, submodule pointer
 ├── store-desk-worker/              ← StoreDesk Worker (edge API)
 ├── store-desk-mobile/              ← StoreDesk Mobile (phone)
 ├── store-desk-web/                 ← StoreDesk Web (marketing + licenses)
-├── store-desk-cloud-backend/       ← Cloud Hub (WSS)
 └── brand-kit/                      ← logos + color tokens
 ```
 
@@ -52,7 +51,6 @@ StoreDesk/                          ← parent (docs, scripts, submodule pointer
 | **StoreDesk Worker** | Node + Express + local Mongo | Edge API (catalog, Commander, vendor prices) |
 | **StoreDesk Mobile** | Flutter | Phone helper — AppUser login, scan/search/prices. Play/launcher label **StoreDesk** |
 | **StoreDesk Web** | Next.js on Vercel | Product site + store license admin (Atlas) |
-| **Cloud Hub** | Node on Cloud Run | WSS rooms for multi-store relay (Epic 1+) |
 
 Product branding:
 

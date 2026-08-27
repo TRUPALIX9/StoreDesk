@@ -87,7 +87,7 @@ Store active WOs at: `docs/work-orders/WO-YYYYMMDD-short-slug.md`
 3. **Branches** — `develop` (integration) and `production` (stable). Never push directly to `production` without QA.
 4. **Mobile server URL** — LAN IP only (never `localhost` on the phone).
 5. **Invoice → price** — user must review InvoiceItems before VendorPrice is created. Never auto-save raw extraction.
-6. **Naming** — StoreDesk (desktop), StoreDesk Worker (edge API), StoreDesk Mobile (Flutter), StoreDesk Web, StoreDesk Cloud Hub.
+6. **Naming** — StoreDesk (desktop), StoreDesk Worker (edge API), StoreDesk Mobile (Flutter), StoreDesk Web.
 7. **Releases** — Before cutting a new release, always update the `LATEST_RELEASE_TAG` constant in `store-desk-web/src/app/download/DownloadClient.tsx` to match the new version tag.
 
 ---

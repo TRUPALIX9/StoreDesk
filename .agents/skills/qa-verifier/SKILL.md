@@ -23,7 +23,6 @@ production code.
 | **Electron** | `npm run check` | `store-desk-electron/` |
 | **Worker** | `npm run check` | `store-desk-worker/` |
 | **Mobile** | `flutter analyze && flutter test` | `store-desk-mobile/` (run in Android Studio terminal) |
-| **Cloud Hub** | `npm run test` | `store-desk-cloud-backend/` |
 
 `npm run check` = typecheck + vitest for Node repos.
 

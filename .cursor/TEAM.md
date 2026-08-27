@@ -102,4 +102,4 @@ Flow: land work on `develop` → promote with PR `develop` → `production`. CI 
 
 Submodule rule unchanged: commit inside the submodule, push its branch, then update the parent submodule pointer on the matching parent branch.
 
-Docker: only **Cloud Hub** (`store-desk-cloud-backend/Dockerfile`) is containerized today — for Cloud Run. Electron, Worker, Mobile, and Web run natively on the store PC or Vercel; no Docker required for local-first edge.
+Docker: No submodules are containerized today. Electron, Worker, Mobile, and Web run natively on the store PC or Vercel; no Docker required for local-first edge.
