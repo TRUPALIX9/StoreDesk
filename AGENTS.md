@@ -55,7 +55,6 @@ Main Desktop App: StoreDesk
 Mobile App: StoreDesk Mobile
 Edge Worker / API: StoreDesk Worker
 Web: StoreDesk Web
-Cloud Hub: StoreDesk Cloud Hub
 ```
 
 Do not call the mobile app “StoreDesk Buddy.”
@@ -126,29 +125,6 @@ Use:
 - flutter_riverpod
 - dio
 - flutter_secure_storage
-
-## Cloud Hub: StoreDesk Cloud Hub
-
-**Deployment target: GCP Compute Engine `e2-micro` VM (Always Free Tier).**
-
-Do NOT target Cloud Run for the Cloud Hub. Use:
-
-- Node.js 20
-- Express (HTTP) + `ws` (WebSocket)
-- PM2 process manager (`ecosystem.config.cjs`) — always-on, autorestart
-- Cloudflare Tunnel (`cloudflared`) — SSL termination, no static IP, no certbot
-- MongoDB Atlas (Mongoose) — entity sync + auth only
-- PM2 memory ceiling: `--max-old-space-size=512` (guards 1 GB VM RAM)
-
-**Hub non-negotiables:**
-
-- The Hub is a **lightweight JSON router only** — no catalog, Commander XML, or invoice data on the Hub process or Atlas
-- Run exactly **1 PM2 instance** (fork mode) — no cluster/multi-instance without Redis
-- Heartbeat interval: `60000` ms (relaxed from Cloud Run's 30 s — no timeout cap on VM)
-- Deploy CD: SSH via `scripts/deploy-vm.sh` and `.github/workflows/deploy-vm.yml` — never `gcloud run deploy`
-- Legacy `AGENT_KEY` hello supported while `HUB_ALLOW_LEGACY_AGENT_KEY=1`; disable to `0` after full v1 migration
-- `RELAY_SESSION_SECRET` must be set in production (`.env` on VM, OS-protected)
-- Never put `MONGODB_URI` or `RELAY_SESSION_SECRET` in Git, GitHub vars (only `VM_SSH_PRIVATE_KEY` secret)
 
 
 - mobile_scanner
@@ -321,7 +297,6 @@ StoreDesk/                         # parent Git repo (this workspace root when c
 ├── store-desk-worker/             # submodule — StoreDesk Worker
 ├── store-desk-mobile/             # submodule — StoreDesk Mobile
 ├── store-desk-web/                # submodule — StoreDesk Web (licenses)
-├── store-desk-cloud-backend/      # submodule — Cloud Hub (WSS)
 ├── brand-kit/                     # logos + icon
 ├── docs/
 ├── scripts/
@@ -338,13 +313,12 @@ GitHub remotes:
 - Worker: `https://github.com/TRUPALIX9/store-desk-worker.git`
 - Mobile: `https://github.com/TRUPALIX9/store-desk-mobile.git`
 - Web: `https://github.com/storedesk-dev/StoreDesk-web.git`
-- Cloud Hub: `https://github.com/TRUPALIX9/store-desk-cloud-backend.git` (Epic 1)
 
 Rules:
 
 - **Use Git submodules** — do not merge app repos into the parent codebase.
 - Do **not** convert to an npm/pnpm monorepo unless explicitly asked.
-- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-worker`, `store-desk-mobile`, `store-desk-web`, `store-desk-cloud-backend`) unless explicitly asked.
+- Do **not** rename the app submodule folders (`store-desk-electron`, `store-desk-worker`, `store-desk-mobile`, `store-desk-web`) unless explicitly asked.
 - Do **not** rewrite or delete Git history.
 - Make app-specific code changes **inside the correct submodule**.
 - Commit submodule changes inside the submodule, push, then update the parent submodule pointer.
