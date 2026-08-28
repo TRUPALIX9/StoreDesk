@@ -18,6 +18,6 @@ secrets/*
 *-service-account*.json
 store-desk-*.json
 
-# Downloaded binary executables
-resources/bin/*.exe
-resources/bin/*.dll
+# Downloaded binary executables and generated service configs
+resources/bin/*
+!resources/bin/.gitkeep
