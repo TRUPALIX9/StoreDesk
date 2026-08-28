@@ -28,13 +28,14 @@ jobs:
           npm install
           npm run build
           npm install -g pkg
-          mkdir -p ../store-desk-electron/build
-          pkg dist/index.js -t node18-win-x64 -o ../store-desk-electron/build/worker.exe
+          mkdir -p ../resources/bin
+          pkg dist/index.js -t node18-win-x64 -o ../resources/bin/worker.exe
 
       - name: Install & Package Electron App
         working-directory: ./store-desk-electron
         run: |
           npm install
+          npm run fetch-binaries
           npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
