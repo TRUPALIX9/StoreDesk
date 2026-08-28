@@ -2,6 +2,21 @@
 
 MongoDB collections (Mongoose). All documents use `createdAt` / `updatedAt` unless noted.
 
+## ER Diagram
+
+```mermaid
+erDiagram
+    Product ||--o{ ProductVariant : "has many"
+    ProductVariant ||--o{ VendorPrice : "priced by"
+    Vendor ||--o{ VendorPrice : "offers"
+    PricingRule }|--|| Product : "scopes to"
+    PricingRule }|--|| ProductVariant : "scopes to"
+    PriceBookEntry }|--|| Product : "overlays"
+    POSDailySummary ||--o{ Transaction : "aggregates"
+    IntegrationSettings ||--o| POSDailySummary : "syncs"
+    MobileDevice }|--|| Store : "pairs to"
+```
+
 ## Collections
 
 ```txt
@@ -9,9 +24,6 @@ Product
 ProductVariant
 Vendor
 VendorPrice
-Invoice
-InvoiceItem
-ExtractionJob
 PricingRule
 MobileDevice
 PriceBookEntry
@@ -99,8 +111,7 @@ Index: `{ vendorId, variantId, isCurrentPrice }`
 
 ---
 
-## Invoice
-
+## 
 | Field | Type | Notes |
 |-------|------|-------|
 | _id | string | required |
@@ -116,8 +127,7 @@ Index: `{ vendorId, variantId, isCurrentPrice }`
 
 ---
 
-## InvoiceItem
-
+## 
 One extracted invoice row.
 
 | Field | Type | Notes |
@@ -138,8 +148,7 @@ One extracted invoice row.
 
 ---
 
-## ExtractionJob
-
+## 
 | Field | Type | Notes |
 |-------|------|-------|
 | _id | string | required |

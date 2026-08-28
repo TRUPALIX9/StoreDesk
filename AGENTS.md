@@ -30,19 +30,6 @@ The goal is to build a professional, themed, production-quality app for:
 
 **Removed from current product UI:** Invoice upload/review (desktop + mobile), Mobile Access APK URL / pairing QR. Vendor prices stay manual / Price Book. Do not re-add without a Work Order.
 
-This is **not** a stock-count inventory system.
-
-Do not build:
-
-- Stock quantity
-- Current stock
-- Add stock
-- Reduce stock
-- Low stock alerts
-- Reorder levels
-- Warehouse locations
-- Stock movements
-- Inventory adjustment
 
 ---
 
@@ -323,6 +310,10 @@ Rules:
 - Make app-specific code changes **inside the correct submodule**.
 - Commit submodule changes inside the submodule, push, then update the parent submodule pointer.
 - Clone with `git clone --recurse-submodules` or run `git submodule update --init --recursive`.
+- **Ponytail Philosophy** — Always follow the "Ladder of Laziness" rules. Choose boring, native solutions over custom abstractions, boilerplate, and new dependencies (YAGNI).
+- **Caveman Style** — Communicate in a terse, technical, fragment-based format. Drop filler words, pleasantries, and hedging to optimize token efficiency while keeping code blocks exact.
+- **Open Design System** — Follow all design tokens, colors, typography rules, and density guidelines defined in the root [DESIGN.md](file:///Users/trupal/WORK/RCP/DESIGN.md) when generating UI.
+- **Superpowers Discipline** — Enforce process discipline, TDD, planning, systematic debugging, and mandatory skill invocation for all tasks.
 
 ---
 
@@ -414,9 +405,6 @@ fileStorageService
 Do not create:
 
 ```txt
-inventoryService
-stockMovementService
-reorderService
 ```
 
 ---
@@ -485,9 +473,6 @@ Product
 ProductVariant
 Vendor
 VendorPrice
-Invoice
-InvoiceItem
-ExtractionJob
 PricingRule
 MobileDevice
 ```
@@ -495,11 +480,6 @@ MobileDevice
 Do not create:
 
 ```txt
-Inventory
-StockMovement
-Warehouse
-Reorder
-StockAdjustment
 ```
 
 ---
@@ -647,8 +627,7 @@ Confidence
 Notes
 ```
 
-## Invoice
-
+## 
 Represents an uploaded invoice.
 
 Invoice fields should support:
@@ -680,8 +659,7 @@ desktop
 mobile
 ```
 
-## InvoiceItem
-
+## 
 Represents one extracted row from an invoice.
 
 InvoiceItem fields should support:
@@ -846,10 +824,8 @@ Invoices from desktop or mobile must follow this workflow:
 ```txt
 Upload invoice
     ↓
-Create Invoice
-    ↓
-Create ExtractionJob
-    ↓
+Create     ↓
+Create     ↓
 Extract invoice data
     ↓
 Create InvoiceItem review rows
@@ -870,8 +846,6 @@ Update suggested selling price
 Critical rule:
 
 ```txt
-Never create VendorPrice directly from raw extraction.
-Never update inventory because inventory is out of scope.
 ```
 
 ---
@@ -1100,7 +1074,6 @@ Mobile Access
 Settings
 ```
 
-Do not include Inventory.
 
 ---
 
@@ -1634,7 +1607,6 @@ Follow these rules:
 7. Use consistent theme structure.
 8. Use reusable components.
 9. Avoid giant components.
-10. Do not build stock/inventory features.
 11. Do not skip invoice review.
 12. Do not expose MongoDB to mobile.
 13. Keep mobile simple and fast.
@@ -1786,12 +1758,6 @@ If Flutter is not installed locally, do not fake success. Document it as pending
 # Non-Negotiable Rules
 
 ```txt
-- Do not build stock tracking.
-- Do not build inventory quantity.
-- Do not build low stock alerts.
-- Do not build reorder levels.
-- Do not create StockMovement.
-- Do not create Inventory model.
 - Do not let mobile connect directly to MongoDB.
 - Do not save raw invoice extraction directly as final vendor price.
 - Always require invoice review before creating VendorPrice.

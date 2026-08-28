@@ -17,3 +17,7 @@ secrets/*
 !secrets/.gitkeep
 *-service-account*.json
 store-desk-*.json
+
+# Downloaded binary executables and generated service configs
+resources/bin/*
+!resources/bin/.gitkeep

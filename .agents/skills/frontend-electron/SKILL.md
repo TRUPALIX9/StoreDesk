@@ -29,12 +29,16 @@ You implement the desktop admin UI in `store-desk-electron/`.
 
 ## Owns
 
-- `src/pages/` — all page-level screens
+- `src/pages/` — all page-level screens including:
+  - `ManageWorkerPage.tsx` — **service control UI** (start/stop/restart Worker, cloudflared tunnel status, config editor). Calls Electron IPC `serviceManager` API — never HTTP endpoints for orchestration.
+  - `SetupWizardPage.tsx` — onboarding / setup-key redemption flow
+  - All other product pages (POS, Price Book, Vendors, etc.)
 - `src/components/` — shared UI primitives (`PageShell`, `SectionCard`, `FilterBar`, `DataTableCard`)
 - `src/modules/` — feature modules (POS, Price Book, etc.)
 - `src/theme/` — centralized palette, typography, component overrides
 - `src/api/` — HTTP client (thin; no business logic)
 - `src/electron/` — main process, preload, IPC handlers
+
 
 ## Does NOT own
 
@@ -48,7 +52,6 @@ You implement the desktop admin UI in `store-desk-electron/`.
 - No hardcoded hex colors in pages — use `theme.palette.*` or token constants
 - No redundant section subtitles (MUI density is medium/compact)
 - Keep pages thin — business logic in services/utils, not in JSX
-- No inventory/stock screens or copy
 
 ## Definition of done
 

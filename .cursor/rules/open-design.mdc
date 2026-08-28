@@ -1,0 +1,17 @@
+---
+description: Open Design system. Enforce reading and following DESIGN.md design system constraints for all UI generation.
+globs: src/**/*, lib/**/*, **/pages/**/*, **/components/**/*, **/theme/**/*, **/styles.css, **/index.css
+alwaysApply: false
+---
+
+# Open Design System Rule
+
+When creating, editing, or styling any user interfaces (UI), components, layouts, or stylesheets, you must adhere strictly to the design tokens and specifications in **`DESIGN.md`** at the workspace root.
+
+## Guidelines:
+1. **Always Read Design Rules**: Read [DESIGN.md](file:///Users/trupal/WORK/RCP/DESIGN.md) before writing any UI or styling code.
+2. **Follow Color Tokens**: Use only the designated colors (`primary`, `success`, `ink`, `canvas-soft`, etc.) defined under `colors`. Do not use generic browser defaults or ad-hoc custom hex codes.
+3. **Tabular Numerics**: For financial data, prices, metrics, or table displays, apply `font-variant-numeric: tabular-nums` or the corresponding `{typography.body-tabular}` token.
+4. **Density and Sizing**: Maintain visual density guidelines. Use compact margins and paddings for dense dashboards.
+5. **No Prohibited Patterns**: Avoid neon accents, generic rainbow gradients, or oversized border radii on containers (keep cards to `8px` or `12px` border-radius).
+6. **Tool Consistency**: Use MUI components (like `TextField` with `size="small"`) and central theme overrides rather than writing custom HTML components.

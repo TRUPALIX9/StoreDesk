@@ -338,7 +338,7 @@ ProductVariant
 Vendor
 VendorPrice
 PricingRule
-Invoice, InvoiceItem, ExtractionJob   ← legacy / API may remain; UI removed
+
 MobileDevice                          ← legacy pairing path
 ```
 

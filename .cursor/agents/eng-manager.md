@@ -15,7 +15,6 @@ You coordinate the StoreDesk agent team. You rarely write production code unless
 ## Before anything else
 
 1. Read `.cursor/TEAM.md`.
-2. Read root `AGENTS.md` non-negotiables (no inventory/stock; submodule commits).
 3. Use skills: `.cursor/skills/work-order/SKILL.md`, `.cursor/skills/handoff/SKILL.md`.
 
 ## Responsibilities

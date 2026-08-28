@@ -25,29 +25,41 @@ Rules: `.cursor/rules/react-dev.mdc`, `mui.mdc`, `storedesk-ui.mdc`, `mui-mcp.md
 
 ## Layers
 
-```txt
-┌─────────────────────────────────────────────┐
-│  pages/ + modules/*/components/             │  Feature screens
-├─────────────────────────────────────────────┤
-│  components/ui/                             │  PageShell, SectionCard, …
-│  components/ (PageHeader, AppLayout, …)     │  App chrome
-├─────────────────────────────────────────────┤
-│  theme/                                     │  Palette, typography, layout
-├─────────────────────────────────────────────┤
-│  api/ + modules/*/utils/                    │  Data & domain logic
-└─────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph "Feature Screens"
+        Screens[pages/ & modules/*/components/]
+    end
+    
+    subgraph "App Chrome & UI Core"
+        Chrome[components/ PageHeader, AppLayout, etc.]
+        Primitives[components/ui/ PageShell, SectionCard, etc.]
+    end
+    
+    subgraph "Theming & Styling"
+        Theme[theme/ Palette, typography, layout]
+    end
+    
+    subgraph "Data & Domain Logic"
+        API[api/ & modules/*/utils/]
+    end
+
+    Screens --> Chrome
+    Chrome --> Primitives
+    Primitives --> Theme
+    Screens --> API
 ```
 
 ## Page composition
 
-```txt
-PageShell
-  PageHeader          title + primary actions
-  FilterBar           search / filters (optional)
-  content
-    DataTableCard     tables
-    SectionCard       forms / summaries / settings
-    Dialog            create / edit
+```mermaid
+graph TD
+    PS[PageShell] --> PH[PageHeader : title + primary actions]
+    PS --> FB[FilterBar : search / filters optional]
+    PS --> Content[Content]
+    Content --> DTC[DataTableCard : tables]
+    Content --> SC[SectionCard : forms / summaries / settings]
+    Content --> Dialog[Dialog : create / edit]
 ```
 
 ## Content rules

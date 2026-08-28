@@ -18,11 +18,10 @@ Human and agent documentation for the whole StoreDesk system. Prefer editing an 
 | `verifone-commander-reports.md` | **Commander Ruby + T-Log / closed daily & shift** — periods, KPIs, POS Reports |
 | `architecture.md` | System architecture (desktop ↔ Worker ↔ StoreDesk Mobile) |
 | `api-contract.md` | HTTP API surfaces |
-| `database-schema.md` | Mongo entities (no Inventory/Stock) |
 | `wireframes.md` | Desktop/mobile UX wireframes |
 | `ui-architecture.md` | Electron UI system + Cursor skills |
 | `mobile-flow.md` | StoreDesk Mobile pairing/scan/prices + Play beta `0.0.1-beta1` vs APK (no mobile invoice upload) |
-| `invoice-extraction.md` | Extraction/review notes |
+
 | `sprint-plan.md` / `sprint-status.md` | Delivery plan/status |
 | `release.md` | Branching, APK/AAB, Play beta, checklists |
 | `../brand-kit/README.md` | Logos + color tokens (`#1A63F4` / `#00A87B`) |

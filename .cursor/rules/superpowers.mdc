@@ -1,0 +1,46 @@
+---
+description: >-
+  Superpowers process rules — mandatory skill invocation, plan-first development,
+  TDD, systematic debugging. Source: https://github.com/obra/superpowers v6.3.0.
+  Plugin installed at ~/.gemini/config/plugins/superpowers/
+globs: "**/*"
+alwaysApply: true
+---
+
+# Superpowers Agentic Methodology
+
+Superpowers v6.3.0 is installed as an Antigravity plugin (`~/.gemini/config/plugins/superpowers/`) and is bootstrapped from `GEMINI.md` at session start.
+
+## The Core Rule
+
+**Invoke relevant skills BEFORE any response or action** — including clarifying questions, reading files, or exploring the codebase.
+
+> If there is even a 1% chance a skill applies → YOU MUST USE IT. Non-negotiable.
+
+## Skill Invocation Map
+
+| Trigger | Skill |
+|---------|-------|
+| New feature / component / behavior | `superpowers:brainstorming` |
+| Multi-step implementation | `superpowers:writing-plans` |
+| Any bug, test failure, unexpected behavior | `superpowers:systematic-debugging` |
+| Executing a written plan | `superpowers:executing-plans` |
+| Parallel agent coordination | `superpowers:subagent-driven-development` |
+| TDD cycle | `superpowers:test-driven-development` |
+| Before marking done | `superpowers:verification-before-completion` |
+| Before PR/merge | `superpowers:requesting-code-review` + `superpowers:finishing-a-development-branch` |
+| Responding to review | `superpowers:receiving-code-review` |
+
+## Priority Order
+
+1. Process skill (`brainstorming` / `systematic-debugging`)
+2. Domain skill (`tech-lead`, `backend-server`, `frontend-electron`, `mobile-flutter`)
+3. `ponytail` (YAGNI gate)
+4. `open-design` (UI token alignment)
+5. `qa-verifier` (before WO close)
+
+## Hard Gates
+
+- **No code** without human partner approval (brainstorming hard gate).
+- **No fix** without root cause found first (systematic-debugging iron law: `NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST`).
+- **No WO closed** without QA green.

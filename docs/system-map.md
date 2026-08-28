@@ -20,25 +20,30 @@ Commander E2E: [`verifone-commander-price-book.md`](./verifone-commander-price-b
 
 ## Setup-v1 target map
 
-```txt
-StoreDesk Web admin (central InternalAdmin operators only)
-  ├─ Organization ─► Subscription ─► Store/site ─► WorkerInstallation
-  ├─ creates immutable workerInstallationId from selected site + Worker/contact/store snapshots
-  ├─ provisions AppUsers by email + exact Organization/Store/Worker UserAssignments
-  ├─ emails one-time setup key to installation site contact (routing metadata, not login)
-  ├─ audited OS/privacy acknowledgements + version/hash-bound EULA acceptance
-  ├─ setup key ──Electron protected IPC──TLS──► StoreDesk Worker/service manager
-  ├─ stores hashes + tenant/audit metadata; returns permanent Worker credential only to Worker
-  └─ AppUser login/assignment selection ─► short-lived role/audience-scoped Hub client sessions
-
-StoreDesk service manager (`store-desk-worker/packages/service-manager/`; privileged local IPC/CLI)
-  ├─ WinSW | launchd | systemd
-  ├─ AES-256-GCM config + installation key + OS ACLs
-  └─ install/start/stop/update/rollback/diagnostics/recovery
-
-StoreDesk / StoreDesk Mobile ── assignment-scoped client session ──► Cloud Hub ──► Worker :4310
-Worker ── Worker-only credential/session, outbound WSS ──► Cloud Hub
-Worker ──► local Mongo + Commander
+```mermaid
+graph TD
+    %% Web Admin Hierarchy
+    Admin[🌐 StoreDesk Web Admin] --> Org[Organization]
+    Org --> Sub[Subscription]
+    Sub --> Store[Store / Site]
+    Store --> Install[Worker Installation]
+    
+    %% Provisioning Flow
+    Admin -. "Provisions AppUsers" .-> AppUser[AppUser]
+    Admin -. "Emails Setup Key" .-> Contact[Site Contact]
+    Contact -. "Enters Key via IPC" .-> Desktop[StoreDesk Desktop]
+    Desktop -. "Sends Key over TLS" .-> Worker[StoreDesk Worker]
+    
+    %% Session Flow
+    AppUser -. "Logs In" .-> Hub[☁️ Cloud Hub]
+    Worker -. "Outbound WSS" .-> Hub
+    
+    %% Internal Structure
+    subgraph "Store Environment"
+        Worker --> Mongo[(MongoDB)]
+        Worker --> Commander[Verifone Commander]
+        WinSW[⚙️ OS Service Manager] -. "Manages" .-> Worker
+    end
 ```
 
 Lifecycle:
@@ -179,13 +184,13 @@ StoreDesk Mobile and StoreDesk never connect to Commander directly.
 
 ## Service, paths, logs, and recovery target
 
-Location decision: implement the private service-manager package at `store-desk-worker/packages/service-manager/`, versioned and released with Worker. Electron consumes the signed artifact and typed local IPC client only. This keeps privileged lifecycle/config logic beside its sole managed runtime, avoids a sixth submodule/repository and source duplication, and permits Worker/service-manager compatibility testing in one CI/release graph.
+Location decision: Electron manages OS services directly (via `sudo-prompt` and WinSW/native commands). The `store-desk-worker/packages/service-manager/` folder has been removed. StoreDesk Electron bundles/launches only the necessary configurations.
 
-| Platform | Manager / Worker service | Config and data | Logs / recovery |
-|----------|--------------------------|-----------------|-----------------|
-| Windows | `StoreDeskServiceManager` / `StoreDeskWorker` via WinSW | `%ProgramData%\StoreDesk` data/config; versioned binaries under `%ProgramFiles%\StoreDesk\releases` | `%ProgramData%\StoreDesk\logs|diagnostics`; machine DPAPI or SYSTEM-only key file |
-| macOS | `dev.storedesk.service-manager` / `dev.storedesk.worker` via launchd | `/Library/Application Support/StoreDesk`; releases kept separately | `/Library/Logs/StoreDesk`; System Keychain or root-only key file |
-| Linux | `storedesk-service-manager.service` / `storedesk-worker.service` via systemd | `/etc/storedesk` config, `/var/lib/storedesk` data, `/opt/storedesk/releases` | `/var/log/storedesk`, `/var/lib/storedesk/diagnostics`; root-only key |
+| Platform | Worker / Cloudflared service | Config and data | Logs / recovery |
+|----------|------------------------------|-----------------|-----------------|
+| Windows | `StoreDeskWorker` / `Cloudflared` via WinSW | `%ProgramData%\StoreDesk` data/config; versioned binaries under `%ProgramFiles%\StoreDesk\releases` | `%ProgramData%\StoreDesk\logs|diagnostics`; machine DPAPI or SYSTEM-only key file |
+| macOS | `dev.storedesk.worker` / `dev.storedesk.cloudflared` via launchd | `/Library/Application Support/StoreDesk`; releases kept separately | `/Library/Logs/StoreDesk`; System Keychain or root-only key file |
+| Linux | `storedesk-worker.service` / `storedesk-cloudflared.service` via systemd | `/etc/storedesk` config, `/var/lib/storedesk` data, `/opt/storedesk/releases` | `/var/log/storedesk`, `/var/lib/storedesk/diagnostics`; root-only key |
 
 Recovery rules:
 
@@ -208,7 +213,7 @@ Required E2E matrix covers cross-tenant/assignment denial, immutable hierarchy b
 
 ## Already applied this WO (frontend IA)
 
-- Sidebar restored to product flow: Dashboard, POS, Products, Price Book, Vendors, Invoice Upload, Review Queue, Mobile, Settings  
+- Sidebar restored to product flow: Dashboard, POS, Products, Price Book, Vendors, Mobile, Settings  
 - Default route → `/dashboard` (not only POS)  
 - Settings “More tools” demoted to Pricing rules / Vendor prices / Lottery only  
 

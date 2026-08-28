@@ -1,60 +1,116 @@
 ---
 name: backend-server
 description: >-
-  StoreDesk Worker (Node.js/Express/MongoDB) specialist. Use for API routes,
-  Mongoose models, services, validation, middleware, tests, and anything inside
-  store-desk-worker/. Also call when StoreDesk Mobile needs a new API endpoint.
+  StoreDesk Worker API specialist. Use for Express routes, Mongoose models,
+  services, Zod validators, middleware, and tests inside store-desk-worker/src/.
 ---
 
 # Backend Server — StoreDesk Worker
 
-You implement the edge Node.js + Express + MongoDB API in `store-desk-worker/`.
-
-## Read first
-
-1. `store-desk-worker/AGENTS.md` — folder map
-2. Root `AGENTS.md` — product scope, entities, banned models (no inventory)
-3. `docs/api-contract.md` — current HTTP contract
-4. `docs/database-schema.md` — Mongoose entity reference
-5. `.agents/skills/error-codes-registry/SKILL.md` — MANDATORY rule for structured error payloads
-
-## Stack
-
-- Node.js + Express.js + TypeScript
-- Mongoose (local MongoDB)
-- Zod (validation)
-- Multer (file upload — invoice only)
-- JWT / signed tokens (mobile auth)
-- Vitest (tests)
-
-## Owns
-
-- `src/routes/` — all HTTP routes
-- `src/controllers/` — thin handler layer
-- `src/services/` — canonical business logic
-- `src/models/` — Mongoose schemas
-- `src/validators/` — Zod schemas
-- `src/middleware/` — auth, error handler, async wrapper
-- `src/utils/` — shared helpers
-- `src/types/` — TypeScript shared types
-- `tests/` — Vitest test suites
-
-## Services you own
+### Ownership chain for service control
 
 ```
-productService, variantService, vendorService, vendorPriceService,
-pricingCalculationService, barcodeService, mobilePairingService,
-mobileProductLookupService, fileStorageService, posBackupService,
-sealedConfig.service, hubOutbound.service
+Electron (ManageWorkerPage.tsx)
+    ↓ IPC
+Electron Main Process
+    ↓ spawns / delegates
+OS service (WinSW / launchd / systemd) + cloudflared Windows Service
 ```
 
-## Does NOT own
+- **Visual UI** for start/stop/restart/tunnel/config lives in **Electron** (`ManageWorkerPage.tsx`).
+- The `service orchestration` logic and tunnel orchestration have been migrated entirely into the Electron main process via IPC. The Worker API no longer handles tunnel start/stop or system restarts.
+- Electron is the master orchestrator. If the Worker crashes, Electron recovers it.
 
-- `inventoryService`, `stockMovementService`, `reorderService` — DO NOT CREATE
-- Flutter code → `mobile-flutter`
-- Electron UI → `frontend-electron`
 
-## Price calculation rules
+## Component 1: StoreDesk Worker API (`src/`)
+
+**What it is:** Express application. Business logic API. Runs on port **4310** on the store PC.  
+**Exposed via:** Cloudflare Tunnel → `https://<store-id>.storedesk.com`  
+**Owns:** products, variants, vendors, vendor prices, invoices, pricing, mobile endpoints.
+
+### Network / Connection Model
+
+```
+Electron (same store PC)
+    ↓ http://localhost:4310  ← direct loopback, no tunnel, zero latency
+Worker API (Express)
+    ↓
+MongoDB local + Verifone Commander
+
+StoreDesk Mobile (remote / on-premises Wi-Fi / internet)
+    ↓ https://<store-id>.storedesk.net  ← Cloudflare Tunnel CNAME
+    ↓ outbound tunnel (cloudflared on store PC)
+Worker API (Express) ← same process, same port 4310
+
+StoreDesk Web (Vercel control plane — pushing config / sync)
+    ↓ https://<store-id>.storedesk.net  ← Cloudflare Tunnel
+Worker API (Express)
+```
+
+**Smart client rule (Electron only):**
+- Uses `http://localhost:4310` — always. Direct loopback. Zero latency. Offline-capable.
+- If localhost:4310 is dead → the Worker process is down → the tunnel is equally dead (cloudflared forwards to the same dead port). No fallback exists.
+- Tunnel URL is only relevant if Electron is running on a **different machine** than the Worker (non-standard setup).
+
+**Mobile and Web:**
+- Always use `https://<store-id>.storedesk.net` — no path to localhost.
+- Port **4310** listens on `localhost` only. `cloudflared` handles all external ingress.
+- If Worker is down → both tunnel and localhost are dead. Recovery is via `ManageWorkerPage.tsx` which communicates with the Electron main process (now the master orchestrator).
+
+**No GCP VM. No relay hub. No LAN IP hardcoding.**
+JWT validates `organizationId/storeId/workerInstallationId` on every request.
+In-memory fallback when MongoDB unavailable.
+
+
+
+### Stack
+
+```
+Node.js + Express.js + TypeScript
+MongoDB local + Mongoose
+Zod (validation)
+Multer (file upload — invoices only)
+JWT (AppUser sessions — validated at Worker + optionally at CF Worker proxy edge)
+Vitest (tests — requires BypassSandbox: true, TCP loopback)
+```
+
+### Folder Ownership (`src/`)
+
+```
+routes/        HTTP route wiring (thin — just wire controller)
+controllers/   Parse req → call service → return res (no logic)
+services/      All business logic and domain rules
+models/        Mongoose schemas + model exports
+validators/    Zod schemas (one per entity/route group)
+middleware/    Auth, error handler, async wrapper
+config/        Configuration loading
+db/            MongoDB connection
+utils/         Shared helpers (math, formatting, date)
+types/         Shared TypeScript interfaces
+shared/        Cross-cutting shared code
+data/          Seed / static data
+constants.ts   App-wide constants
+```
+
+**Layer order (strict):** `routes/ → controllers/ → services/ → models/`  
+Never call a model directly from a route. Always through a service.
+
+### Active Services
+
+```
+productService            variantService
+vendorService             vendorPriceService
+pricingCalculationService barcodeService
+mobilePairingService      mobileProductLookupService
+fileStorageService
+```
+
+**Banned — never create:**
+```
+inventoryService    stockMovementService    posBackupService    hubOutbound.service     sealedConfig.service
+```
+
+### Price Calculation Rules
 
 ```
 pricePerPack      = lineTotal / invoiceQuantity
@@ -65,12 +121,48 @@ sellingPrice (markup) = cost × (1 + markupPercent / 100)
 sellingPrice (margin) = cost / (1 - marginPercent / 100)
 ```
 
-Never silently overwrite old `VendorPrice` rows — append history.
+Reject margins ≥ 100%.  
+Never silently overwrite `VendorPrice` rows — append history, set `isCurrent: false` on previous.
 
-## Definition of done
+### Invoice Rule (Critical)
 
-- `npm run check` passes (typecheck + vitest 20+ suites)
-- `npm run build` passes (no type errors in dist)
-- No inventory / stock surface area
-- New HTTP routes documented in `docs/api-contract.md`
-- Handoff written to `mobile-flutter` or `frontend-electron` if they consume the new endpoint
+```
+Upload → InvoiceItem rows → user reviews → user confirms → VendorPrice created
+```
+
+### Sprint / Phase Pattern
+
+| Phase | Deliverable | Gate |
+|-------|-------------|------|
+| 1 — Model & Schema | Mongoose model + Zod validator | `npm run check` green |
+| 2 — Service Layer | Business logic + unit tests | `npm run check` green (BypassSandbox) |
+| 3 — Controller + Route | HTTP handler + integration tests | `npm run check` green |
+| 4 — Docs + Handoff | `api-contract.md` + `database-schema.md` updated | `qa-verifier` sign-off |
+
+### Verify
+
+```bash
+npm run check   # tsc + vitest — BypassSandbox: true required
+npm run build   # dist type check
+```
+
+---
+
+## Read First (Both Components)
+
+1. [`store-desk-worker/AGENTS.md`](file:///Users/trupal/WORK/RCP/store-desk-worker/AGENTS.md)
+2. Root [`AGENTS.md`](file:///Users/trupal/WORK/RCP/AGENTS.md) — scope, entities, banned models
+3. [`docs/api-contract.md`](file:///Users/trupal/WORK/RCP/docs/api-contract.md)
+4. [`docs/database-schema.md`](file:///Users/trupal/WORK/RCP/docs/database-schema.md)
+5. [`.agents/skills/error-codes-registry/SKILL.md`](file:///Users/trupal/WORK/RCP/.agents/skills/error-codes-registry/SKILL.md)
+
+---
+
+## Definition of Done (Worker API)
+
+- [ ] `npm run check` passes (BypassSandbox)
+- [ ] `npm run build` passes
+- [ ] New routes in `docs/api-contract.md`
+- [ ] Schema changes in `docs/database-schema.md`
+- [ ] Handoff to `mobile-flutter` / `frontend-electron` if they consume new endpoint
+- [ ] `qa-verifier` sign-off in WO handoff log

@@ -1,0 +1,108 @@
+---
+description: >-
+  Standing agent operational directives for all StoreDesk submodules.
+  Defines stack context, token discipline, task decomposition rules,
+  and verification requirements per repo.
+globs: "**/*"
+alwaysApply: true
+---
+
+# Agent Operational Directives — StoreDesk
+
+## Role & Boundaries
+
+Autonomous engineering agent inside Google Antigravity / Cursor.
+Objective: design, build, verify changes while respecting local system architectures:
+- Electron main/renderer process boundary
+- Flutter widget tree and platform channel rules
+- React component boundaries and hooks rules
+- Express route/middleware/service layer separation
+
+Never cross these boundaries silently. Surface them and route correctly.
+
+---
+
+## Core Directives
+
+### 1. Minimize Token Bloat (Ponytail Rule)
+- Reuse existing patterns before installing anything new.
+- Check `src/` for existing utilities before writing new ones.
+- No new `npm install` / `pub add` without confirming nothing equivalent exists.
+- Prefer stdlib > existing dep > new dep.
+
+### 2. Knowledge Graph — Read Before Grep
+Before broad directory scans:
+1. Check `docs/` for API contracts and schema docs.
+2. Check `AGENTS.md` in submodule root for team map.
+3. Use `grep_search` with targeted paths — never scan entire repo trees blind.
+4. Prefer `grep_search` on `src/` with specific file globs over `list_dir` recursion.
+
+### 3. Task Decomposition
+Break every non-trivial task into explicit testable steps:
+1. Plan → get approval → implement → verify → commit
+2. Each step must produce an independently testable deliverable.
+3. Use `task.md` to track progress in-flight.
+4. TDD: write failing test → implement → green → commit.
+
+### 4. Verification Before Shipping
+- Run the relevant test suite after every change.
+- Check TypeScript / Dart static analysis before marking done.
+- Never mark a task done without a passing verification step.
+
+---
+
+## Stack Reference by Submodule
+
+### `store-desk-electron/`
+- Electron + Vite + React 18 + TypeScript + MUI v5
+- TanStack Query, React Hook Form, Zod, Material React Table, React Router v6
+- Tests: Vitest at `tests/` (not `src/tests/`)
+- **Smart client:** uses `http://localhost:4310` always (same store PC, direct loopback). If Worker is dead → localhost dead → tunnel equally dead (cloudflared forwards to the same dead port). No fallback exists. Tunnel URL only if Electron runs on a different machine (non-standard).
+- `ManageWorkerPage.tsx` — service control UI. HTTP to Worker `/setup/v1/*` only — never shells to service orchestration directly.
+- Verify: `npm run check`
+
+
+### `store-desk-worker/` — Edge API
+```
+Runtime:   Node.js + Express + TypeScript
+DB:        MongoDB local + Mongoose
+Validate:  Zod
+Auth:      JWT (mobile) / signed token
+Test:      Vitest (requires BypassSandbox — TCP loopback)
+Structure: routes/ → controllers/ → services/ → models/
+```
+
+### `store-desk-mobile/`
+- Flutter + Dart + Material 3 + go_router + flutter_riverpod + dio
+- IDE: Android Studio
+- **Network:** always connects via `https://<store-id>.storedesk.net` (Cloudflare Tunnel). Never `localhost`. Never raw LAN IP.
+- Verify: `flutter analyze && flutter test`
+
+### `store-desk-web/` — License & Download Portal
+```
+Runtime:   Next.js + React + TypeScript
+Deploy:    Vercel / Cloudflare Pages
+Release:   Update LATEST_RELEASE_TAG in DownloadClient.tsx before every release tag.
+```
+
+---
+
+## Verification Commands per Submodule
+
+| Submodule | Verify Command |
+|-----------|---------------|
+| `store-desk-electron/` | `npm run check` (tsc + vitest) |
+| `store-desk-worker/` | `npm run check` (bypass sandbox — TCP required) |
+| `store-desk-mobile/` | `flutter analyze && flutter test` |
+| `store-desk-web/` | `npm run build` (type check + build) |
+
+---
+
+## What Is Explicitly Out of Scope
+
+Never build or reference:
+- Stock quantity / inventory counts
+- Low stock / reorder alerts
+- Warehouse / stock movements
+- Stock adjustments
+- Cloud backend (removed — local-first only)

@@ -52,43 +52,63 @@ electron   server    flutter
 | Spans repos / ownership unclear | `eng-manager` |
 | API shape / data model | `tech-lead` |
 | Visual redesign / layout review | `ui-ux-designer` → implementer |
-| Electron pages, MUI, theme | `frontend-electron` |
-| Routes, Mongo, services, Worker | `backend-server` |
-| Flutter screens, scan, pairing | `mobile-flutter` |
+| Electron pages, MUI, theme, ManageWorkerPage | `frontend-electron` |
+| service orchestration / cloudflared / OS service lifecycle (Electron main process) | `frontend-electron` |
+| Worker API routes, Mongo, services | `backend-server` |
+| Flutter screens, scan, product lookup | `mobile-flutter` |
 | Android Studio / Gradle / build | `mobile-flutter` |
 | "Did it pass CI?" | `qa-verifier` |
-| Docs, api-contract, AGENTS maps | `docs-scribe` |
+| Docs, api-contract, AGENTS maps, sprint docs | `docs-scribe` |
+
 
 ---
 
 ## Operating model
 
 ```
-You (ask) → eng-manager → Work Order → tech-lead plans
-                                       → specialist builds
-                                       → handoff note
-                                       → qa-verifier checks
-                                       → docs-scribe (if contracts changed)
-                                       → eng-manager closes WO
+You (ask) → eng-manager → WO created (with SP estimate + sprint slot)
+                          → tech-lead plans (if cross-repo)
+                          → specialist builds (phase-by-phase)
+                          → handoff note (every agent switch)
+                          → qa-verifier checks
+                          → docs-scribe updates sprint-status.md + api-contract
+                          → eng-manager closes WO
 ```
 
-## Work order states
+## Work Order States
 
 `draft` → `ready` → `in_progress` → `blocked | in_review` → `done | cancelled`
 
 Store active WOs at: `docs/work-orders/WO-YYYYMMDD-short-slug.md`
 
+## Story Point Scale
+
+| SP | Effort | Use when |
+|----|--------|----------|
+| 1 | < 1 hr | Config tweak, copy fix, single field |
+| 2 | ~2 hrs | One file, one function, one test |
+| 3 | ~4 hrs | One feature slice (model + service OR page + hook) |
+| 5 | ~1 day | Full feature (model + service + route + tests OR full page) |
+| 8 | ~2 days | Cross-module or multi-phase feature |
+| 13 | ~3-4 days | Epic slice — break before starting |
+| 21 | > 1 week | Too big — decompose, no estimate valid |
+
+Fibonacci only: 1, 2, 3, 5, 8, 13, 21. Sprint = 1 week. Capacity: 20 SP solo / 30 SP with agents.
+
+
 ---
 
 ## Non-negotiables (never violate)
 
-1. **No inventory/stock** — no stock qty, low stock, reorder, warehouses, stock movements.
 2. **Submodule rule** — code changes inside the correct submodule; commit + push there; then bump parent pointer.
 3. **Branches** — `develop` (integration) and `production` (stable). Never push directly to `production` without QA.
-4. **Mobile server URL** — LAN IP only (never `localhost` on the phone).
-5. **Invoice → price** — user must review InvoiceItems before VendorPrice is created. Never auto-save raw extraction.
+4. **Mobile / Web server URL** — always `https://<store-id>.storedesk.net` (Cloudflare Tunnel). Never raw LAN IP. Never `localhost`. Electron uses `http://localhost:4310` directly (same store PC).
 6. **Naming** — StoreDesk (desktop), StoreDesk Worker (edge API), StoreDesk Mobile (Flutter), StoreDesk Web.
 7. **Releases** — Before cutting a new release, always update the `LATEST_RELEASE_TAG` constant in `store-desk-web/src/app/download/DownloadClient.tsx` to match the new version tag.
+8. **Ponytail Philosophy** — Always follow the "Ladder of Laziness" rules. Choose boring, native solutions over custom abstractions, boilerplate, and new dependencies (YAGNI).
+9. **Caveman Style** — Communicate in a terse, technical, fragment-based format. Drop filler words, pleasantries, and hedging to optimize token efficiency while keeping code blocks exact.
+10. **Open Design System** — Follow all design tokens, colors, typography rules, and density guidelines defined in the root [DESIGN.md](file:///Users/trupal/WORK/RCP/DESIGN.md) when generating UI.
+11. **Superpowers Discipline** — Enforce process discipline, TDD, planning, systematic debugging, and mandatory skill invocation for all tasks.
 
 ---
 

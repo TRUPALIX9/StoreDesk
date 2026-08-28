@@ -28,26 +28,27 @@ jobs:
           npm install
           npm run build
           npm install -g pkg
-          mkdir -p ../store-desk-electron/build
-          pkg dist/index.js -t node18-win-x64 -o ../store-desk-electron/build/worker.exe
+          mkdir -p ../resources/bin
+          pkg dist/index.js -t node18-win-x64 -o ../resources/bin/worker.exe
 
       - name: Install & Package Electron App
         working-directory: ./store-desk-electron
         run: |
-          npm install --legacy-peer-deps
+          npm install
+          npm run fetch-binaries
           npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Rename Windows Artifact
         working-directory: ./store-desk-electron/release
-        run: Get-ChildItem -Filter *.exe | Rename-Item -NewName "StoreDesk.Windows.Setup.exe"
+        run: Get-ChildItem -Filter *.exe | Rename-Item -NewName "StoreDesk Windows Setup.exe"
 
       - name: Upload StoreDesk Setup Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StoreDesk-Setup-Windows
-          path: store-desk-electron/release/StoreDesk.Windows.Setup.exe
+          path: store-desk-electron/release/StoreDesk Windows Setup.exe
 
   build-android:
     runs-on: ubuntu-latest
@@ -108,3 +109,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Update Vercel Download Link in Web Repo
+        working-directory: ./store-desk-web
+        run: |
+          FILE="src/app/download/DownloadClient.tsx"
+          TAG_NAME="${{ github.ref_name }}"
+          
+          # Replace the version in the APK and EXE URLs using sed
+          sed -i "s|releases/download/v[0-9]*\.[0-9]*\.[0-9]*/|releases/download/${TAG_NAME}/|g" "$FILE"
+          
+          # Ensure the EXE file name points to the standard one we rename it to
+          sed -i "s|StoreDesk\.Setup\.[0-9]*\.[0-9]*\.[0-9]*\.exe|StoreDesk%20Windows%20Setup.exe|g" "$FILE"
+          
+          # Commit the changes back to store-desk-web repository to trigger Vercel
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout production
+          git add "$FILE"
+          git commit -m "chore: auto-update download links to $TAG_NAME" || echo "No changes to commit"
+          git push origin production || echo "Nothing to push"

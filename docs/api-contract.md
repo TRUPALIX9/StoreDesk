@@ -8,7 +8,7 @@ JSON request/response bodies unless noted. Errors return `{ "error": "message" }
 
 - Existing local application routes remain under `/api/*`.
 - Setup/control-plane HTTP uses `/api/v1/*`; Hub messages include `"version": 1`.
-- Service-manager commands use privileged local IPC/CLI, not Worker `:4310` and never Hub relay.
+- Service orchestration uses privileged local IPC internal to Electron, not Worker `:4310` and never Hub relay.
 - StoreDesk Worker is the only application API target. StoreDesk and StoreDesk Mobile never access MongoDB or Commander directly.
 - `setup-v1` preserves local-first LAN operation on `0.0.0.0:4310`; it does not add inventory or stock APIs.
 
@@ -97,7 +97,7 @@ Success (`201`, returned once):
 }
 ```
 
-Electron performs no cloud login. With no activated local Worker it goes directly to setup-key onboarding, accepts acknowledgements, then transfers the key and acknowledgement payload over authenticated protected local IPC to the Worker activation path and clears renderer/form state. Only StoreDesk Worker calls redemption over TLS. The service manager may broker protected handoff and seal-file ACL operations, but its IPC response and logs never contain the permanent credential.
+Electron performs no cloud login. With no activated local Worker it goes directly to setup-key onboarding, accepts acknowledgements, then transfers the key and acknowledgement payload over authenticated protected local IPC to the Worker activation path and clears renderer/form state. Only StoreDesk Worker calls redemption over TLS. Electron may broker protected handoff and seal-file ACL operations, but its IPC response and logs never contain the permanent credential.
 
 Web atomically validates the setup-key hash, exact organization/store/installation/contact-email binding, subscription entitlement, current EULA/privacy/system versions and document hash, TTL/attempt budget, and installation identity before consuming the key, recording immutable acceptance/redemption audit, and creating one Worker credential. The server records redemption time independently. Same-installation retries with the same idempotency key return safe completion status, not the credential; concurrent or replayed redemption cannot mint another credential.
 
@@ -146,36 +146,22 @@ These Worker routes are safe projections for approved local clients; they cannot
 |--------|------|-------------|
 | GET | `/api/setup/v1/status` | Setup state, versions, entitlement freshness, dependency summaries, and last transition correlation ID |
 | POST | `/api/setup/v1/activation` | Submits a setup key and EULA acceptance reference to the local activation service; body is write-only and response never echoes either |
+| GET | `/api/setup/v1/tunnel/status` | Read Cloudflare Tunnel daemon status |
 | GET | `/api/diagnostics/v1/summary` | Redacted Worker/database/Commander/Hub health for an authorized desktop user |
-| POST | `/api/diagnostics/v1/bundle` | Ask service manager to create a bounded redacted bundle; returns job metadata/path handle, not secrets |
+| POST | `/api/diagnostics/v1/bundle` | Ask Electron to create a bounded redacted bundle; returns job metadata/path handle, not secrets |
 
 Remote relay may access diagnostics summary only with explicit `diagnostics:read`; privileged activation, bundle creation, service control, config, update, and rollback routes are never relayable.
 
-## Privileged service-manager CLI/IPC v1
+## Privileged Service Orchestration (Electron)
 
-CLI executable: `storedesk-service`. JSON mode emits `contractVersion`, `command`, `ok`, `state`, `correlationId`, and a safe `error` when needed.
-
-```txt
-storedesk-service install
-storedesk-service uninstall
-storedesk-service status [--json]
-storedesk-service start|stop|restart worker
-storedesk-service activate --setup-key-stdin
-storedesk-service config validate
-storedesk-service update check|stage|apply [--version <semver>]
-storedesk-service rollback [--to <semver>]
-storedesk-service diagnostics collect [--output <path>]
-storedesk-service recovery status|reactivate
-```
+Electron acts as the master orchestrator, using internal IPC and `sudo-prompt` to manage OS services directly via WinSW (Windows) and native commands (launchd/systemd).
 
 Rules:
 
-- Setup-key input is stdin/OS-protected IPC only, never a positional argument.
-- IPC is a Windows named pipe or root-owned Unix domain socket with peer identity checks and SYSTEM/root/admin ACLs.
+- Setup-key input is OS-protected IPC only, never a positional argument.
 - Destructive uninstall, rollback, or recovery requires local elevation and confirmation/noninteractive policy.
 - Update accepts only a signed manifest, pinned signing identity, compatible schema range, and matching artifact digest.
 - Diagnostic bundles contain lifecycle/version/service/dependency/update summaries and bounded logs after redaction. Secret-pattern tests must fail bundle creation if redaction cannot be guaranteed.
-- CLI exit codes: `0` success, `2` invalid input, `3` authorization/elevation required, `4` invalid lifecycle transition, `5` dependency unavailable, `6` health gate failed/rollback started, `7` recovery required.
 
 ## Organizations, app users, assignments, and client sessions v1
 
@@ -319,24 +305,6 @@ Alias: `/api/prices` mirrors `/api/vendor-prices`.
 | GET | `/api/vendor-prices/best/:variantId` |
 | GET | `/api/vendor-prices/history/:variantId` |
 
-## Invoices
-
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/invoices/upload` | multipart file |
-| GET | `/api/invoices` | List invoices |
-| GET | `/api/invoices/:id` | Get invoice |
-| POST | `/api/invoices/:id/extract` | Start extraction |
-| GET | `/api/invoices/:id/items` | List review rows |
-| PUT | `/api/invoice-items/:id` | Update one review row |
-| POST | `/api/invoices/:id/confirm-prices` | Confirm reviewed prices |
-
-## Review queue
-
-| Method | Path |
-|--------|------|
-| GET | `/api/review-queue` |
-
 ## Pricing (planned)
 
 | Method | Path |
@@ -362,12 +330,5 @@ Alias: `/api/prices` mirrors `/api/vendor-prices`.
 | GET | `/api/mobile/vendor-prices/:variantId/best` |
 | GET | `/api/mobile/pricing/suggestion/:variantId` |
 | GET | `/api/mobile/vendors` |
-| POST | `/api/mobile/invoices/upload` | _(legacy — Worker may still expose; current Flutter client does not use)_ |
-| GET | `/api/mobile/invoices/:invoiceId/status` | _(legacy — unused by current Flutter client)_ |
-| GET | `/api/mobile/review-queue` |
 
 These routes are reachable only through an assignment-scoped Hub session issued by `/api/v1/app-auth/*`. The legacy `/api/mobile/pair/request` and `/api/mobile/pair/confirm` routes are retired from the target contract and must not be used by new Electron/Mobile flows.
-
-## Invoice confirm rule
-
-`POST /api/invoices/:id/confirm-prices` creates **VendorPrice** records only. It must not create or update inventory.

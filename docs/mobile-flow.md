@@ -24,11 +24,11 @@ The phone **never** connects to MongoDB or Commander directly.
 
 ## 2. Access model (license → org users)
 
-```txt
-StoreDesk Web admin
-  → create Organization + Store license
-  → provision AppUsers for that organization
-  → Desktop / Mobile sign in as those users
+```mermaid
+graph LR
+    Admin[🌐 StoreDesk Web Admin] -->|Creates| Org[Organization & Store License]
+    Org -->|Provisions| AppUser[AppUsers]
+    AppUser -->|Sign In| Devices[💻 Desktop / 📱 Mobile]
 ```
 
 There is **no** desktop Mobile Access page for APK download or pairing QR. Configuration is saved on the organization users created with the license.
