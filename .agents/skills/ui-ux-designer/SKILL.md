@@ -50,5 +50,4 @@ A design brief with:
 ## Constraints
 
 - Never approve glow KPIs, rainbow gradients, or heavy animation in store-facing UI
-- Never recommend stock / inventory UI components
 - Always prefer existing primitives (`PageShell`, `SectionCard`, `DataTableCard`) over new patterns

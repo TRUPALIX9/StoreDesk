@@ -150,7 +150,6 @@ If the APK is missing, Worker returns **404 JSON** with build instructions. The 
 7. Confirm pairing QR / APK URL screens are gone.
 8. Scan or search a product; view vendor prices.
 9. Confirm **no** invoice upload/review UI on desktop or mobile.
-10. Confirm **no inventory/stock screens** exist anywhere.
 
 ## iPhone path
 

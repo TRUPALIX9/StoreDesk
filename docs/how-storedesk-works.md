@@ -19,17 +19,6 @@ It helps the store owner and staff:
 - Run **StoreDesk** on a phone (Play beta) with AppUser login against the assigned Worker
 - Manage **store licenses** and agent keys on StoreDesk Web (Vercel + Atlas M0)
 
-It is **not** a stock / inventory-count system.
-
-| In scope | Out of scope |
-|----------|----------------|
-| Products, variants, UPCs | On-hand quantity |
-| Vendor costs and history | “Add stock” / “reduce stock” |
-| Manual vendor prices / Price Book costs | Invoice upload/review UI (removed from desktop) |
-| Suggested selling price from margin/markup | Low-stock / reorder alerts |
-| POS sales summary, analytics, sale tax helpers | Warehouse locations / stock movements |
-| Org AppUsers from Web license | Direct phone → MongoDB; local APK QR / pairing codes |
-
 ---
 
 ## 2. The apps
@@ -172,9 +161,9 @@ Open Price Book → live Commander vPLUs (+ local overlays)
 
 Details: [`verifone-commander-price-book.md`](./verifone-commander-price-book.md). Suggested sell from pricing rules (margin ≥ 100% rejected) still applies on the Product/Variant path; Price Book Cost Analysis shows margin vs overlay costs.
 
-### C. Vendor costs (no invoice UI)
+### C. Vendor costs
 
-Vendor costs are entered **manually** (Vendor Prices / Price Book overlays). Invoice upload and extraction review were removed from StoreDesk desktop and mobile.
+Vendor costs are entered **manually** (Vendor Prices / Price Book overlays).
 
 ### D. Price Book
 
@@ -305,4 +294,4 @@ All of that stays **on the local network** — no required cloud backend.
 
 ## 11. One-sentence summary
 
-**StoreDesk is the store’s local command center for POS visibility, catalog/vendor costs, and org-licensed desktop/phone access — running through StoreDesk Worker on the LAN (Hub later), without stock-count inventory or invoice upload.**
+**StoreDesk is the store’s local command center for POS visibility, catalog/vendor costs, and org-licensed desktop/phone access — running through StoreDesk Worker on the LAN (Hub later).**

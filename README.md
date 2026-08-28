@@ -8,8 +8,6 @@
 
 It is designed with a **hybrid local-first architecture**: the system runs through a **Local Store Connection** (StoreDesk Worker) that talks directly to the local Verifone Commander register. This protects the store from internet outages. An optional cloud connection synchronizes reports directly into Google Sheets and relays connections for the **StoreDesk Mobile Scanner**.
 
-**Note:** StoreDesk is **not** an inventory system. It focuses on products, retail prices, vendor costs, Google Sheets reports, and Cost Analysis—not stock counts, warehouse locations, or reorder levels.
-
 ---
 
 ## 1. System Architecture & End-to-End Flow
@@ -20,7 +18,7 @@ StoreDesk is built as a single parent repository with submodules for each applic
 | App | Folder | Tech | Role |
 | --- | --- | --- | --- |
 | **StoreDesk Worker** | `store-desk-worker/` | Node.js + Express | **Local Store Connection.** Runs on the store PC (`0.0.0.0:4310`). This is the Source of Truth. It talks directly to Verifone Commander and local Mongo. |
-| **StoreDesk** | `store-desk-electron/` | Electron + React | **Desktop Dashboard.** Runs on the store PC. Features Price Book, Cost Analysis, POS sales, and Invoice Review. |
+| **StoreDesk** | `store-desk-electron/` | Electron + React | **Desktop Dashboard.** Runs on the store PC. Features Price Book, Cost Analysis, and POS sales. |
 | **StoreDesk Mobile** | `store-desk-mobile/` | Flutter | **StoreDesk Mobile Scanner.** Turn any phone into a price checker. Scan barcodes, search products, view vendor prices. |
 | **StoreDesk Web** | `store-desk-web/` | Next.js + Atlas | **Web Dashboard.** Central admin for managing subscriptions, stores, and licensing. |
 

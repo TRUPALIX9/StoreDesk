@@ -34,6 +34,33 @@ StoreDesk service manager ── local privileged service/update/config operatio
 
 Store data remains local even though the primary client identity/transport flow uses Cloud Hub. Clients never connect directly to MongoDB or Atlas. Manual LAN URL entry, manual Worker selection, QR/6-digit pairing, and pairing-first UI are retired target behavior. Emergency local recovery, if retained, is disabled by default, requires explicit elevated support policy, and is outside normal onboarding. Cloud/auth/Hub loss produces explicit offline/unavailable messaging; it must not silently broaden assignments or fall back to unauthenticated LAN access.
 
+## Local Connection Model
+
+```mermaid
+graph TD
+    subgraph "Store Environment"
+        Desktop["💻 StoreDesk Desktop (Electron)"]
+        Mongo[("🗄️ MongoDB (Local)")]
+        Worker["⚙️ StoreDesk Worker (Node.js)"]
+        CF_Tunnel["🚇 cloudflared (OS Service)"]
+        WinSW["⚙️ WinSW Service Manager"]
+
+        Desktop -- "http://localhost:4310" --> Worker
+        Worker -- "mongoose" --> Mongo
+        CF_Tunnel -- "reverse proxy" --> Worker
+        WinSW -. "manages" .-> Worker
+        WinSW -. "manages" .-> CF_Tunnel
+    end
+
+    subgraph "Cloud & Mobile"
+        Mobile["📱 StoreDesk Mobile (Flutter)"]
+        Web["🌐 StoreDesk Web (Control Plane)"]
+        
+        Mobile -- "https://<store-id>.storedesk.net" --> CF_Tunnel
+        Web -- "https://<store-id>.storedesk.net" --> CF_Tunnel
+    end
+```
+
 ## Setup lifecycle v1
 
 The service manager persists the authoritative local state; StoreDesk Worker reports a sanitized projection.
@@ -110,7 +137,7 @@ The service manager creates one 256-bit installation key. Secret local configura
 
 StoreDesk Worker is the only target API process. The legacy `store-desk-electron/src/server` copy is a migration source, not an alternate production runtime. Price Book, Commander PLU lookup/status, POS Reports, T-Log Transactions, storage overlays, and their tests must move into Worker before the embedded server is retired. `COMMANDER_*` secrets belong only in Worker encrypted config. Existing Commander reads remain read-only; write-back needs a separate reviewed contract.
 
-Uploaded invoices and catalog data remain local. Raw extraction never creates a final `VendorPrice`; human review remains mandatory and price history is preserved.
+Uploaded invoices and catalog data remain local. Price history is preserved.
 
 The Worker's first bootstrap/sync is control-plane metadata only: immutable `organizationId`, `storeId`, `workerInstallationId`, support display snapshots, subscription entitlements and grace policy, protocol compatibility, server time, credential status, and Hub reachability/presence. It must not upload or mirror catalog, Commander, invoice, or vendor-price data. Worker records an idempotent bootstrap completion marker and health evidence before Electron/Mobile assignments may connect.
 
@@ -127,9 +154,3 @@ The Worker's first bootstrap/sync is control-plane metadata only: immutable `org
 Rollout phases: contract/threat review → control plane → service manager/Worker → Commander migration → clients/relay → signed update/rollback → staged pilot → general availability. Each phase is backward-compatible with LAN `:4310` until relay E2E is proven.
 
 Parent and submodules use `develop` for integration and `production` for stable releases. See `api-contract.md`, `env-by-project.md`, `system-map.md`, and `database-schema.md`.
-
-## Scope boundaries
-
-In scope: products, variants, vendors, vendor-price history, reviewed invoices, pricing, AppUser assignment-scoped Electron/Mobile access, Commander read integration, setup/service lifecycle, and approved relay.
-
-Never in scope: inventory quantities, stock movements, reorder levels, warehouse locations, direct mobile/desktop MongoDB access, or cloud storage of the store catalog/Commander/invoices.

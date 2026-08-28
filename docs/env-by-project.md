@@ -66,13 +66,13 @@ Production secret config is a versioned AES-256-GCM envelope with a fresh 96-bit
 
 ### Cross-platform service names and paths
 
-The service-manager package is owned by the Worker submodule at `store-desk-worker/packages/service-manager/`. Its release output includes the `storedesk-service` CLI/helper, WinSW/launchd/systemd templates, schemas, and adapter tests. StoreDesk Electron bundles/launches only a signed compatible artifact and typed IPC client; no second source copy or Electron-held secret configuration is permitted.
+Electron orchestrates OS services directly (via `sudo-prompt` and WinSW/native commands). The `store-desk-worker/packages/service-manager/` folder has been removed. StoreDesk Electron bundles/launches only the necessary configurations.
 
-| Platform | Service names | Config / installation key | Data / releases | Logs / diagnostics |
-|----------|---------------|---------------------------|-----------------|--------------------|
-| Windows (WinSW) | `StoreDeskServiceManager`, `StoreDeskWorker` | `%ProgramData%\StoreDesk\config\worker.enc.json`; key protected with machine DPAPI, fallback `%ProgramData%\StoreDesk\keys\installation.key` with SYSTEM/Admin ACL | `%ProgramData%\StoreDesk\data`; `%ProgramFiles%\StoreDesk\releases` | `%ProgramData%\StoreDesk\logs`; `%ProgramData%\StoreDesk\diagnostics` |
-| macOS (launchd) | `dev.storedesk.service-manager`, `dev.storedesk.worker` | `/Library/Application Support/StoreDesk/config/worker.enc.json`; System Keychain, fallback `/Library/Application Support/StoreDesk/keys/installation.key` root-only | `/Library/Application Support/StoreDesk/data`; `/Library/Application Support/StoreDesk/releases` | `/Library/Logs/StoreDesk`; `/Library/Application Support/StoreDesk/diagnostics` |
-| Linux (systemd) | `storedesk-service-manager.service`, `storedesk-worker.service` | `/etc/storedesk/worker.enc.json`; system credential store where available, fallback `/etc/storedesk/installation.key` mode `0600` root | `/var/lib/storedesk`; `/opt/storedesk/releases` | `/var/log/storedesk`; `/var/lib/storedesk/diagnostics` |
+| Platform | Worker / Cloudflared service | Config / installation key | Data / releases | Logs / diagnostics |
+|----------|------------------------------|---------------------------|-----------------|--------------------|
+| Windows (WinSW) | `StoreDeskWorker`, `Cloudflared` | `%ProgramData%\StoreDesk\config\worker.enc.json`; key protected with machine DPAPI, fallback `%ProgramData%\StoreDesk\keys\installation.key` with SYSTEM/Admin ACL | `%ProgramData%\StoreDesk\data`; `%ProgramFiles%\StoreDesk\releases` | `%ProgramData%\StoreDesk\logs`; `%ProgramData%\StoreDesk\diagnostics` |
+| macOS (launchd) | `dev.storedesk.worker`, `dev.storedesk.cloudflared` | `/Library/Application Support/StoreDesk/config/worker.enc.json`; System Keychain, fallback `/Library/Application Support/StoreDesk/keys/installation.key` root-only | `/Library/Application Support/StoreDesk/data`; `/Library/Application Support/StoreDesk/releases` | `/Library/Logs/StoreDesk`; `/Library/Application Support/StoreDesk/diagnostics` |
+| Linux (systemd) | `storedesk-worker.service`, `storedesk-cloudflared.service` | `/etc/storedesk/worker.enc.json`; system credential store where available, fallback `/etc/storedesk/installation.key` mode `0600` root | `/var/lib/storedesk`; `/opt/storedesk/releases` | `/var/log/storedesk`; `/var/lib/storedesk/diagnostics` |
 
 Directories must not be user-writable when loaded by a privileged service. Updates stage beside the active release, retain one last known-good compatible release, and never place store data inside a versioned binary directory. Uninstall preserves data by default; purge requires explicit elevated confirmation. See `architecture.md` and `api-contract.md` for recovery/CLI behavior.
 
