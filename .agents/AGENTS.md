@@ -101,7 +101,7 @@ Fibonacci only: 1, 2, 3, 5, 8, 13, 21. Sprint = 1 week. Capacity: 20 SP solo / 3
 ## Non-negotiables (never violate)
 
 2. **Submodule rule** — code changes inside the correct submodule; commit + push there; then bump parent pointer.
-3. **Branches** — `develop` (integration) and `production` (stable). Never push directly to `production` without QA.
+3. **Branches & Production Rule** — Work, commits, and pushes MUST ALWAYS go to `develop`. NEVER merge or push to `production` unless explicitly instructed by the user. Maintain `docs/develop-to-prod.md` to document all changes queued on `develop` ready for production PRs.
 4. **Mobile / Web server URL** — always `https://<store-id>.storedesk.net` (Cloudflare Tunnel). Never raw LAN IP. Never `localhost`. Electron uses `http://localhost:4310` directly (same store PC).
 6. **Naming** — StoreDesk (desktop), StoreDesk Worker (edge API), StoreDesk Mobile (Flutter), StoreDesk Web.
 7. **Releases** — Before cutting a new release, always update the `LATEST_RELEASE_TAG` constant in `store-desk-web/src/app/download/DownloadClient.tsx` to match the new version tag.
