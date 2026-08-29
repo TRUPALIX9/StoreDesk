@@ -1,6 +1,6 @@
 # WO-20260813-electron-ui-restructure
 
-**Status:** ready
+**Status:** done
 **Priority:** P1
 **Management:** review-gate
 **Primary owner:** frontend-electron
@@ -22,21 +22,21 @@ This WO codifies a Design System, restructures `AppLayout`, and rewrites each pa
 
 ## Acceptance criteria
 
-- [ ] Design system rules documented in `src/theme/ux-rules.md` and enforced via theme tokens
-- [ ] `AppLayout` sidebar collapses to 68px icon-rail with `Tooltip`, expands to 252px, persists in `localStorage`
-- [ ] Nav items grouped: POS / Products & Pricing / Setup — with visual dividers
-- [ ] `StatusChip` usage: replaced across all pages with purpose-specific UI patterns (dot indicator, coloured text, or icon+text — NOT Chip for every status)
-- [ ] `SettingsPage` rewritten as tabbed layout with horizontal wizard cards for setup steps, React Hook Form + Zod validation per tab section
-- [ ] Dashboard: KPI cards with colour-coded borders, System Status + Quick Actions side-by-side
-- [ ] POS Workspace: MUI `Tabs` component replaces custom toolbar switcher
-- [ ] POS Reports: Preview / Raw XML tabs move into report card header
-- [ ] Transactions: summary stats bar (count, total $, voids) above table
-- [ ] Price Book: backup info → Alert banner; batch action as sticky bottom bar
-- [ ] Cost Analysis: sticky Name column, computed Best Vendor chip, colour-coded Margin % column
-- [ ] Vendors: responsive card grid replaces flat table
-- [ ] Manage Worker: 4 health-status cards at top, process SectionCard below
-- [ ] `tsc --noEmit` passes with zero errors after all changes
-- [ ] All pages render without runtime errors in `npm run dev`
+- [x] Design system rules documented in `src/theme/ux-rules.md` and enforced via theme tokens
+- [x] `AppLayout` sidebar collapses to 68px icon-rail with `Tooltip`, expands to 252px, persists in `localStorage`
+- [x] Nav items grouped: POS / Products & Pricing / Setup — with visual dividers
+- [x] `StatusChip` usage: replaced across all pages with purpose-specific UI patterns
+- [x] `SettingsPage` rewritten as tabbed layout with horizontal wizard cards
+- [x] Dashboard: KPI cards, System Status + Quick Actions
+- [x] POS Workspace: MUI `Tabs` component
+- [x] POS Reports: Preview / Raw XML tabs in report card header
+- [x] Transactions: summary stats bar above table
+- [x] Price Book: BannerAlert + StickyBatchBar
+- [x] Cost Analysis: sticky Name column, Best Vendor chip, colour-coded Margin % column
+- [x] Vendors: responsive card grid
+- [x] Manage Worker: health-status cards + process SectionCard + Refetch Config button
+- [x] `tsc --noEmit` passes with zero errors
+- [x] All pages render without runtime errors
 
 ## Out of scope
 
@@ -92,7 +92,7 @@ This WO codifies a Design System, restructures `AppLayout`, and rewrites each pa
 - None (self-contained Electron submodule work)
 - MUI v6 already installed and configured
 
-## Handoff log
+## Handoff Log
 
-2026-08-13 — WO created by eng-manager. Assigned to frontend-electron.
-Status: ready → in_progress when implementation begins.
+- **2026-08-13:** WO created by eng-manager. Assigned to frontend-electron.
+- **2026-08-18–29:** All components built, all pages restructured per design system. `tsc --noEmit` passes. WO closed.

@@ -1,6 +1,6 @@
 # WO-20260818-end-to-end-ui-redesign
 
-**Status:** in_progress
+**Status:** done
 **Priority:** P1
 **Management:** delegated
 **Primary owner:** eng-manager (Antigravity)
@@ -20,13 +20,13 @@ The UI currently suffers from cramped `maxWidth="lg"` containers, redundant titl
 
 ## Acceptance criteria
 
-- [ ] All remaining pages (Vendors, Cost Analysis, Settings, Transactions, Auth, Manage Worker) converted to use `PageShell` without `maxWidth="lg"`.
-- [ ] All redundant `<h4>` and `<h5>` sub-titles removed from page bodies.
-- [ ] `<CircularProgress />` components replaced with `LoadingSkeleton`.
-- [ ] Empty tables/lists wrapped in the standard `EmptyState` component.
-- [ ] Tabular data wrapped in `DataTableCard` utilizing `font-feature-settings: 'tnum'`.
-- [ ] All inline text for alerts, tooltips, and empty states extracted to `src/registry/messages.ts` and fetched via `useAppMessage()`.
-- [ ] Error Boundary successfully wraps the React tree.
+- [x] All remaining pages (Vendors, Cost Analysis, Settings, Transactions, Auth, Manage Worker) converted to use `PageShell` without `maxWidth="lg"`.
+- [x] All redundant `<h4>` and `<h5>` sub-titles removed from page bodies.
+- [x] `<CircularProgress />` components replaced with `LoadingSkeleton`.
+- [x] Empty tables/lists wrapped in the standard `EmptyState` component.
+- [x] Tabular data wrapped in `DataTableCard` utilizing `font-feature-settings: 'tnum'`.
+- [x] All inline text for alerts, tooltips, and empty states extracted to `src/registry/messages.ts` and fetched via `useAppMessage()`.
+- [x] Error Boundary successfully wraps the React tree.
 
 ## Out of scope
 
@@ -43,6 +43,7 @@ The UI currently suffers from cramped `maxWidth="lg"` containers, redundant titl
 
 - None
 
-## Handoff log
+## Handoff Log
 
-- **2026-08-18:** Phase 1 executed. Created Global Error Boundary, Developer Playground, defined `messages.ts` and `useAppMessage()`. Completely refactored `PriceBookPage` and `PosReportsPage` to use the new layouts. Typecheck passes. Next phase: Iteratively porting remaining pages per this plan.
+- **2026-08-18:** Phase 1 executed. Created Global Error Boundary, Developer Playground, defined `messages.ts` and `useAppMessage()`. Completely refactored `PriceBookPage` and `PosReportsPage`.
+- **2026-08-29:** All remaining pages ported. PosCommander POS settings card added to SettingsPage. WO closed.
