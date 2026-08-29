@@ -8,7 +8,7 @@ This project includes:
    Main Electron desktop admin app.
 
 2. **StoreDesk Worker**  
-   Edge Node.js + Express + local MongoDB API on the store PC (not a hosted cloud server).
+   Edge Node.js + Express + local SQLite API on the store PC (not a hosted cloud server).
 
 3. **StoreDesk Mobile**  
    Flutter mobile helper app.
@@ -94,8 +94,7 @@ Use:
 - Node.js
 - Express.js
 - TypeScript
-- MongoDB local
-- Mongoose
+- SQLite local via Prisma ORM
 - Multer for file upload
 - Zod for validation
 - JWT or secure signed token for mobile authentication
@@ -187,7 +186,7 @@ Style:
 
 # Local Connection Rule
 
-StoreDesk Mobile must never connect directly to MongoDB.
+StoreDesk Mobile must never connect directly to the SQLite database.
 
 Correct connection:
 
@@ -198,7 +197,7 @@ Local Wi-Fi API URL
     ↓
 StoreDesk Worker
     ↓
-MongoDB Local
+SQLite Local (Prisma)
 ```
 
 The mobile app connects to the local backend using a URL like:
@@ -466,7 +465,7 @@ Do **not** require Upload Invoice on mobile for the current beta.
 
 # Database Entities
 
-Use these MongoDB collections only:
+Use these SQLite/Prisma tables only:
 
 ```txt
 Product
@@ -1035,7 +1034,7 @@ Setup checklist:
 
 ```txt
 1. Start StoreDesk Worker
-2. Connect MongoDB
+2. Connect Database (SQLite)
 3. Add first vendor
 4. Add first product
 5. Add first product variant

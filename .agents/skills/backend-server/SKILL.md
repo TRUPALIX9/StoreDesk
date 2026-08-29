@@ -1,7 +1,7 @@
 ---
 name: backend-server
 description: >-
-  StoreDesk Worker API specialist. Use for Express routes, Mongoose models,
+  StoreDesk Worker API specialist. Use for Express routes, Prisma models,
   services, Zod validators, middleware, and tests inside store-desk-worker/src/.
 ---
 
@@ -35,7 +35,7 @@ Electron (same store PC)
     ↓ http://localhost:4310  ← direct loopback, no tunnel, zero latency
 Worker API (Express)
     ↓
-MongoDB local + Verifone Commander
+SQLite local + Verifone Commander
 
 StoreDesk Mobile (remote / on-premises Wi-Fi / internet)
     ↓ https://<store-id>.storedesk.net  ← Cloudflare Tunnel CNAME
@@ -59,7 +59,7 @@ Worker API (Express)
 
 **No GCP VM. No relay hub. No LAN IP hardcoding.**
 JWT validates `organizationId/storeId/workerInstallationId` on every request.
-In-memory fallback when MongoDB unavailable.
+In-memory fallback when SQLite unavailable.
 
 
 
@@ -67,7 +67,7 @@ In-memory fallback when MongoDB unavailable.
 
 ```
 Node.js + Express.js + TypeScript
-MongoDB local + Mongoose
+SQLite local + Prisma
 Zod (validation)
 Multer (file upload — invoices only)
 JWT (AppUser sessions — validated at Worker + optionally at CF Worker proxy edge)
@@ -80,11 +80,11 @@ Vitest (tests — requires BypassSandbox: true, TCP loopback)
 routes/        HTTP route wiring (thin — just wire controller)
 controllers/   Parse req → call service → return res (no logic)
 services/      All business logic and domain rules
-models/        Mongoose schemas + model exports
+models/        Prisma schemas + model exports
 validators/    Zod schemas (one per entity/route group)
 middleware/    Auth, error handler, async wrapper
 config/        Configuration loading
-db/            MongoDB connection
+db/            SQLite connection
 utils/         Shared helpers (math, formatting, date)
 types/         Shared TypeScript interfaces
 shared/        Cross-cutting shared code
@@ -134,7 +134,7 @@ Upload → InvoiceItem rows → user reviews → user confirms → VendorPrice c
 
 | Phase | Deliverable | Gate |
 |-------|-------------|------|
-| 1 — Model & Schema | Mongoose model + Zod validator | `npm run check` green |
+| 1 — Model & Schema | Prisma model + Zod validator | `npm run check` green |
 | 2 — Service Layer | Business logic + unit tests | `npm run check` green (BypassSandbox) |
 | 3 — Controller + Route | HTTP handler + integration tests | `npm run check` green |
 | 4 — Docs + Handoff | `api-contract.md` + `database-schema.md` updated | `qa-verifier` sign-off |

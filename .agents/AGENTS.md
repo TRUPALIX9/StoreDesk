@@ -37,7 +37,7 @@ electron   server    flutter
 | Engineering Manager | `skills/eng-manager/SKILL.md` | Intake, WO create/close, routing, unblocking |
 | Tech Lead | `skills/tech-lead/SKILL.md` | Cross-repo architecture, API contracts, spikes |
 | Frontend Electron | `skills/frontend-electron/SKILL.md` | `store-desk-electron/` React/MUI |
-| Backend Server | `skills/backend-server/SKILL.md` | `store-desk-worker/` Express/Mongo |
+| Backend Server | `skills/backend-server/SKILL.md` | `store-desk-worker/` Express/SQLite |
 | Mobile Flutter | `skills/mobile-flutter/SKILL.md` | `store-desk-mobile/` Flutter + Android Studio |
 | UI/UX Designer | `skills/ui-ux-designer/SKILL.md` | Design critique (read-only by default) |
 | QA Verifier | `skills/qa-verifier/SKILL.md` | CI checks, test pass/fail, risk notes |
@@ -54,7 +54,7 @@ electron   server    flutter
 | Visual redesign / layout review | `ui-ux-designer` → implementer |
 | Electron pages, MUI, theme, ManageWorkerPage | `frontend-electron` |
 | service orchestration / cloudflared / OS service lifecycle (Electron main process) | `frontend-electron` |
-| Worker API routes, Mongo, services | `backend-server` |
+| Worker API routes, SQLite, services | `backend-server` |
 | Flutter screens, scan, product lookup | `mobile-flutter` |
 | Android Studio / Gradle / build | `mobile-flutter` |
 | "Did it pass CI?" | `qa-verifier` |
