@@ -5,9 +5,9 @@ Story points: Fibonacci — 1, 2, 3, 5, 8, 13, 21.
 
 ---
 
-# Current Sprint — 2026-W35 (25 Aug – 29 Aug 2026)
+# Current Sprint — 2026-W36 (1 Sep – 5 Sep 2026)
 
-**Goal:** Stabilize agent team config, architecture docs, and skill set to enable clean feature sprints.  
+**Goal:** Full-repo audit → docs updated; begin AppUser Hub session wiring and LotterySetupPage.  
 **Capacity:** 20 SP  
 **Committed SP:** 8
 
@@ -15,9 +15,8 @@ Story points: Fibonacci — 1, 2, 3, 5, 8, 13, 21.
 
 | WO | Title | SP | Owner | Status |
 |----|-------|----|-------|--------|
-| WO-20260827-agent-skills-reconfig | Reconfigure team skills + story point system | 3 | eng-manager | done |
-| WO-20260827-arch-docs-cf-tunnel | Update all docs to reflect CF Tunnel + smart client arch | 3 | docs-scribe | done |
-| WO-20260827-worker-two-component | Clarify Worker API vs service orchestration split in all skills | 2 | backend-server | done |
+| — | Full-repo audit + system-map / schema / sprint docs update | 3 | docs-scribe | done |
+| — | LotterySetupPage — basic UI + Worker lottery routes | 5 | frontend-electron + backend-server | ready |
 
 ## Carried Over
 
@@ -27,22 +26,29 @@ _(none)_
 
 | WO | Title | SP | Priority |
 |----|-------|----|----------|
-| — | Worker `/setup/v1/*` endpoints — complete service control surface | 8 | P1 |
-| — | ManageWorkerPage.tsx — tunnel status + config editor UI | 5 | P1 |
-| — | Mobile: replace LAN IP with CF Tunnel URL in connection flow | 3 | P1 |
-| — | Mobile: AppUser login + assignment-scoped session storage | 5 | P1 |
-| — | Worker: Cloudflare Worker proxy JWT edge validation | 5 | P2 |
-| — | StoreDesk Web: CF API tunnel provisioning on store creation | 8 | P2 |
-| — | Electron: SetupWizardPage — setup-key redemption flow | 8 | P1 |
+| — | AppUser Hub session — mobile + electron login → CF Tunnel | 8 | P0 |
+| — | SetupWizardPage — setup-key redemption backend (Worker) | 8 | P0 |
+| — | Invoice extraction — real PDF/OCR path (pdf-parse + pattern match) | 8 | P0 |
+| — | Worker controllers/ layer — extract from service/route files | 3 | P1 |
+| — | Electron `src/features/` + `src/layouts/` — populate first feature slice | 5 | P1 |
 | — | Worker: `productService` + `variantService` full CRUD + tests | 5 | P2 |
 | — | Worker: `vendorPriceService` price history + best-price query | 5 | P2 |
-| — | Worker: `pricingCalculationService` — margin/markup + rounding | 3 | P2 |
-| — | Electron: Price Book page — Commander PLU + vendor cost columns | 8 | P2 |
 | — | Mobile: Scanner screen — CF Tunnel product lookup | 5 | P2 |
+| — | StoreDesk Web: CF API tunnel provisioning on store creation | 8 | P2 |
+| — | Electron: SetupWizardPage — setup-key redemption flow | 8 | P1 |
 
 ---
 
 # Sprint Archive
+
+## Sprint 2026-W35 (25 Aug – 29 Aug 2026) — completed
+
+**Committed:** 8 SP | **Done:** 16 SP (overdelivered with agent team)
+
+- WO-20260827-agent-skills-reconfig ✅ — Reconfigure team skills + SP system
+- WO-20260827-arch-docs-cf-tunnel ✅ — Update all docs to reflect CF Tunnel + smart client arch
+- WO-20260827-worker-two-component ✅ — Clarify Worker API vs service orchestration split
+- WO-20260827-cf-tunnel-migration ✅ — CF Tunnel migration end-to-end
 
 ## Sprint 0 (completed)
 - Repo + submodule structure

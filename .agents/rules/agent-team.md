@@ -26,4 +26,4 @@ See full org chart, routing, and skills list: `.agents/AGENTS.md`
 | agent-team | `.agents/skills/eng-manager/SKILL.md` |
 | work-order | `.agents/skills/work-order/SKILL.md` |
 | handoff | `.agents/skills/handoff/SKILL.md` |
-| context-budget | `.agents/skills/context-budget/SKILL.md` |
+

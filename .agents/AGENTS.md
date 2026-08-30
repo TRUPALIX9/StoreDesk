@@ -37,7 +37,7 @@ electron   server    flutter
 | Engineering Manager | `skills/eng-manager/SKILL.md` | Intake, WO create/close, routing, unblocking |
 | Tech Lead | `skills/tech-lead/SKILL.md` | Cross-repo architecture, API contracts, spikes |
 | Frontend Electron | `skills/frontend-electron/SKILL.md` | `store-desk-electron/` React/MUI |
-| Backend Server | `skills/backend-server/SKILL.md` | `store-desk-worker/` Express/Mongo |
+| Backend Server | `skills/backend-server/SKILL.md` | `store-desk-worker/` Express/SQLite |
 | Mobile Flutter | `skills/mobile-flutter/SKILL.md` | `store-desk-mobile/` Flutter + Android Studio |
 | UI/UX Designer | `skills/ui-ux-designer/SKILL.md` | Design critique (read-only by default) |
 | QA Verifier | `skills/qa-verifier/SKILL.md` | CI checks, test pass/fail, risk notes |
@@ -54,7 +54,7 @@ electron   server    flutter
 | Visual redesign / layout review | `ui-ux-designer` → implementer |
 | Electron pages, MUI, theme, ManageWorkerPage | `frontend-electron` |
 | service orchestration / cloudflared / OS service lifecycle (Electron main process) | `frontend-electron` |
-| Worker API routes, Mongo, services | `backend-server` |
+| Worker API routes, SQLite, services | `backend-server` |
 | Flutter screens, scan, product lookup | `mobile-flutter` |
 | Android Studio / Gradle / build | `mobile-flutter` |
 | "Did it pass CI?" | `qa-verifier` |
@@ -101,7 +101,7 @@ Fibonacci only: 1, 2, 3, 5, 8, 13, 21. Sprint = 1 week. Capacity: 20 SP solo / 3
 ## Non-negotiables (never violate)
 
 2. **Submodule rule** — code changes inside the correct submodule; commit + push there; then bump parent pointer.
-3. **Branches** — `develop` (integration) and `production` (stable). Never push directly to `production` without QA.
+3. **Branches & Production Rule** — Work, commits, and pushes MUST ALWAYS go to `develop`. NEVER merge or push to `production` unless explicitly instructed by the user. Maintain `docs/develop-to-prod.md` to document all changes queued on `develop` ready for production PRs.
 4. **Mobile / Web server URL** — always `https://<store-id>.storedesk.net` (Cloudflare Tunnel). Never raw LAN IP. Never `localhost`. Electron uses `http://localhost:4310` directly (same store PC).
 6. **Naming** — StoreDesk (desktop), StoreDesk Worker (edge API), StoreDesk Mobile (Flutter), StoreDesk Web.
 7. **Releases** — Before cutting a new release, always update the `LATEST_RELEASE_TAG` constant in `store-desk-web/src/app/download/DownloadClient.tsx` to match the new version tag.
