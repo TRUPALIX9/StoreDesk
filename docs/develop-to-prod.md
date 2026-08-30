@@ -9,7 +9,7 @@ This document tracks all features, bug fixes, and API contract updates currently
 ## Queued Release Items (develop branch)
 
 ### 1. Developer Setup & Account Provisioning
-- **Developer Account**: Automatically provisions `development@demo.com` with password `demo@1` as a verified AppUser in MongoDB on worker startup.
+- **Developer Account**: Automatically provisions `development@demo.com` with password `demo@1` as a verified AppUser in **SQLite (Prisma)** on Worker startup (`ensureDeveloperUser()`). Note: prior docs said MongoDB — actual datasource is SQLite.
 - **Developer Tunnel**: Default Cloudflare Tunnel fallback configured to `https://develop.storedesk.net` across Worker sealed config and client endpoints.
 
 ### 2. Live Verifone Commander Integration

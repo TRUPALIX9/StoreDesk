@@ -1,23 +1,12 @@
 # StoreDesk Database Schema
 
-MongoDB collections (Mongoose). All documents use `createdAt` / `updatedAt` unless noted.
+> **⚠️ Correction (2026-08-30):** StoreDesk Worker uses **Prisma + SQLite**, not MongoDB/Mongoose.  
+> Source of truth: [`store-desk-worker/prisma/schema.prisma`](../store-desk-worker/prisma/schema.prisma)  
+> StoreDesk Web (Vercel) uses **Atlas MongoDB via Mongoose** for org/license data only.
 
-## ER Diagram
+## Tables (Prisma / SQLite — Worker)
 
-```mermaid
-erDiagram
-    Product ||--o{ ProductVariant : "has many"
-    ProductVariant ||--o{ VendorPrice : "priced by"
-    Vendor ||--o{ VendorPrice : "offers"
-    PricingRule }|--|| Product : "scopes to"
-    PricingRule }|--|| ProductVariant : "scopes to"
-    PriceBookEntry }|--|| Product : "overlays"
-    POSDailySummary ||--o{ Transaction : "aggregates"
-    IntegrationSettings ||--o| POSDailySummary : "syncs"
-    MobileDevice }|--|| Store : "pairs to"
-```
-
-## Collections
+All models include `organizationId` + `storeId` scope fields. All include `createdAt`. Most include `updatedAt`.
 
 ```txt
 Product
@@ -29,10 +18,13 @@ MobileDevice
 PriceBookEntry
 POSDailySummary
 Transaction
+POSMonthlyReport
 IntegrationSettings
+User
 ```
 
-No `Inventory`, `StockMovement`, or stock-related collections.
+No `Inventory`, `StockMovement`, `Invoice`, `InvoiceItem`, or stock-related tables.  
+Invoice and InvoiceItem models exist in AGENTS.md spec but are **not yet implemented** in the Prisma schema.
 
 ---
 
