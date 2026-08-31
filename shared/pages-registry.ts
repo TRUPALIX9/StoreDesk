@@ -182,15 +182,6 @@ export const ELECTRON_PAGES: PageDefinition[] = [
     knownFeatureFlags: {},
   },
   {
-    key: "userManagement",
-    label: "User Management",
-    description: "App user roles, assignment management, and session controls.",
-    app: "electron",
-    filePath: "src/pages/UserManagementPage.tsx",
-    defaultEnabled: false,
-    knownFeatureFlags: {},
-  },
-  {
     key: "settings",
     label: "Settings",
     description: "Store settings — POS config, receipt template, tax rates, and preferences.",
