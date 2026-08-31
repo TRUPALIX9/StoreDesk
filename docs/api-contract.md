@@ -179,12 +179,14 @@ Web admin and diagnostic UI/API always present the hierarchy `Organization → S
 | POST | `/api/v1/app-auth/sessions` | Issues a short-lived audience/role/assignment/device-scoped Hub session for one granted ready assignment |
 | POST | `/api/v1/app-auth/refresh` | Rotates refresh credential and rechecks user, assignment, device, installation, and subscription status |
 | POST | `/api/v1/app-auth/logout` | Revokes current refresh credential/session and clears device session state |
+| GET | `/api/v1/admin/organizations/:organizationId/roles` | Retrieves Organization-wide custom roles stored in MongoDB |
+| PUT | `/api/v1/admin/organizations/:organizationId/roles` | Updates Organization-wide custom roles with name, ID, and Electron/Mobile page access keys |
 | POST | `/api/v1/admin/app-users/:appUserId/disable` | Disables app account and revokes all refresh credentials/sessions |
 | POST | `/api/v1/admin/app-users/:appUserId/reissue-enrollment` | Central admin revokes prior enrollment/recovery material and emails a replacement; no self-service reset |
 | DELETE | `/api/v1/admin/client-devices/:deviceId` | Revokes a device and all of its sessions |
 | GET | `/api/v1/admin/organizations/:organizationId/stores/:storeId/worker-installations/:workerInstallationId/sessions` | Hierarchy-scoped safe session/device audit |
 
-Login with one active assignment auto-selects it. Multiple assignments return only authorized hierarchy/display snapshots and require an explicit `assignmentId` selection; arbitrary Worker IDs are rejected. Zero assignments, disabled user/device, revoked assignment, suspended subscription, or non-ready Worker returns a stable denial/offline status without leaking other tenants.
+Login with one active assignment auto-selects it. Multiple assignments return only authorized hierarchy/display snapshots and require an explicit `assignmentId` selection; arbitrary Worker IDs are rejected. Zero assignments, disabled user/device, revoked assignment, suspended subscription, or non-ready Worker returns a stable denial/offline status without leaking other tenants. First user in an organization is automatically assigned the `org_admin` role.
 
 AppUser enrollment credentials are distinct from Worker setup keys and bind only the intended AppUser email/device enrollment. They are high-entropy, short-lived, single-use, hashed at rest, redacted, rate-limited, and cannot redeem a Worker or access Web admin. Password/account recovery is central-admin reissue into Electron/Mobile, not a customer Web password-reset portal.
 
@@ -202,8 +204,16 @@ Relay-session exchange response:
   "storeId": "SD-PLACEHOLDER",
   "workerInstallationId": "winst_<uuid>",
   "assignmentId": "assign_<id>",
-  "role": "app_user",
-  "scopes": ["relay:request"]
+  "role": "org_admin",
+  "scopes": ["relay:request"],
+  "roleAccess": {
+    "roleName": "Organization Admin",
+    "roleId": "org_admin",
+    "accessKeys": {
+      "electron": { "pages": [{ "key": "pos", "enabled": true, "featureFlags": { "enableRefunds": true } }] },
+      "mobile": { "pages": [{ "key": "mobilePos", "enabled": true, "featureFlags": { "enableManualEntry": true } }] }
+    }
+  }
 }
 ```
 

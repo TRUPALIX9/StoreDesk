@@ -258,3 +258,30 @@ Persisted POS integration configuration, Commander IP/credentials, and import tr
 | organizationId, storeId | string | required, indexed |
 | commander | object | `host`, `username`, `password` |
 | lastImportSource, lastImportAt | string | sync metadata |
+
+---
+
+## ControlPlane Models (MongoDB — StoreDesk Web)
+
+Models stored in MongoDB Atlas via Mongoose by `store-desk-web`:
+
+### Organization
+| Field | Type | Notes |
+|-------|------|-------|
+| organizationId | string | Primary public ID (e.g. `org_...`) |
+| name | string | Organization display name |
+| slug | string | Unique URL slug |
+| billingEmail | string | Billing contact email |
+| status | string | `pending`, `active`, `suspended` |
+| roles | Array<Role> | Organization-wide custom roles (stores `roleName`, `roleId`, `accessKeys`) |
+
+### UserAssignment
+| Field | Type | Notes |
+|-------|------|-------|
+| assignmentId | string | Primary public ID (e.g. `asn_...`) |
+| appUserId | string → AppUser | Target user ID |
+| organizationId | string → Organization | Scope |
+| storeId | string → TenantStore | Assigned store |
+| role | string | Role ID matching `Organization.roles[].roleId` (e.g. `org_admin` or custom roleId) |
+| status | string | `active`, `revoked` |
+

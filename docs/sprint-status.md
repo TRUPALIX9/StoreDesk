@@ -10,13 +10,11 @@ Updated: 2026-08-30
 
 - Full-repo audit + system-map / schema / sprint docs update — docs-scribe — ✅ done (this run)
 
-## Blocked
-
-_(none)_
-
 ## Done This Sprint
 
-- Full-repo audit 2026-08-30 — docs-scribe — QA: PASS
+- Organization-Wide Custom Roles & Canonical Page Registry (22 pages) — ✅ done (2026-08-30)
+- End-to-End cleanup of legacy lotterySetup page across all apps — ✅ done (2026-08-30)
+- Auto-assignment of org_admin role to 1st org user — ✅ done (2026-08-30)
 
 ## Done Last Sprint (W35)
 
