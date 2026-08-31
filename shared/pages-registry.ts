@@ -168,15 +168,6 @@ export const ELECTRON_PAGES: PageDefinition[] = [
     },
   },
   {
-    key: "lotterySetup",
-    label: "Lottery Setup",
-    description: "Lottery product and scratch ticket configuration for the store.",
-    app: "electron",
-    filePath: "src/pages/LotterySetupPage.tsx",
-    defaultEnabled: false,
-    knownFeatureFlags: {},
-  },
-  {
     key: "manageWorker",
     label: "Manage Worker",
     description: "Edge server status, service controls, logs, and Cloudflare Tunnel status.",
