@@ -62,6 +62,10 @@ export interface PageDefinition {
    */
   defaultEnabled: boolean;
   /**
+   * If true, this core page is always accessible in navigation and cannot be disabled.
+   */
+  alwaysEnabled?: boolean;
+  /**
    * Named feature flags that can be toggled independently per page per role.
    * The app reads these at runtime from pageEntry.featureFlags[key].
    *
@@ -96,6 +100,7 @@ export const ELECTRON_PAGES: PageDefinition[] = [
     app: "electron",
     filePath: "src/pages/DashboardPage.tsx",
     defaultEnabled: true,
+    alwaysEnabled: true,
     knownFeatureFlags: {},
   },
   {
@@ -192,6 +197,7 @@ export const ELECTRON_PAGES: PageDefinition[] = [
     app: "electron",
     filePath: "src/pages/SettingsPage.tsx",
     defaultEnabled: true,
+    alwaysEnabled: true,
     knownFeatureFlags: {},
   },
 ];
@@ -220,6 +226,7 @@ export const MOBILE_PAGES: PageDefinition[] = [
     app: "mobile",
     filePath: "lib/features/dashboard/dashboard_screen.dart",
     defaultEnabled: true,
+    alwaysEnabled: true,
     knownFeatureFlags: {},
   },
   {
