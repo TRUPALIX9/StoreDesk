@@ -23,3 +23,16 @@ This document tracks all features, bug fixes, and API contract updates currently
 ### 4. UI & Form Enhancements
 - **Price Book Forms**: `vendorHackney` returnable status toggle pre-filled in item form; UPC modifier pre-filled cleanly when adding new variants.
 - **Electron Pre-fill**: Pre-fills `development@demo.com` (`demo@1`) on `AppUserLoginPage`.
+
+---
+
+## Production Release History
+
+### Release Date: 2026-08-31
+**Submodules Released:** `store-desk-web`
+- **Features Included:** 
+  - Restructured Roles/Access Control UI (Config/Views split).
+  - Renamed `serviceManagerVersion` to `electronVersion` for clarity.
+  - Implemented automatic Cloudflare Tunnel cleanup logic via API on organization delete.
+  - Removed old "Enrollment Key" system for AppUsers; replaced with direct password assignment upon invitation.
+  - Reduced horizontal table bloat (Org IDs and Store IDs moved to tooltips).
