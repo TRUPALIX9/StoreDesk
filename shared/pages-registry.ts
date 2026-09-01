@@ -297,6 +297,16 @@ export const MOBILE_PAGES: PageDefinition[] = [
     defaultEnabled: false,
     knownFeatureFlags: {},
   },
+  {
+    key: "mobileSettings",
+    label: "Settings",
+    description: "Mobile app settings, preferences, and debugging.",
+    app: "mobile",
+    filePath: "lib/features/settings/settings_screen.dart",
+    defaultEnabled: true,
+    alwaysEnabled: true,
+    knownFeatureFlags: {}
+  }
 ];
 
 // ─── COMBINED REGISTRY ────────────────────────────────────────────────────────
