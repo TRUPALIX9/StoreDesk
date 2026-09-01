@@ -69,7 +69,7 @@ EULA/privacy/system acknowledgements are submitted only during setup-key redempt
     "workerInstallationId": "winst_<uuid>",
     "platform": "windows|macos|linux",
     "workerVersion": "1.2.3",
-    "serviceManagerVersion": "1.2.3"
+    "electronVersion": "1.2.3"
   }
 }
 ```
