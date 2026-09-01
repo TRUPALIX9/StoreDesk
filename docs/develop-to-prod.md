@@ -36,3 +36,4 @@ This document tracks all features, bug fixes, and API contract updates currently
   - Implemented automatic Cloudflare Tunnel cleanup logic via API on organization delete.
   - Removed old "Enrollment Key" system for AppUsers; replaced with direct password assignment upon invitation.
   - Reduced horizontal table bloat (Org IDs and Store IDs moved to tooltips).
+  - Updated About page copy to include Trupal Patel's founder story.
