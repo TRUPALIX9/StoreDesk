@@ -143,15 +143,6 @@ export const ELECTRON_PAGES: PageDefinition[] = [
     knownFeatureFlags: {},
   },
   {
-    key: "pricingRules",
-    label: "Pricing Rules",
-    description: "Margin/markup rules, rounding configuration, and scope-based overrides.",
-    app: "electron",
-    filePath: "src/pages/PricingRulesPage.tsx",
-    defaultEnabled: true,
-    knownFeatureFlags: {},
-  },
-  {
     key: "costAnalysis",
     label: "Cost Analysis",
     description: "True cost comparison across vendors — price per item, per pack, per unit.",
